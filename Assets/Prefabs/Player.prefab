@@ -45,6 +45,7 @@ GameObject:
   - component: {fileID: 438285571990529212}
   - component: {fileID: 7881608528124680515}
   - component: {fileID: 1721975736593546506}
+  - component: {fileID: 653464733472787873}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -161,12 +162,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walkSpeed: 40
   jumpForce: 45
+  jumpBufferFrames: 8
+  coyoteTime: 0.1
+  maxAirJumps: 1
+  maxFallingSpeed: -10
   groundCheckPoint: {fileID: 6081919134884060294}
   groundCheckY: 0.2
   groundCheckX: 0.5
   whatIsGround:
     serializedVersion: 2
     m_Bits: 64
+  dashSpeed: 30
+  dashTime: 0.2
+  dashCooldown: 0.1
+  dashEffect: {fileID: 8902779006071723231, guid: 9042fa1c9d75d430788014ec956f31d3, type: 3}
+  pState: {fileID: 0}
   rb: {fileID: 0}
 --- !u!70 &7881608528124680515
 CapsuleCollider2D:
@@ -253,3 +263,24 @@ MonoBehaviour:
   - {x: 0.5, y: -0.5, z: 0}
   - {x: 0.5, y: 0.5, z: 0}
   - {x: -0.5, y: 0.5, z: 0}
+--- !u!95 &653464733472787873
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7263213754260323155}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 2a0afbbd0627d44429b8646024a41234, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
