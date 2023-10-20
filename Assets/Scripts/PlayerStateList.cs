@@ -12,5 +12,11 @@ public class PlayerStateList : MonoBehaviour
     public bool healing;
     public bool casting;
     public bool cutscene = false;
-    public bool alive;
+    public bool alive = true; // Default to alive
+
+    // You can use the Awake method to initialize properties.
+    private void Awake()
+    {
+        // Set any other initializations here if needed.
+    }
 }
