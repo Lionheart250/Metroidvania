@@ -316,8 +316,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 249141535
+  m_SortingLayer: 2
   m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: 0738b4e1e84a34b8cad6bdce42a7e16a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -353,9 +353,9 @@ Rigidbody2D:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!114 &438285571990529212
 MonoBehaviour:
@@ -407,7 +407,7 @@ MonoBehaviour:
   recoilYSteps: 10
   recoilXSpeed: 100
   recoilYSpeed: 100
-  health: 5
+  health: 0
   maxHealth: 10
   maxTotalHealth: 10
   heartShards: 0
@@ -498,7 +498,7 @@ MonoBehaviour:
   m_Intensity: 3
   m_LightVolumeIntensity: 1
   m_LightVolumeIntensityEnabled: 0
-  m_ApplyToSortingLayers: e906945c
+  m_ApplyToSortingLayers: e906945cf1fbf0c71f99d90eaf04f04a
   m_LightCookieSprite: {fileID: 0}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
   m_LightOrder: 0

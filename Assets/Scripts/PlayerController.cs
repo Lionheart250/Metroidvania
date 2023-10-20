@@ -114,9 +114,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float manaGain;
     public bool halfMana;
 
-    public ManaOrbsHandler manaOrbsHandler;
-    public int orbShard;
-    public int manaOrbs;
+    //public ManaOrbsHandler manaOrbsHandler;
+    //public int orbShard;
+    //public int manaOrbs;
     [Space(5)]
 
 
@@ -213,17 +213,18 @@ public class PlayerController : MonoBehaviour
     }
     void Update()
     {
+        if (pState.cutscene) return;
         if(pState.alive)
          GetInputs();
          UpdateJumpVariables();
-         
+         RestoreTimeScale();
          if (pState.dashing) return;
          Flip();
          Move();
          Jump();
          StartDash();
          Attack();
-         RestoreTimeScale();
+         
          FlashWhileInvincible();
          Heal();
          CastSpell();
@@ -307,6 +308,27 @@ public class PlayerController : MonoBehaviour
         pState.dashing = false;
         yield return new WaitForSeconds(dashCooldown);
         canDash = true;
+    }
+
+    public IEnumerator WalkIntoNewScene(Vector2 _exitDir, float _delay)
+    {
+        //If exit direction is upwards
+        if(_exitDir.y != 0)
+        {
+            rb.velocity = jumpForce * _exitDir;
+        }
+
+        //If exit direction requires horizontal movement
+        if(_exitDir.x != 0)
+        {
+            xAxis = _exitDir.x > 0 ? 1 : -1;
+
+            Move();
+        }
+
+        Flip();
+        yield return new WaitForSeconds(_delay);
+        pState.cutscene = false;
     }
 
     void Attack()
@@ -573,7 +595,7 @@ IEnumerator StopTakingDamage()
     public void RestoreMana()
     {
         halfMana = false;
-        UIManager.Instance.SwitchMana(UIManager.ManaState.FullMana);
+       // UIManager.Instance.SwitchMana(UIManager.ManaState.FullMana);
     }
 
     void Heal()
@@ -592,8 +614,8 @@ IEnumerator StopTakingDamage()
             }
 
             //drain mana
-            manaOrbsHandler.usedMana = true;
-            manaOrbsHandler.countDown = 3f;
+            //manaOrbsHandler.usedMana = true;
+            //manaOrbsHandler.countDown = 3f;
             Mana -= Time.deltaTime * manaDrainSpeed;
         }
         else

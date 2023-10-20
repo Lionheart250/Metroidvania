@@ -1,0 +1,170 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &6089599224808845458
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3398537252002304321, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_Name
+      value: Charger Variant
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304321, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_TagString
+      value: Enemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304324, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_BodyType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304324, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304324, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_CollisionDetection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304325, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 99e80bf4b73d98340b381b73fec53b6a, type: 3}
+    - target: {fileID: 3398537252002304325, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_SortingLayer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304325, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_SortingOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304325, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 249141535
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304326, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -31.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304326, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304326, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304326, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.999962
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304326, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304326, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304326, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.008726558
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304326, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304326, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304326, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304327, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: damage
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304327, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: ledgeCheckX
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304327, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: ledgeCheckY
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304327, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: flipWaitTime
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304328, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_Size.x
+      value: 4.79
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304328, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_Size.y
+      value: 5.87
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304328, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_Offset.y
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304328, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.x
+      value: 5.29
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304328, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.y
+      value: 5.58
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304329, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 8f90dd38e833e4d35bac949959c6d884, type: 2}
+    m_RemovedComponents:
+    - {fileID: 3398537252002304327, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3398537252002304321, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8756753723086063971}
+  m_SourcePrefab: {fileID: 100100000, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+--- !u!1 &8910545193787072979 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3398537252002304321, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+  m_PrefabInstance: {fileID: 6089599224808845458}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8756753723086063971
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8910545193787072979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfce8408e209a4be8bbcff4c2d00cc4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 10
+  recoilLength: 0.1
+  recoilFactor: 0.75
+  isRecoiling: 0
+  speed: 15
+  damage: 2
+  orangeBlood: {fileID: 3739910812526775868, guid: 4e4dbde8bf42f4e8ea7bd8f97379924f, type: 3}
+  hurtSound: {fileID: 0}
+  rb: {fileID: 0}
+  anim: {fileID: 0}
+  ledgeCheckX: 2.4
+  ledgeCheckY: 3
+  chargeSpeedMultiplier: 6
+  chargeDuration: 10
+  jumpForce: 20
+  whatIsGround:
+    serializedVersion: 2
+    m_Bits: 64
