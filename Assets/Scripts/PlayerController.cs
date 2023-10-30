@@ -114,9 +114,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float manaGain;
     public bool halfMana;
 
-    //public ManaOrbsHandler manaOrbsHandler;
-    //public int orbShard;
-    //public int manaOrbs;
+    public ManaOrbsHandler manaOrbsHandler;
+    public int orbShard;
+    public int manaOrbs;
     [Space(5)]
 
 
@@ -213,23 +213,58 @@ public class PlayerController : MonoBehaviour
     }
     void Update()
     {
+        if (GameManager.Instance.gameIsPaused) return;
+
         if (pState.cutscene) return;
         if(pState.alive)
-         GetInputs();
-         UpdateJumpVariables();
-         RestoreTimeScale();
-         UpdateCameraYDampForPlayerFall();
-         if (pState.dashing) return;
-         Flip();
-         Move();
-         Jump();
-         StartDash();
-         Attack();
-         
-         FlashWhileInvincible();
-         Heal();
-         CastSpell();
-          
+        {
+            GetInputs();
+            ToggleMap();
+           // ToggleInventory();
+        }
+        
+        UpdateJumpVariables();
+        RestoreTimeScale();
+        UpdateCameraYDampForPlayerFall();
+
+        if (pState.alive)
+        {
+            Heal();
+        }
+
+        if (pState.dashing || pState.healing) return;
+
+        if(pState.alive)
+        {
+            if(!isWallJumping)
+            {
+                Flip();
+                Move();
+                Jump();
+            }
+           // if(unlockedWallJump)
+           // {
+               // WallSlide();
+               // WallJump();
+            //}
+            if(unlockedDash)
+            {
+                StartDash();
+            }            
+            Attack();
+            CastSpell();
+        }        
+        FlashWhileInvincible();     
+        
+        if(Input.GetKeyDown(KeyCode.L))
+        {
+            Health = 0;
+            StartCoroutine(Death());
+        }
+        if (manaOrbs > 3)
+        {
+            manaOrbs = 3;
+        }
     }
 
     private void FixedUpdate()
@@ -253,9 +288,22 @@ public class PlayerController : MonoBehaviour
        xAxis = Input.GetAxisRaw("Horizontal");
        yAxis = Input.GetAxisRaw("Vertical");
        attack = Input.GetButtonDown("Attack");
+       openMap = Input.GetButton("Map");
        if (Input.GetButton("Cast/Heal"))
         {
             castOrHealTimer += Time.deltaTime;
+        }
+    }
+
+    void ToggleMap()
+    {
+        if(openMap)
+        {
+            UIManager.Instance.mapHandler.SetActive(true);
+        }
+        else
+        {
+            UIManager.Instance.mapHandler.SetActive(false);
         }
     }
     
@@ -401,10 +449,10 @@ public class PlayerController : MonoBehaviour
                         Mana += manaGain;
                     }
 
-                   // if(Mana >= 1 || (halfMana && Mana >= 0.5))
-                   // {
-                  //      manaOrbsHandler.UpdateMana(manaGain * 3);
-                   // }
+                    if(Mana >= 1 || (halfMana && Mana >= 0.5))
+                    {
+                        manaOrbsHandler.UpdateMana(manaGain * 3);
+                    }
                                         
                 }
             }
@@ -581,15 +629,15 @@ IEnumerator StopTakingDamage()
         Time.timeScale = 1f;
         GameObject _bloodSpurtParticles = Instantiate(bloodSpurt, transform.position, Quaternion.identity);
         Destroy(_bloodSpurtParticles, 1.5f);
-        //anim.SetTrigger("Death");
+        anim.SetTrigger("Death");
 
         yield return new WaitForSeconds(0.9f);
-        //StartCoroutine(UIManager.Instance.ActivateDeathScreen());
+        StartCoroutine(UIManager.Instance.ActivateDeathScreen());
 
         yield return new WaitForSeconds(0.1f);
-        //Instantiate(GameManager.Instance.shade, transform.position, Quaternion.identity);
+        Instantiate(GameManager.Instance.shade, transform.position, Quaternion.identity);
 
-        //SaveData.Instance.SavePlayerData();
+        SaveData.Instance.SavePlayerData();
 
     }
 
@@ -610,10 +658,23 @@ IEnumerator StopTakingDamage()
         }
     }
 
+    public void Respawned()
+    {
+        if(!pState.alive)
+        {
+            pState.alive = true;
+            halfMana = true;
+            UIManager.Instance.SwitchMana(UIManager.ManaState.HalfMana);
+            Mana = 0;
+            Health = maxHealth;
+            anim.Play("Player_Idle");
+        }
+    }
+
     public void RestoreMana()
     {
         halfMana = false;
-       // UIManager.Instance.SwitchMana(UIManager.ManaState.FullMana);
+        UIManager.Instance.SwitchMana(UIManager.ManaState.FullMana);
     }
 
     void Heal()
@@ -632,8 +693,8 @@ IEnumerator StopTakingDamage()
             }
 
             //drain mana
-            //manaOrbsHandler.usedMana = true;
-            //manaOrbsHandler.countDown = 3f;
+            manaOrbsHandler.usedMana = true;
+            manaOrbsHandler.countDown = 3f;
             Mana -= Time.deltaTime * manaDrainSpeed;
         }
         else
@@ -718,8 +779,8 @@ IEnumerator StopTakingDamage()
             pState.recoilingX = true;
 
             Mana -= manaSpellCost;
-           // manaOrbsHandler.usedMana = true;
-           // manaOrbsHandler.countDown = 3f;
+            manaOrbsHandler.usedMana = true;
+            manaOrbsHandler.countDown = 3f;
             yield return new WaitForSeconds(0.35f);
         }
 
@@ -733,8 +794,8 @@ IEnumerator StopTakingDamage()
             rb.velocity = Vector2.zero;
 
             Mana -= manaSpellCost;
-            //manaOrbsHandler.usedMana = true;
-           // manaOrbsHandler.countDown = 3f;
+            manaOrbsHandler.usedMana = true;
+            manaOrbsHandler.countDown = 3f;
             yield return new WaitForSeconds(0.35f);
         }
 
@@ -747,8 +808,8 @@ IEnumerator StopTakingDamage()
             downSpellFireball.SetActive(true);
 
             Mana -= manaSpellCost;
-            //manaOrbsHandler.usedMana = true;
-           // manaOrbsHandler.countDown = 3f;
+            manaOrbsHandler.usedMana = true;
+            manaOrbsHandler.countDown = 3f;
             yield return new WaitForSeconds(0.35f);
         }
 

@@ -13,8 +13,11 @@ public class SceneTransition : MonoBehaviour
 
     [SerializeField] private float exitTime;
 
+    
+
+
     // Start is called before the first frame update
-    private void Start()
+    private void awake()
     {
         if(GameManager.Instance.transitionedFromScene == transitionTo)
         {
@@ -22,7 +25,6 @@ public class SceneTransition : MonoBehaviour
 
             StartCoroutine(PlayerController.Instance.WalkIntoNewScene(exitDirection, exitTime));
         }
-
         StartCoroutine(UIManager.Instance.sceneFader.Fade(SceneFader.FadeDirection.Out));
     }
 
@@ -30,11 +32,25 @@ public class SceneTransition : MonoBehaviour
     {
         if (_other.CompareTag("Player"))
         {
+            CheckShadeData();
+
             GameManager.Instance.transitionedFromScene = SceneManager.GetActiveScene().name;
 
             PlayerController.Instance.pState.cutscene = true;
 
             StartCoroutine(UIManager.Instance.sceneFader.FadeAndLoadScene(SceneFader.FadeDirection.In, transitionTo));
+        }
+    }
+    void CheckShadeData()
+    {
+        GameObject[] enemyObjects = GameObject.FindGameObjectsWithTag("Enemy");
+
+        for (int i = 0; i < enemyObjects.Length; i++)
+        {
+            if (enemyObjects[i].GetComponent<Shade>() != null)
+            {
+                SaveData.Instance.SaveShadeData();
+            }
         }
     }
 }

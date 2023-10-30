@@ -419,6 +419,9 @@ MonoBehaviour:
   manaDrainSpeed: 0.2
   manaGain: 0.3
   halfMana: 0
+  manaOrbsHandler: {fileID: 0}
+  orbShard: 0
+  manaOrbs: 3
   manaSpellCost: 0.3
   timeBetweenCast: 0.5
   spellDamage: 5
@@ -434,11 +437,11 @@ MonoBehaviour:
   hurtSound: {fileID: 0}
   pState: {fileID: 0}
   rb: {fileID: 0}
-  unlockedWallJump: 0
-  unlockedDash: 0
-  unlockedVarJump: 0
-  unlockedSideCast: 0
-  unlockedUpCast: 0
+  unlockedWallJump: 1
+  unlockedDash: 1
+  unlockedVarJump: 1
+  unlockedSideCast: 1
+  unlockedUpCast: 1
   unlockedDownCast: 0
 --- !u!70 &7881608528124680515
 CapsuleCollider2D:
