@@ -22,24 +22,36 @@ public class CameraManager : MonoBehaviour
     public static CameraManager Instance { get; private set; }
 
     private void Awake()
+{
+    if (Instance == null)
     {
-        if(Instance == null)
-        {
-            Instance = this;
-        }
-
-        for(int i = 0; i < allVirtualCameras.Length; i++)
-        {
-            if (allVirtualCameras[i].enabled)
-            {
-                currentCamera = allVirtualCameras[i];
-
-                framingTransposer = currentCamera.GetCinemachineComponent<CinemachineFramingTransposer>();
-            }
-        }
-
-        normalYDamp = framingTransposer.m_YDamping;
+        Instance = this;
     }
+
+    bool openRoomCameraFound = false;
+
+    // Search for the 'Open Room Camera' specifically
+    foreach (var camera in allVirtualCameras)
+    {
+        if (camera.name == "Open Room Camera") {
+            currentCamera = camera;
+            framingTransposer = currentCamera.GetCinemachineComponent<CinemachineFramingTransposer>();
+            openRoomCameraFound = true;
+            break; // Exit the loop once the camera is found
+        }
+    }
+
+    if (!openRoomCameraFound && allVirtualCameras.Length > 0) {
+        // If 'Open Room Camera' is not found, default to the first camera in the array
+        currentCamera = allVirtualCameras[0];
+        framingTransposer = currentCamera.GetCinemachineComponent<CinemachineFramingTransposer>();
+    }
+
+    normalYDamp = framingTransposer.m_YDamping;
+}
+
+
+
 
     private void Start()
     {

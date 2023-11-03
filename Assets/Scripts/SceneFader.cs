@@ -72,16 +72,9 @@ public class SceneFader : MonoBehaviour
     }
 
     void SetColorImage(ref float _alpha, FadeDirection _fadeDirection)
-{
-    if (fadeOutUIImage != null)
     {
         fadeOutUIImage.color = new Color(fadeOutUIImage.color.r, fadeOutUIImage.color.g, fadeOutUIImage.color.b, _alpha);
 
         _alpha += 0.02f * (_fadeDirection == FadeDirection.Out ? -1 : 1);
     }
-    else
-    {
-        // Handle the case when fadeOutUIImage is null (e.g., log an error message).
-    }
-}
 }

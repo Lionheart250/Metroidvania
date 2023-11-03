@@ -191,16 +191,33 @@ public class PlayerController : MonoBehaviour
 
     // Start is called before the first frame update
     void Start()
-    {     pState = GetComponent<PlayerStateList>();
-    
-          rb = GetComponent<Rigidbody2D>();
-          sr = GetComponent<SpriteRenderer>();
-          anim = GetComponent<Animator>();
-          gravity = rb.gravityScale;
-          Health = maxHealth;
-          Mana = mana;
-          manaStorage.fillAmount = Mana;
+    {
+        pState = GetComponent<PlayerStateList>();
 
+        rb = GetComponent<Rigidbody2D>();
+        sr = GetComponent<SpriteRenderer>();
+        audioSource = GetComponent<AudioSource>();
+        gravity = rb.gravityScale;
+        anim = GetComponent<Animator>();
+        manaOrbsHandler = FindObjectOfType<ManaOrbsHandler>();
+
+        SaveData.Instance.LoadPlayerData();
+        if(manaOrbs > 3)
+        {
+            manaOrbs = 3;
+        }
+        if (halfMana)
+        {
+            UIManager.Instance.SwitchMana(UIManager.ManaState.HalfMana);
+        }
+
+        gravity = rb.gravityScale;
+
+        Mana = mana;
+        manaStorage.fillAmount = Mana;
+
+        Health = maxHealth;
+        Debug.Log(transform.position);
     }
 
     // Update is called once per frame
@@ -220,7 +237,7 @@ public class PlayerController : MonoBehaviour
         {
             GetInputs();
             ToggleMap();
-           // ToggleInventory();
+            //ToggleInventory();
         }
         
         UpdateJumpVariables();
@@ -242,11 +259,11 @@ public class PlayerController : MonoBehaviour
                 Move();
                 Jump();
             }
-           // if(unlockedWallJump)
-           // {
-               // WallSlide();
-               // WallJump();
-            //}
+            if(unlockedWallJump)
+            {
+                WallSlide();
+                WallJump();
+            }
             if(unlockedDash)
             {
                 StartDash();
@@ -679,7 +696,7 @@ IEnumerator StopTakingDamage()
 
     void Heal()
     {
-        if (Input.GetButton("Cast/Heal") && castOrHealTimer > 0.1f && Health < maxHealth && Mana > 0 && !pState.jumping && !pState.dashing)
+        if (Input.GetButton("Cast/Heal") && castOrHealTimer > 0.5f && Health < maxHealth && Mana > 0 && !pState.jumping && !pState.dashing)
         {
             pState.healing = true;
             anim.SetBool("Healing", true);
@@ -728,7 +745,7 @@ IEnumerator StopTakingDamage()
 
     void CastSpell()
     {
-        if (Input.GetButtonUp("Cast/Heal") && castOrHealTimer <= 0.1f && timeSinceCast >= timeBetweenCast && Mana >= manaSpellCost)
+        if (Input.GetButtonUp("Cast/Heal") && castOrHealTimer <= 0.5f && timeSinceCast >= timeBetweenCast && Mana >= manaSpellCost)
         {
             pState.casting = true;
             timeSinceCast = 0;
@@ -760,7 +777,7 @@ IEnumerator StopTakingDamage()
         //audioSource.PlayOneShot(spellCastSound);
 
         //side cast
-        if ((yAxis == 0 || (yAxis < 0 && Grounded())))// && unlockedSideCast)
+        if ((yAxis == 0 || (yAxis < 0 && Grounded())) && unlockedSideCast)
         {
             anim.SetBool("Casting", true);
             yield return new WaitForSeconds(0.15f);
@@ -785,7 +802,7 @@ IEnumerator StopTakingDamage()
         }
 
         //up cast
-        else if( yAxis > 0)// && unlockedUpCast)
+        else if( yAxis > 0 && unlockedUpCast)
         {
             anim.SetBool("Casting", true);
             yield return new WaitForSeconds(0.15f);
@@ -800,7 +817,7 @@ IEnumerator StopTakingDamage()
         }
 
         //down cast
-        else if((yAxis < 0 && !Grounded()))// && unlockedDownCast)
+        else if((yAxis < 0 && !Grounded()) && unlockedDownCast)
         {
             anim.SetBool("Casting", true);
             yield return new WaitForSeconds(0.15f);
@@ -843,7 +860,7 @@ IEnumerator StopTakingDamage()
             pState.jumping = true;
         }
         
-        if (!Grounded() && airJumpCounter < maxAirJumps && Input.GetButtonDown("Jump")) //&& unlockedVarJump)
+        if (!Grounded() && airJumpCounter < maxAirJumps && Input.GetButtonDown("Jump") && unlockedVarJump)
         {
             //audioSource.PlayOneShot(jumpSound);
 
@@ -895,4 +912,55 @@ IEnumerator StopTakingDamage()
         }
     }
     
+    private bool Walled()
+    {
+        return Physics2D.OverlapCircle(wallCheck.position, 0.2f, wallLayer);
+    }
+
+    void WallSlide()
+    {
+        if(Walled() && !Grounded() && xAxis != 0)
+        {
+            isWallSliding = true;
+            rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -wallSlidingSpeed, float.MaxValue));
+        }
+        else
+        {
+            isWallSliding = false;
+        }
+    }
+    void WallJump()
+    {
+        if(isWallSliding)
+        {
+            isWallJumping = false;
+            wallJumpingDirection = !pState.lookingRight ? 1 : -1;
+
+            CancelInvoke(nameof(StopWallJumping));
+        }
+
+        if (Input.GetButtonDown("Jump") && isWallSliding)
+        {
+            isWallJumping = true;
+            rb.velocity = new Vector2(wallJumpingDirection * wallJumpingPower.x, wallJumpingPower.y);
+
+            dashed = false;
+            airJumpCounter = 0;
+
+            if((pState.lookingRight && transform.eulerAngles.y == 0) || (!pState.lookingRight && transform.eulerAngles.y != 0))
+            {
+                pState.lookingRight = !pState.lookingRight;
+                int _yRotation = pState.lookingRight ? 0 : 180;
+
+                transform.eulerAngles = new Vector2(transform.eulerAngles.x, _yRotation);
+            }
+
+            Invoke(nameof(StopWallJumping), wallJumpingDuration);
+        }
+    }
+    void StopWallJumping()
+    {
+        isWallJumping = false;
+    }
 }
+

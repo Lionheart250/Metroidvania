@@ -13,11 +13,8 @@ public class SceneTransition : MonoBehaviour
 
     [SerializeField] private float exitTime;
 
-    
-
-
     // Start is called before the first frame update
-    private void awake()
+    private void Awake()
     {
         if(GameManager.Instance.transitionedFromScene == transitionTo)
         {

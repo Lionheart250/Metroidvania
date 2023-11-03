@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerStateList : MonoBehaviour
 {
+    public static PlayerStateList Instance; // Singleton reference
+
     public bool jumping = false;
     public bool dashing = false;
     public bool recoilingX, recoilingY;
@@ -14,9 +16,17 @@ public class PlayerStateList : MonoBehaviour
     public bool cutscene = false;
     public bool alive = true; // Default to alive
 
-    // You can use the Awake method to initialize properties.
     private void Awake()
     {
-        // Set any other initializations here if needed.
+        // Ensure there's only one instance of the PlayerStateList
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject); // Makes the object persist between scenes
+        }
+        else
+        {
+            Destroy(gameObject); // If another instance is found, destroy it
+        }
     }
 }

@@ -31,6 +31,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8393741681737554738}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3625483626110136204
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6347059120626767168}
+  m_Layer: 0
+  m_Name: Wall Check
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6347059120626767168
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3625483626110136204}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.7, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8393741681737554738}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3657150963780276792
 GameObject:
   m_ObjectHideFlags: 0
@@ -60,7 +91,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 20, y: 20, z: 1}
+  m_LocalScale: {x: 25, y: 50, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8393741681737554738}
@@ -276,6 +307,7 @@ Transform:
   - {fileID: 5273050065689229505}
   - {fileID: 4784169075175515984}
   - {fileID: 625061989439647171}
+  - {fileID: 6347059120626767168}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7521046159861858718
@@ -374,17 +406,17 @@ MonoBehaviour:
   jumpBufferFrames: 8
   coyoteTime: 0.1
   maxAirJumps: 1
-  maxFallingSpeed: 100
-  wallSlidingSpeed: 2
-  wallCheck: {fileID: 0}
+  maxFallingSpeed: 1000
+  wallSlidingSpeed: 4
+  wallCheck: {fileID: 6347059120626767168}
   wallLayer:
     serializedVersion: 2
-    m_Bits: 0
-  wallJumpingDuration: 0
-  wallJumpingPower: {x: 0, y: 0}
+    m_Bits: 64
+  wallJumpingDuration: 0.2
+  wallJumpingPower: {x: 30, y: 90}
   groundCheckPoint: {fileID: 6081919134884060294}
   groundCheckY: 0.2
-  groundCheckX: 0.5
+  groundCheckX: 1
   whatIsGround:
     serializedVersion: 2
     m_Bits: 64
@@ -407,7 +439,7 @@ MonoBehaviour:
   recoilYSteps: 10
   recoilXSpeed: 100
   recoilYSpeed: 100
-  health: 0
+  health: 10
   maxHealth: 10
   maxTotalHealth: 10
   heartShards: 0
@@ -442,7 +474,7 @@ MonoBehaviour:
   unlockedVarJump: 1
   unlockedSideCast: 1
   unlockedUpCast: 1
-  unlockedDownCast: 0
+  unlockedDownCast: 1
 --- !u!70 &7881608528124680515
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
