@@ -407,13 +407,13 @@ MonoBehaviour:
   coyoteTime: 0.1
   maxAirJumps: 1
   maxFallingSpeed: 1000
-  wallSlidingSpeed: 4
+  wallSlidingSpeed: 12
   wallCheck: {fileID: 6347059120626767168}
   wallLayer:
     serializedVersion: 2
     m_Bits: 64
   wallJumpingDuration: 0.2
-  wallJumpingPower: {x: 30, y: 90}
+  wallJumpingPower: {x: 60, y: 180}
   groundCheckPoint: {fileID: 6081919134884060294}
   groundCheckY: 0.2
   groundCheckX: 1
@@ -447,13 +447,13 @@ MonoBehaviour:
   hitFlashSpeed: 6
   timeToHeal: 1
   manaStorage: {fileID: 0}
-  mana: 1
+  mana: 4
   manaDrainSpeed: 0.2
   manaGain: 0.3
   halfMana: 0
   manaOrbsHandler: {fileID: 0}
-  orbShard: 0
-  manaOrbs: 3
+  orbShard: 12
+  manaOrbs: 1
   manaSpellCost: 0.3
   timeBetweenCast: 0.5
   spellDamage: 5
@@ -469,7 +469,7 @@ MonoBehaviour:
   hurtSound: {fileID: 0}
   pState: {fileID: 0}
   rb: {fileID: 0}
-  unlockedWallJump: 1
+  unlockedWallJump: 0
   unlockedDash: 1
   unlockedVarJump: 1
   unlockedSideCast: 1
