@@ -176,7 +176,7 @@ MonoBehaviour:
   recoilLength: 1
   recoilFactor: 1
   isRecoiling: 0
-  speed: 5
+  speed: 50
   damage: 1
   orangeBlood: {fileID: 3739910812526775868, guid: 4e4dbde8bf42f4e8ea7bd8f97379924f, type: 3}
   hurtSound: {fileID: 0}

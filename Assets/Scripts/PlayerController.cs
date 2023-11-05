@@ -685,6 +685,7 @@ IEnumerator StopTakingDamage()
             Mana = 0;
             Health = maxHealth;
             anim.Play("Player_Idle");
+            StartCoroutine(UIManager.Instance.DeactivateDeathScreen());
         }
     }
 

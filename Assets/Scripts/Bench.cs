@@ -23,10 +23,10 @@ public class Bench : MonoBehaviour
         {
             interacted = true;
             
-           // SaveData.Instance.benchSceneName = SceneManager.GetActiveScene().name;
-          //  SaveData.Instance.benchPos = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y);
-          //  SaveData.Instance.SaveBench();
-          //  SaveData.Instance.SavePlayerData();
+            SaveData.Instance.benchSceneName = SceneManager.GetActiveScene().name;
+            SaveData.Instance.benchPos = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y);
+            SaveData.Instance.SaveBench();
+            SaveData.Instance.SavePlayerData();
             Debug.Log("benched");
 
         }

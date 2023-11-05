@@ -39,15 +39,18 @@ public class SceneTransition : MonoBehaviour
         }
     }
     void CheckShadeData()
-    {
-        GameObject[] enemyObjects = GameObject.FindGameObjectsWithTag("Enemy");
+{
+    GameObject[] enemyObjects = GameObject.FindGameObjectsWithTag("Enemy");
 
+    if (enemyObjects != null)
+    {
         for (int i = 0; i < enemyObjects.Length; i++)
         {
-            if (enemyObjects[i].GetComponent<Shade>() != null)
+            if (enemyObjects[i] != null && enemyObjects[i].GetComponent<Shade>() != null)
             {
                 SaveData.Instance.SaveShadeData();
             }
         }
     }
+}
 }

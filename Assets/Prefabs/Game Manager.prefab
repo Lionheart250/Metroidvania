@@ -46,9 +46,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   transitionedFromScene: 
   platformingRespawnPoint: {x: 0, y: 0}
-  respawnPoint: {x: 0, y: 0}
+  respawnPoint: {x: -192.7, y: -26.2}
   defaultRespawnPoint: {x: 0, y: 0}
-  bench: {fileID: 4282452007705929223, guid: cdf23ac5d7f4e458f8b71d3dee001c13, type: 3}
+  bench: {fileID: 831736564586237598, guid: cdf23ac5d7f4e458f8b71d3dee001c13, type: 3}
   shade: {fileID: 4154037307840377307, guid: 62c1a1089c97a4b18acb19de55bf1624, type: 3}
   fadeTime: 0.25
   gameIsPaused: 0

@@ -439,7 +439,7 @@ MonoBehaviour:
   recoilYSteps: 10
   recoilXSpeed: 100
   recoilYSpeed: 100
-  health: 10
+  health: 2
   maxHealth: 10
   maxTotalHealth: 10
   heartShards: 0
@@ -447,13 +447,13 @@ MonoBehaviour:
   hitFlashSpeed: 6
   timeToHeal: 1
   manaStorage: {fileID: 0}
-  mana: 4
+  mana: 1
   manaDrainSpeed: 0.2
   manaGain: 0.3
   halfMana: 0
   manaOrbsHandler: {fileID: 0}
   orbShard: 12
-  manaOrbs: 1
+  manaOrbs: 3
   manaSpellCost: 0.3
   timeBetweenCast: 0.5
   spellDamage: 5

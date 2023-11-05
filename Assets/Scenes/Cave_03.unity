@@ -544,6 +544,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 259499895}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!66 &66419935 stripped
+CompositeCollider2D:
+  m_CorrespondingSourceObject: {fileID: 7236194619910889793, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
+  m_PrefabInstance: {fileID: 1247936965}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &67453959
 GameObject:
   m_ObjectHideFlags: 0
@@ -3668,6 +3673,10 @@ PrefabInstance:
       propertyPath: shade
       value: 
       objectReference: {fileID: 4154037307840377307, guid: 62c1a1089c97a4b18acb19de55bf1624, type: 3}
+    - target: {fileID: 461846067771931452, guid: 240079ef6b43545a0941d758601dbc45, type: 3}
+      propertyPath: fadeTime
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 748030824758861161, guid: 240079ef6b43545a0941d758601dbc45, type: 3}
       propertyPath: m_Name
       value: Game Manager
@@ -4528,6 +4537,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1390291633}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!66 &802947224 stripped
+CompositeCollider2D:
+  m_CorrespondingSourceObject: {fileID: 2345388063976280360, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
+  m_PrefabInstance: {fileID: 1247936965}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &820861484
 GameObject:
   m_ObjectHideFlags: 0
@@ -5869,6 +5883,22 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 3.63002
       objectReference: {fileID: 0}
+    - target: {fileID: 2345388063797424981, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
+      propertyPath: m_ClearFlags
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2345388063797424981, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
+      propertyPath: m_BackGroundColor.b
+      value: 0.0055624777
+      objectReference: {fileID: 0}
+    - target: {fileID: 2345388063797424981, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
+      propertyPath: m_BackGroundColor.g
+      value: 0.0055624777
+      objectReference: {fileID: 0}
+    - target: {fileID: 2345388063797424981, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
+      propertyPath: m_BackGroundColor.r
+      value: 0.23584908
+      objectReference: {fileID: 0}
     - target: {fileID: 2345388063976280360, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
       propertyPath: m_ColliderPaths.Array.size
       value: 2
@@ -6165,6 +6195,14 @@ PrefabInstance:
       propertyPath: m_ColliderPaths.Array.data[2].m_ColliderPaths.Array.data[0].Array.data[3].Y
       value: -7335000064
       objectReference: {fileID: 0}
+    - target: {fileID: 2345388064654447824, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
+      propertyPath: m_BoundingShape2D
+      value: 
+      objectReference: {fileID: 66419935}
+    - target: {fileID: 2345388064654447827, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
+      propertyPath: m_Name
+      value: Secret Room Camera
+      objectReference: {fileID: 0}
     - target: {fileID: 2345388065338176314, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -6210,9 +6248,17 @@ PrefabInstance:
       value: Cameras
       objectReference: {fileID: 0}
     - target: {fileID: 3723839632819368375, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
-      propertyPath: m_IsActive
-      value: 0
+      propertyPath: m_Name
+      value: Open Room Camera
       objectReference: {fileID: 0}
+    - target: {fileID: 3723839632819368375, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6322943624731163116, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
+      propertyPath: m_BoundingShape2D
+      value: 
+      objectReference: {fileID: 802947224}
     - target: {fileID: 8270585651975105996, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
       propertyPath: allVirtualCameras.Array.size
       value: 2
@@ -7720,6 +7766,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8384892018430509961, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: fadeTime
+      value: 0.2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -8714,7 +8764,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4455866852497740107, guid: b9fa3b738169740e9b92a61ed3d6fa04, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 53.5
+      value: 40.8
       objectReference: {fileID: 0}
     - target: {fileID: 4455866852497740107, guid: b9fa3b738169740e9b92a61ed3d6fa04, type: 3}
       propertyPath: m_LocalPosition.z
@@ -8754,7 +8804,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6576171250640668739, guid: b9fa3b738169740e9b92a61ed3d6fa04, type: 3}
       propertyPath: exitTime
-      value: 0.5
+      value: 0.01
       objectReference: {fileID: 0}
     - target: {fileID: 6576171250640668739, guid: b9fa3b738169740e9b92a61ed3d6fa04, type: 3}
       propertyPath: startPoint
