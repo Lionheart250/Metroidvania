@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3398537252002304321, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
       propertyPath: m_Name
-      value: Charger Variant
+      value: Charger
       objectReference: {fileID: 0}
     - target: {fileID: 3398537252002304321, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
       propertyPath: m_TagString
@@ -31,26 +31,34 @@ PrefabInstance:
     - target: {fileID: 3398537252002304325, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 99e80bf4b73d98340b381b73fec53b6a, type: 3}
+      objectReference: {fileID: 21300000, guid: d09dd71c432f54bf684e7560950f2ac6, type: 3}
     - target: {fileID: 3398537252002304325, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
       propertyPath: m_SortingLayer
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3398537252002304325, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
       propertyPath: m_SortingOrder
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3398537252002304325, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
       propertyPath: m_SortingLayerID
       value: 249141535
       objectReference: {fileID: 0}
     - target: {fileID: 3398537252002304326, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304326, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304326, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -31.3
+      value: -30.9
       objectReference: {fileID: 0}
     - target: {fileID: 3398537252002304326, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.6
+      value: 11.7
       objectReference: {fileID: 0}
     - target: {fileID: 3398537252002304326, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
       propertyPath: m_LocalPosition.z
@@ -102,11 +110,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3398537252002304328, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
       propertyPath: m_Size.x
-      value: 4.79
+      value: 12.6
       objectReference: {fileID: 0}
     - target: {fileID: 3398537252002304328, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
       propertyPath: m_Size.y
-      value: 5.87
+      value: 18.76
       objectReference: {fileID: 0}
     - target: {fileID: 3398537252002304328, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
       propertyPath: m_Offset.y
@@ -114,11 +122,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3398537252002304328, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
       propertyPath: m_SpriteTilingProperty.oldSize.x
-      value: 5.29
+      value: 16.685682
       objectReference: {fileID: 0}
     - target: {fileID: 3398537252002304328, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
       propertyPath: m_SpriteTilingProperty.oldSize.y
-      value: 5.58
+      value: 23.88
       objectReference: {fileID: 0}
     - target: {fileID: 3398537252002304329, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
       propertyPath: m_Controller
@@ -160,8 +168,8 @@ MonoBehaviour:
   hurtSound: {fileID: 0}
   rb: {fileID: 0}
   anim: {fileID: 0}
-  ledgeCheckX: 2.4
-  ledgeCheckY: 3
+  ledgeCheckX: 5
+  ledgeCheckY: 5
   chargeSpeedMultiplier: 6
   chargeDuration: 10
   jumpForce: 20
