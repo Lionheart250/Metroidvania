@@ -8,7 +8,6 @@ using UnityEngine.SceneManagement;
 [System.Serializable]
 public struct SaveData
 {
-  //any variable you want to save HAS to be public
     public static SaveData Instance;
 
     //map stuff
@@ -42,15 +41,15 @@ public struct SaveData
 
     public void Initialize()
     {
-        if(!File.Exists(Application.persistentDataPath + "/save.bench.data")) //if file doesnt exist, we'll create the file
+        if(!File.Exists(Application.persistentDataPath + "/save.bench.data")) //if file doesnt exist, well create the file
         {
             BinaryWriter writer = new BinaryWriter(File.Create(Application.persistentDataPath + "/save.bench.data"));
         }
-        if (!File.Exists(Application.persistentDataPath + "/save.player.data")) //if file doesnt exist, we'll create the file
+        if (!File.Exists(Application.persistentDataPath + "/save.player.data")) //if file doesnt exist, well create the file
         {
             BinaryWriter writer = new BinaryWriter(File.Create(Application.persistentDataPath + "/save.player.data"));
         }
-        if (!File.Exists(Application.persistentDataPath + "/save.shade.data")) //if file doesnt exist, we'll create the file
+        if (!File.Exists(Application.persistentDataPath + "/save.shade.data")) //if file doesnt exist, well create the file
         {
             BinaryWriter writer = new BinaryWriter(File.Create(Application.persistentDataPath + "/save.shade.data"));
         }

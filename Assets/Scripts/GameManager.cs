@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour
 
     public GameObject shade;
 
-    //[SerializeField] private FadeUI pauseMenu;
+    [SerializeField] private FadeUI pauseMenu;
     [SerializeField] private float fadeTime;
     public bool gameIsPaused;
 
@@ -60,7 +60,7 @@ public class GameManager : MonoBehaviour
 
         if(Input.GetKeyDown(KeyCode.Escape) && !gameIsPaused)
         {
-           // pauseMenu.FadeUIIn(fadeTime);
+            pauseMenu.FadeUIIn(fadeTime);
             Time.timeScale = 0;
             gameIsPaused = true;
         }

@@ -401,7 +401,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6412131fb41b34c318aa79c502cfb9a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  walkSpeed: 40
+  walkSpeed: 50
   jumpForce: 180
   jumpBufferFrames: 8
   coyoteTime: 0.1
@@ -440,7 +440,7 @@ MonoBehaviour:
   recoilXSpeed: 100
   recoilYSpeed: 100
   health: 2
-  maxHealth: 10
+  maxHealth: 5
   maxTotalHealth: 10
   heartShards: 0
   bloodSpurt: {fileID: 8550120535757804210, guid: 78d1006fe79674df6981f3cb25edd387, type: 3}
@@ -452,8 +452,8 @@ MonoBehaviour:
   manaGain: 0.3
   halfMana: 0
   manaOrbsHandler: {fileID: 0}
-  orbShard: 12
-  manaOrbs: 3
+  orbShard: 0
+  manaOrbs: 0
   manaSpellCost: 0.3
   timeBetweenCast: 0.5
   spellDamage: 5

@@ -10,6 +10,7 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] GameObject deathScreen;
     public GameObject mapHandler;
+    public GameObject inventory;
     [SerializeField] GameObject halfMana, fullMana;
 
 
@@ -46,14 +47,13 @@ public class UIManager : MonoBehaviour
 
             case ManaState.HalfMana:
 
-               fullMana.SetActive(false);
-               halfMana.SetActive(true);
+                fullMana.SetActive(false);
+                halfMana.SetActive(true);
 
                 break;
         }
         manaState = _manaState;
     }
-
     public IEnumerator ActivateDeathScreen()
     {
         yield return new WaitForSeconds(0.8f);

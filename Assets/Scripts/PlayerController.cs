@@ -237,7 +237,7 @@ public class PlayerController : MonoBehaviour
         {
             GetInputs();
             ToggleMap();
-            //ToggleInventory();
+            ToggleInventory();
         }
         
         UpdateJumpVariables();
@@ -306,6 +306,7 @@ public class PlayerController : MonoBehaviour
        yAxis = Input.GetAxisRaw("Vertical");
        attack = Input.GetButtonDown("Attack");
        openMap = Input.GetButton("Map");
+       openInventory = Input.GetButton("Inventory");
        if (Input.GetButton("Cast/Heal"))
         {
             castOrHealTimer += Time.deltaTime;
@@ -321,6 +322,18 @@ public class PlayerController : MonoBehaviour
         else
         {
             UIManager.Instance.mapHandler.SetActive(false);
+        }
+    }
+
+    void ToggleInventory()
+    {
+        if (openInventory)
+        {
+            UIManager.Instance.inventory.SetActive(true);
+        }
+        else
+        {
+            UIManager.Instance.inventory.SetActive(false);
         }
     }
     

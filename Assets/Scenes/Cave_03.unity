@@ -3037,10 +3037,6 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
-      propertyPath: manaOrbs
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
       propertyPath: manaStorage
       value: 
       objectReference: {fileID: 828660925}
@@ -3834,15 +3830,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2345388063797424981, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
       propertyPath: m_BackGroundColor.b
-      value: 0.039215688
+      value: 0.2264151
       objectReference: {fileID: 0}
     - target: {fileID: 2345388063797424981, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
       propertyPath: m_BackGroundColor.g
-      value: 0.019607844
+      value: 0.11000357
       objectReference: {fileID: 0}
     - target: {fileID: 2345388063797424981, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
       propertyPath: m_BackGroundColor.r
-      value: 0.019607844
+      value: 0.11000357
       objectReference: {fileID: 0}
     - target: {fileID: 2345388065338176314, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
       propertyPath: m_LocalPosition.x
@@ -9028,6 +9024,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 762836288451511198, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1589548627404402475, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
       propertyPath: m_Name
       value: Canvas
@@ -9112,9 +9112,13 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8384892018430509961, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
-      propertyPath: fadeTime
-      value: 0.2
+    - target: {fileID: 4269439073463070981, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7191597420740865831, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
