@@ -4681,8 +4681,12 @@ PrefabInstance:
       objectReference: {fileID: 4154037307840377307, guid: 62c1a1089c97a4b18acb19de55bf1624, type: 3}
     - target: {fileID: 461846067771931452, guid: 240079ef6b43545a0941d758601dbc45, type: 3}
       propertyPath: fadeTime
-      value: 0.2
+      value: 0.25
       objectReference: {fileID: 0}
+    - target: {fileID: 461846067771931452, guid: 240079ef6b43545a0941d758601dbc45, type: 3}
+      propertyPath: pauseMenu
+      value: 
+      objectReference: {fileID: 1732327117}
     - target: {fileID: 748030824758861161, guid: 240079ef6b43545a0941d758601dbc45, type: 3}
       propertyPath: m_Name
       value: Game Manager
@@ -7253,6 +7257,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3922115881500503448, guid: 0e3e7892c7fa24ddd831db814ee10888, type: 3}
   m_PrefabInstance: {fileID: 1555482541}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1254414560 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1193157956745338212, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+  m_PrefabInstance: {fileID: 1596344131}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 088a7bb54a6134688833877d5b470f6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1254442374 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3398537252002304326, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
@@ -9024,10 +9039,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 762836288451511198, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1589548627404402475, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
       propertyPath: m_Name
       value: Canvas
@@ -9112,19 +9123,74 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4269439073463070981, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
-      propertyPath: m_IsActive
-      value: 0
+    - target: {fileID: 2389871411381653832, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 3
       objectReference: {fileID: 0}
-    - target: {fileID: 7191597420740865831, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
-      propertyPath: m_IsActive
-      value: 0
+    - target: {fileID: 2389871411381653832, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2389871411381653832, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1603598884}
+    - target: {fileID: 2389871411381653832, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Target
+      value: 
+      objectReference: {fileID: 1254414560}
+    - target: {fileID: 2389871411381653832, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2389871411381653832, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: UnpauseGame
+      objectReference: {fileID: 0}
+    - target: {fileID: 2389871411381653832, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
+      value: SoundOnClick
+      objectReference: {fileID: 0}
+    - target: {fileID: 2389871411381653832, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
+      value: UIAudio, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2389871411381653832, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 4723149257235478081, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1603598884}
+    - target: {fileID: 4723149257235478081, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: UnpauseGame
+      objectReference: {fileID: 0}
+    - target: {fileID: 7512763440546503252, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1254414560}
+    - target: {fileID: 7512763440546503252, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SoundOnHover
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+--- !u!114 &1603598884 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 461846067771931452, guid: 240079ef6b43545a0941d758601dbc45, type: 3}
+  m_PrefabInstance: {fileID: 615500964}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad7d0c6b51cf1417f9c0886e27cd49bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1621008814
 GameObject:
   m_ObjectHideFlags: 0
@@ -9587,6 +9653,17 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1732327117 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6547996710052815044, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+  m_PrefabInstance: {fileID: 1596344131}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10143a352e7844c83bab01bc97cd16c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1737743259
 GameObject:
   m_ObjectHideFlags: 0

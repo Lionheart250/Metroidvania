@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8194182634471941518}
   - component: {fileID: 461846067771931452}
+  - component: {fileID: 1636583603836627377}
   m_Layer: 0
   m_Name: Game Manager
   m_TagString: Untagged
@@ -50,5 +51,18 @@ MonoBehaviour:
   defaultRespawnPoint: {x: 0, y: 0}
   bench: {fileID: 831736564586237598, guid: cdf23ac5d7f4e458f8b71d3dee001c13, type: 3}
   shade: {fileID: 4154037307840377307, guid: 62c1a1089c97a4b18acb19de55bf1624, type: 3}
+  pauseMenu: {fileID: 0}
   fadeTime: 0.25
   gameIsPaused: 0
+--- !u!114 &1636583603836627377
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 748030824758861161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 305a288b849b44e97bd6f990b35474bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

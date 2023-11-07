@@ -776,6 +776,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2345388065338176314}
   - component: {fileID: 8270585651975105996}
+  - component: {fileID: -6533142817852262061}
   m_Layer: 0
   m_Name: Cameras
   m_TagString: Untagged
@@ -823,6 +824,18 @@ MonoBehaviour:
   playerFallSpeedTheshold: -10
   isLerpingYDamping: 0
   hasLerpedYDamping: 0
+--- !u!114 &-6533142817852262061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2345388065338176315}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 305a288b849b44e97bd6f990b35474bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2345388065672380218
 GameObject:
   m_ObjectHideFlags: 0

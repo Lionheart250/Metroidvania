@@ -161,7 +161,7 @@ public class PlayerController : MonoBehaviour
 
     private bool canFlash = true;
 
-    //private bool landingSoundPlayed;
+    private bool landingSoundPlayed;
 
 
     public static PlayerController Instance;
@@ -394,7 +394,7 @@ public class PlayerController : MonoBehaviour
         canDash = false;
         pState.dashing = true;
         anim.SetTrigger("Dashing");
-        // audioSource.PlayOneShot(dashAndAttackSound);
+        audioSource.PlayOneShot(dashAndAttackSound);
         rb.gravityScale = 0;
         int _dir = pState.lookingRight ? 1 : -1;
         rb.velocity = new Vector2(_dir * dashSpeed, 0);
@@ -434,7 +434,7 @@ public class PlayerController : MonoBehaviour
         {
             timeSinceAttck = 0;
             anim.SetTrigger("Attacking");
-            //audioSource.PlayOneShot(dashAndAttackSound);
+            audioSource.PlayOneShot(dashAndAttackSound);
 
             if (yAxis == 0 || yAxis < 0 && Grounded())
             {
@@ -566,7 +566,7 @@ public class PlayerController : MonoBehaviour
 {
     if (pState.alive)
     {
-        //audioSource.PlayOneShot(hurtSound);
+        audioSource.PlayOneShot(hurtSound);
 
         Health -= Mathf.RoundToInt(_damage);
         Debug.Log("Player Health: " + Health); // Add this debug log
@@ -788,7 +788,7 @@ IEnumerator StopTakingDamage()
     }
     IEnumerator CastCoroutine()
     {
-        //audioSource.PlayOneShot(spellCastSound);
+        audioSource.PlayOneShot(spellCastSound);
 
         //side cast
         if ((yAxis == 0 || (yAxis < 0 && Grounded())) && unlockedSideCast)
@@ -867,7 +867,7 @@ IEnumerator StopTakingDamage()
     {
         if (jumpBufferCounter > 0 && coyoteTimeCounter > 0 && !pState.jumping)
         {
-            //audioSource.PlayOneShot(jumpSound);
+            audioSource.PlayOneShot(jumpSound);
 
             rb.velocity = new Vector3(rb.velocity.x, jumpForce);
 
@@ -876,7 +876,7 @@ IEnumerator StopTakingDamage()
         
         if (!Grounded() && airJumpCounter < maxAirJumps && Input.GetButtonDown("Jump") && unlockedVarJump)
         {
-            //audioSource.PlayOneShot(jumpSound);
+            audioSource.PlayOneShot(jumpSound);
 
             pState.jumping = true;
 
@@ -901,10 +901,10 @@ IEnumerator StopTakingDamage()
     {
         if (Grounded())
         { 
-            //if (!landingSoundPlayed)
+            if (!landingSoundPlayed)
             {
-                //audioSource.PlayOneShot(landingSound);
-               // landingSoundPlayed = true;
+                audioSource.PlayOneShot(landingSound);
+                landingSoundPlayed = true;
             }
             pState.jumping = false;
             coyoteTimeCounter = coyoteTime;
@@ -913,7 +913,7 @@ IEnumerator StopTakingDamage()
         else
         {
             coyoteTimeCounter -= Time.deltaTime;
-           // landingSoundPlayed = false;
+            landingSoundPlayed = false;
         }
 
         if (Input.GetButtonDown("Jump"))

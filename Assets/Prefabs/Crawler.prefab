@@ -136,7 +136,7 @@ MonoBehaviour:
   speed: 20
   damage: 1
   orangeBlood: {fileID: 3739910812526775868, guid: 4e4dbde8bf42f4e8ea7bd8f97379924f, type: 3}
-  hurtSound: {fileID: 0}
+  hurtSound: {fileID: 8300000, guid: 6348d32b5f865414e90e928f0e55b59c, type: 3}
   rb: {fileID: 0}
   anim: {fileID: 0}
   flipWaitTime: 0
@@ -220,7 +220,7 @@ AudioSource:
   m_GameObject: {fileID: 3398537252002304321}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 24300002, guid: 92f852b48401d0448a024603fa576c7b, type: 2}
+  OutputAudioMixerGroup: {fileID: 24300002, guid: 37079bf2bd3ce440cb3b057ce5afdaff, type: 2}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
