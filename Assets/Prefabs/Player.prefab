@@ -437,8 +437,8 @@ MonoBehaviour:
     m_Bits: 8
   damage: 2
   slashEffect: {fileID: 8036702266434397819, guid: ad76ac7460de649b491fe07ded5743c9, type: 3}
-  recoilXSteps: 10
-  recoilYSteps: 10
+  recoilXSteps: 3
+  recoilYSteps: 3
   recoilXSpeed: 100
   recoilYSpeed: 100
   health: 2

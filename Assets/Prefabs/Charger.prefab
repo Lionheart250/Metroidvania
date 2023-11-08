@@ -172,7 +172,7 @@ MonoBehaviour:
   hurtSound: {fileID: 8300000, guid: 6348d32b5f865414e90e928f0e55b59c, type: 3}
   rb: {fileID: 0}
   anim: {fileID: 0}
-  ledgeCheckX: 5
+  ledgeCheckX: 15
   ledgeCheckY: 5
   chargeSpeedMultiplier: 6
   chargeDuration: 10
