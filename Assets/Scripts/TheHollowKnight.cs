@@ -53,7 +53,7 @@ public class TheHollowKnight : Enemy
         base.Start();
         sr = GetComponentInChildren<SpriteRenderer>();
         anim = GetComponentInChildren<Animator>();
-        ChangeState(EnemyStates.THK_Stage1);
+        ChangeState(EnemyStates.THK_Stage3);
         alive = true;
     }
     public bool Grounded()
@@ -127,24 +127,24 @@ public class TheHollowKnight : Enemy
             {
                 case EnemyStates.THK_Stage1:
                     canStun = true;
-                    attackTimer = 6;
+                    attackTimer = 3;
                     runSpeed = speed;
                     break;
 
                 case EnemyStates.THK_Stage2:
-                    canStun = true;
-                    attackTimer = 5;
+                    canStun = false;
+                    attackTimer = 3;
                     break;
 
                 case EnemyStates.THK_Stage3:
                     canStun = false;
-                    attackTimer = 8;
-                    bloodTimer = 5f;
+                    attackTimer = 2;
+                    bloodTimer = 3f;
                     break;
 
                 case EnemyStates.THK_Stage4:
                     canStun = false;
-                    attackTimer = 10;
+                    attackTimer = 1;
                     runSpeed = speed / 2;
                     bloodTimer = 1.5f;
                     break;
@@ -326,6 +326,7 @@ public class TheHollowKnight : Enemy
     }
     IEnumerator Parry()
     {
+        isInvincible = true;  // Set to true during parry
         attacking = true;
         rb.velocity = Vector2.zero;
         anim.SetBool("Parry", true);
@@ -334,6 +335,8 @@ public class TheHollowKnight : Enemy
 
         parrying = false;
         ResetAllAttacks();
+
+        isInvincible = false;  // Set back to false after parry
     }
     IEnumerator Slash()
     {
@@ -353,7 +356,7 @@ public class TheHollowKnight : Enemy
     void DiveAttackJump()
     {
         attacking = true;
-        moveToPosition = new Vector2(PlayerController.Instance.transform.position.x, rb.position.y + 10);
+        moveToPosition = new Vector2(PlayerController.Instance.transform.position.x, rb.position.y + 20);
         diveAttack = true;
         anim.SetBool("Jump", true);
     }
@@ -374,16 +377,16 @@ public class TheHollowKnight : Enemy
     public void DivingPillars()
     {
         Vector2 _impactPoint = groundCheckPoint.position;
-        float _spawnDistance = 5;
+        float _spawnDistance = 15;
 
-        for(int i = 0; i < 10; i++)
+        for(int i = 0; i < 50; i++)
         {
             Vector2 _pillarSpawnPointRight = _impactPoint + new Vector2(_spawnDistance, 0);
             Vector2 _pillarSpawnPointLeft = _impactPoint - new Vector2(_spawnDistance, 0);
             Instantiate(pillar, _pillarSpawnPointRight, Quaternion.Euler(0, 0, -90));
             Instantiate(pillar, _pillarSpawnPointLeft, Quaternion.Euler(0, 0, -90));
 
-            _spawnDistance += 5;
+            _spawnDistance += 15;
         }
         ResetAllAttacks();
     }
@@ -400,7 +403,7 @@ public class TheHollowKnight : Enemy
     {
         rb.velocity = Vector2.zero;
 
-        float _currentAngle = 30f;
+        float _currentAngle = 90f;
         for(int i = 0; i < 10; i++)
         {
             Debug.Log("launch");
@@ -429,7 +432,7 @@ public class TheHollowKnight : Enemy
     {
         attacking = true;
         rb.velocity = Vector2.zero;
-        moveToPosition = new Vector2(transform.position.x, rb.position.y + 5);
+        moveToPosition = new Vector2(transform.position.x, rb.position.y + 0);
         outbreakAttack = true;
         anim.SetTrigger("BendDown");
     }
@@ -479,7 +482,7 @@ public class TheHollowKnight : Enemy
     public void BounceBendDown()
     {
         rb.velocity = Vector2.zero;
-        moveToPosition = new Vector2(PlayerController.Instance.transform.position.x, rb.position.y + 10);
+        moveToPosition = new Vector2(PlayerController.Instance.transform.position.x, rb.position.y + 20);
         bounceAttack = true;
         anim.SetTrigger("BendDown");
     }
@@ -536,19 +539,19 @@ public class TheHollowKnight : Enemy
         }
         #region health to state
 
-        if(health > 20)
+        if(health > 40)
         {
             ChangeState(EnemyStates.THK_Stage1);
         }
-        if(health <= 15 && health < 10)
+        if(health <= 255 && health < 20)
         {
             ChangeState(EnemyStates.THK_Stage2);
         }
-        if (health <= 10 && health < 5)
+        if (health <= 20 && health < 15)
         {
             ChangeState(EnemyStates.THK_Stage3);
         }
-        if (health < 5)
+        if (health < 10)
         {
             ChangeState(EnemyStates.THK_Stage4);
         }
@@ -566,7 +569,7 @@ public class TheHollowKnight : Enemy
         hitCounter = 0;
         anim.SetBool("Stunned", true);
 
-        yield return new WaitForSeconds(6f);
+        yield return new WaitForSeconds(1f);
         anim.SetBool("Stunned", false);
         stunned = false;
     }

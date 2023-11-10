@@ -5,7 +5,7 @@ using UnityEngine;
 public class BarrageFireball : MonoBehaviour
 {
     [SerializeField] Vector2 startForceMinMax;
-    [SerializeField] float turnSpeed = 0.5f;
+    [SerializeField] float turnSpeed = 5.5f;
 
     Rigidbody2D rb;
     // Start is called before the first frame update

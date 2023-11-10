@@ -21,6 +21,7 @@ public class Enemy : MonoBehaviour
     protected SpriteRenderer sr;
     public Animator anim;
     protected AudioSource audioSource;
+     protected bool isInvincible;
 
     protected enum EnemyStates
     {
@@ -100,15 +101,19 @@ public class Enemy : MonoBehaviour
 
     public virtual void EnemyGetsHit(float _damageDone, Vector2 _hitDirection, float _hitForce)
     {
-        health -= _damageDone;
-        if(!isRecoiling)
+        if (!isInvincible)
         {
-            audioSource.PlayOneShot(hurtSound);
-            GameObject _orangeBlood = Instantiate(orangeBlood, transform.position, Quaternion.identity);
-            Destroy(_orangeBlood, 5.5f);
-            rb.velocity = _hitForce * recoilFactor * _hitDirection;
+            health -= _damageDone;
+            if (!isRecoiling)
+            {
+                audioSource.PlayOneShot(hurtSound);
+                GameObject _orangeBlood = Instantiate(orangeBlood, transform.position, Quaternion.identity);
+                Destroy(_orangeBlood, 5.5f);
+                rb.velocity = _hitForce * recoilFactor * _hitDirection;
+            }
         }
     }
+
     protected virtual void OnCollisionStay2D(Collision2D _other)
     {
         if(_other.gameObject.CompareTag("Player") && !PlayerController.Instance.pState.invincible && health > 0)
@@ -140,3 +145,4 @@ public class Enemy : MonoBehaviour
     }
     
 }
+
