@@ -317,7 +317,7 @@ MonoBehaviour:
   UpAttackArea: {x: 30, y: 60}
   DownAttackTransform: {fileID: 942575830742161012}
   DownAttackArea: {x: 30, y: 60}
-  attackRange: 5
+  attackRange: 50
   attackTimer: 1
   facingRight: 0
   groundCheckPoint: {fileID: 942575831232026690}

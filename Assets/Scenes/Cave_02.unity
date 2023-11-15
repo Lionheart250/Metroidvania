@@ -41298,7 +41298,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2345388063797424980, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 14.999996
+      value: 24.999996
       objectReference: {fileID: 0}
     - target: {fileID: 2345388063797424980, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
       propertyPath: m_LocalPosition.y
@@ -41418,7 +41418,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2345388064654447825, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 14.999996
+      value: 24.999996
       objectReference: {fileID: 0}
     - target: {fileID: 2345388064654447825, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
       propertyPath: m_LocalPosition.y
@@ -41427,6 +41427,10 @@ PrefabInstance:
     - target: {fileID: 2345388064654447826, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
       propertyPath: m_Lens.FieldOfView
       value: 120
+      objectReference: {fileID: 0}
+    - target: {fileID: 2345388065672380216, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
+      propertyPath: m_TrackedObjectOffset.x
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 2345388065672380216, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
       propertyPath: m_TrackedObjectOffset.y
