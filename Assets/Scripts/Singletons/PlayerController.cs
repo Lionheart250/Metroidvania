@@ -21,7 +21,9 @@ public class PlayerController : MonoBehaviour
 
     private int airJumpCounter = 0; //keeps track of how many times the player has jumped in the air
     [SerializeField] private int maxAirJumps; //the max no. of air jumps
-    [SerializeField] private int maxFallingSpeed; //the max no. of air jumps
+    [SerializeField] private int maxFallingSpeed; 
+    public float fallGravityMultiplier = 2.0f; // You can adjust this value
+
 
     private float gravity; //stores the gravity scale at start
     [Space(5)]
@@ -864,38 +866,46 @@ IEnumerator StopTakingDamage()
     }
 
      void Jump()
+{
+    if (jumpBufferCounter > 0 && coyoteTimeCounter > 0 && !pState.jumping)
     {
-        if (jumpBufferCounter > 0 && coyoteTimeCounter > 0 && !pState.jumping)
-        {
-            audioSource.PlayOneShot(jumpSound);
+        audioSource.PlayOneShot(jumpSound);
 
-            rb.velocity = new Vector3(rb.velocity.x, jumpForce);
+        rb.velocity = new Vector3(rb.velocity.x, jumpForce);
 
-            pState.jumping = true;
-        }
-        
-        if (!Grounded() && airJumpCounter < maxAirJumps && Input.GetButtonDown("Jump") && unlockedVarJump)
-        {
-            audioSource.PlayOneShot(jumpSound);
-
-            pState.jumping = true;
-
-            airJumpCounter++;
-
-            rb.velocity = new Vector3(rb.velocity.x, jumpForce);
-        }
-
-        if (Input.GetButtonUp("Jump") && rb.velocity.y > 3)
-        {
-            pState.jumping = false;
-
-            rb.velocity = new Vector2(rb.velocity.x, 0);
-        }
-
-        rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -maxFallingSpeed, rb.velocity.y));
-
-        anim.SetBool("Jumping", !Grounded());
+        pState.jumping = true;
     }
+
+    if (!Grounded() && airJumpCounter < maxAirJumps && Input.GetButtonDown("Jump") && unlockedVarJump)
+    {
+        audioSource.PlayOneShot(jumpSound);
+
+        pState.jumping = true;
+
+        airJumpCounter++;
+
+        rb.velocity = new Vector3(rb.velocity.x, jumpForce);
+    }
+
+    if (Input.GetButtonUp("Jump") && rb.velocity.y > 3)
+    {
+        pState.jumping = false;
+
+        rb.velocity = new Vector2(rb.velocity.x, 0);
+    }
+
+    // Increase gravity while falling
+    if (rb.velocity.y < 0)
+    {
+        rb.velocity += Vector2.up * Physics2D.gravity.y * (fallGravityMultiplier - 1) * Time.deltaTime;
+    }
+
+    // Clamp the vertical velocity to control falling speed
+    rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -maxFallingSpeed, rb.velocity.y));
+
+    anim.SetBool("Jumping", !Grounded());
+}
+
  
     void UpdateJumpVariables()
     {

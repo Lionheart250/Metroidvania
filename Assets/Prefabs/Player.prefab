@@ -379,7 +379,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 50
+  m_GravityScale: 25
   m_Material: {fileID: 6200000, guid: 7fdfcecb5090f42fabba880cf918bd84, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
@@ -404,11 +404,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   walkSpeed: 50
-  jumpForce: 180
+  jumpForce: 120
   jumpBufferFrames: 8
   coyoteTime: 0.1
   maxAirJumps: 1
-  maxFallingSpeed: 1000
+  maxFallingSpeed: 200
+  fallGravityMultiplier: 20
   wallSlidingSpeed: 12
   wallCheck: {fileID: 6347059120626767168}
   wallLayer:
@@ -449,12 +450,12 @@ MonoBehaviour:
   hitFlashSpeed: 6
   timeToHeal: 1
   manaStorage: {fileID: 0}
-  mana: 1
+  mana: 10
   manaDrainSpeed: 0.2
   manaGain: 0.3
   halfMana: 0
   manaOrbsHandler: {fileID: 0}
-  orbShard: 0
+  orbShard: 50
   manaOrbs: 0
   manaSpellCost: 0.3
   timeBetweenCast: 0.5
