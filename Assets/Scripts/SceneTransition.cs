@@ -15,15 +15,35 @@ public class SceneTransition : MonoBehaviour
 
     // Start is called before the first frame update
     private void Awake()
+{
+    // Check if GameManager.Instance is null
+    if (GameManager.Instance == null)
     {
-        if(GameManager.Instance.transitionedFromScene == transitionTo)
-        {
-            PlayerController.Instance.transform.position = startPoint.position;
-
-            StartCoroutine(PlayerController.Instance.WalkIntoNewScene(exitDirection, exitTime));
-        }
-        StartCoroutine(UIManager.Instance.sceneFader.Fade(SceneFader.FadeDirection.Out));
+        Debug.LogError("GameManager.Instance is null!");
+        return; // Exit the Awake method to prevent further issues
     }
+
+    // Check if UIManager.Instance is null
+    if (UIManager.Instance == null)
+    {
+        Debug.LogError("UIManager.Instance is null!");
+        return; // Exit the Awake method to prevent further issues
+    }
+
+    // Check the value of GameManager.Instance.transitionedFromScene
+    // Debug.Log("GameManager.Instance.transitionedFromScene: " + GameManager.Instance.transitionedFromScene);
+
+    // Rest of your Awake method
+    if (GameManager.Instance.transitionedFromScene == transitionTo)
+    {
+        PlayerController.Instance.transform.position = startPoint.position;
+
+        StartCoroutine(PlayerController.Instance.WalkIntoNewScene(exitDirection, exitTime));
+    }
+    StartCoroutine(UIManager.Instance.sceneFader.Fade(SceneFader.FadeDirection.Out));
+}
+
+
 
     private void OnTriggerEnter2D(Collider2D _other)
     {

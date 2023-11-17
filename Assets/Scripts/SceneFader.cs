@@ -8,7 +8,7 @@ public class SceneFader : MonoBehaviour
 {
     public float fadeTime;
 
-    private Image fadeOutUIImage;
+    [SerializeField] private Image fadeOutUIImage;
 
     public enum FadeDirection
     {
@@ -18,9 +18,18 @@ public class SceneFader : MonoBehaviour
 
     // Start is called before the first frame update
     void Start()
+{
+    fadeOutUIImage = GetComponent<Image>();
+
+    if (fadeOutUIImage == null)
     {
-        fadeOutUIImage = GetComponent<Image>();
+        Debug.LogError("Image component not found on SceneFader object.");
     }
+    else
+    {
+        Debug.Log("Image component found and assigned successfully.");
+    }
+}
 
     // Update is called once per frame
     void Update()
@@ -71,10 +80,17 @@ public class SceneFader : MonoBehaviour
         SceneManager.LoadScene(_sceneToLoad);
     }
 
-    void SetColorImage(ref float _alpha, FadeDirection _fadeDirection)
+   void SetColorImage(ref float _alpha, FadeDirection _fadeDirection)
+{
+    if (fadeOutUIImage != null)
     {
         fadeOutUIImage.color = new Color(fadeOutUIImage.color.r, fadeOutUIImage.color.g, fadeOutUIImage.color.b, _alpha);
-
         _alpha += 0.02f * (_fadeDirection == FadeDirection.Out ? -1 : 1);
     }
+    else
+    {
+        Debug.LogError("fadeImageUI is not assigned. Make sure it is assigned in the Unity Editor.");
+    }
+}
+
 }

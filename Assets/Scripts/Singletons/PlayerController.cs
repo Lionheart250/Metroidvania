@@ -69,6 +69,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Vector2 DownAttackArea; //how large the area of down attack is
 
     [SerializeField] private LayerMask attackableLayer; //the layer the player can attack and recoil off of
+    [SerializeField] private float baseAttackSpeed = 0.5f;
 
     private float timeBetweenAttack, timeSinceAttck;
 
@@ -143,7 +144,8 @@ public class PlayerController : MonoBehaviour
     [Header("Audio")]
     [SerializeField] AudioClip landingSound;
     [SerializeField] AudioClip jumpSound;
-    [SerializeField] AudioClip dashAndAttackSound;
+    [SerializeField] AudioClip attackSound;
+    [SerializeField] AudioClip dashSound;
     [SerializeField] AudioClip spellCastSound;
     [SerializeField] AudioClip hurtSound;
 
@@ -219,6 +221,7 @@ public class PlayerController : MonoBehaviour
         manaStorage.fillAmount = Mana;
 
         Health = maxHealth;
+        timeBetweenAttack = baseAttackSpeed;
         Debug.Log(transform.position);
     }
 
@@ -396,7 +399,7 @@ public class PlayerController : MonoBehaviour
         canDash = false;
         pState.dashing = true;
         anim.SetTrigger("Dashing");
-        audioSource.PlayOneShot(dashAndAttackSound);
+        audioSource.PlayOneShot(dashSound);
         rb.gravityScale = 0;
         int _dir = pState.lookingRight ? 1 : -1;
         rb.velocity = new Vector2(_dir * dashSpeed, 0);
@@ -433,10 +436,11 @@ public class PlayerController : MonoBehaviour
     {
         timeSinceAttck += Time.deltaTime;
         if (attack && timeSinceAttck >= timeBetweenAttack)
-        {
-            timeSinceAttck = 0;
+        {    
+            timeBetweenAttack = baseAttackSpeed / 2.0f;
+            timeSinceAttck = 0f;
             anim.SetTrigger("Attacking");
-            audioSource.PlayOneShot(dashAndAttackSound);
+            audioSource.PlayOneShot(attackSound);
 
             if (yAxis == 0 || yAxis < 0 && Grounded())
             {
@@ -673,23 +677,6 @@ IEnumerator StopTakingDamage()
 
     }
 
-    public int Health
-    {
-        get { return health; }
-        set
-        {
-            if (health != value)
-            {
-                health = Mathf.Clamp(value, 0, maxHealth);
-
-                if (onHealthChangedCallback != null)
-                {
-                    onHealthChangedCallback.Invoke();
-                }
-            }
-        }
-    }
-
     public void Respawned()
     {
         if(!pState.alive)
@@ -708,6 +695,23 @@ IEnumerator StopTakingDamage()
     {
         halfMana = false;
         UIManager.Instance.SwitchMana(UIManager.ManaState.FullMana);
+    }
+
+    public int Health
+    {
+        get { return health; }
+        set
+        {
+            if (health != value)
+            {
+                health = Mathf.Clamp(value, 0, maxHealth);
+
+                if (onHealthChangedCallback != null)
+                {
+                    onHealthChangedCallback.Invoke();
+                }
+            }
+        }
     }
 
     void Heal()

@@ -94,8 +94,12 @@ public struct SaveData
         {
             playerHealth = PlayerController.Instance.Health;
             writer.Write(playerHealth);
+
             playerHeartShards = PlayerController.Instance.heartShards;
             writer.Write(playerHeartShards);
+
+            int maxHealth = PlayerController.Instance.maxHealth;
+            writer.Write(maxHealth);
 
             playerMana = PlayerController.Instance.Mana;
             writer.Write(playerMana);
@@ -145,6 +149,12 @@ public struct SaveData
             {
                 playerHealth = reader.ReadInt32();
                 playerHeartShards = reader.ReadInt32();
+
+                int maxHealth = reader.ReadInt32();
+                PlayerController.Instance.maxHealth = maxHealth;
+
+                int additionalHealth = playerHeartShards / 4;  // Assuming 4 heart shards add 1 health
+                PlayerController.Instance.maxHealth += additionalHealth;
                 playerMana = reader.ReadSingle();
                 playerHalfMana = reader.ReadBoolean();
                 playerManaOrbs = reader.ReadInt32();
