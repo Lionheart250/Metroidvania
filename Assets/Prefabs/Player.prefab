@@ -409,6 +409,7 @@ MonoBehaviour:
   coyoteTime: 0.1
   maxAirJumps: 1
   maxFallingSpeed: 200
+  fallGravityMultiplier: 18
   wallSlidingSpeed: 12
   wallCheck: {fileID: 6347059120626767168}
   wallLayer:
@@ -441,7 +442,7 @@ MonoBehaviour:
   recoilYSteps: 4
   recoilXSpeed: 50
   recoilYSpeed: 50
-  health: 2
+  health: 5
   maxHealth: 5
   maxTotalHealth: 10
   heartShards: 0

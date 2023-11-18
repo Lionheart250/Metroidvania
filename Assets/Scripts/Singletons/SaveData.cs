@@ -263,4 +263,41 @@ public struct SaveData
         }
     }
     #endregion
+    public void ClearSavedData()
+{
+    // Delete the save files if they exist
+    if (File.Exists(Application.persistentDataPath + "/save.bench.data"))
+    {
+        File.Delete(Application.persistentDataPath + "/save.bench.data");
+    }
+
+    if (File.Exists(Application.persistentDataPath + "/save.player.data"))
+    {
+        File.Delete(Application.persistentDataPath + "/save.player.data");
+    }
+
+    if (File.Exists(Application.persistentDataPath + "/save.shade.data"))
+    {
+        File.Delete(Application.persistentDataPath + "/save.shade.data");
+    }
+
+    // Optionally reset some default values or perform additional cleanup
+    // For example:
+    sceneNames.Clear();
+    benchSceneName = string.Empty;
+    benchPos = Vector2.zero;
+    playerHealth = 0;
+    // ... (reset other variables as needed)
+}
+
+// ...
+
+// Call this method when you want to clear the saved data
+// For example, when the player selects a "New Game" option
+public void NewGame()
+{
+    ClearSavedData();
+    // Additional initialization for a new game, if needed
+}
+
 }

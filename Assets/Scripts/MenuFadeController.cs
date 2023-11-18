@@ -20,6 +20,11 @@ public class MenuFadeController : MonoBehaviour
         StartCoroutine(FadeAndStartGame(_sceneToLoad));
     }
 
+    public void CallFadeAndClearData()
+    {
+        StartCoroutine(FadeAndClearData());
+    }
+
     IEnumerator FadeAndStartGame(string _sceneToLoad)
     {
         fadeUI.FadeUIIn(fadeTime);
@@ -27,9 +32,28 @@ public class MenuFadeController : MonoBehaviour
         SceneManager.LoadScene(_sceneToLoad);
     }
 
+    IEnumerator FadeAndClearData()
+    {
+        fadeUI.FadeUIIn(fadeTime);
+        yield return new WaitForSeconds(fadeTime);
+
+        // Call the method to clear the data
+        ClearGameData();
+
+        // Optionally load a specific scene after clearing data
+        // SceneManager.LoadScene("MainMenu");
+    }
+
+    // Method to clear the game data
+    private void ClearGameData()
+    {
+        // Assuming you have a reference to your SaveData scriptable object
+        SaveData.Instance.ClearSavedData();
+    }
+
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }
