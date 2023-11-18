@@ -281,13 +281,7 @@ public struct SaveData
         File.Delete(Application.persistentDataPath + "/save.shade.data");
     }
 
-    // Optionally reset some default values or perform additional cleanup
-    // For example:
-    sceneNames.Clear();
-    benchSceneName = string.Empty;
-    benchPos = Vector2.zero;
-    playerHealth = 0;
-    // ... (reset other variables as needed)
+ 
 }
 
 // ...

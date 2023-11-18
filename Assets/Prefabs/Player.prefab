@@ -472,12 +472,12 @@ MonoBehaviour:
   hurtSound: {fileID: 8300000, guid: d0806599436b24b6db29082182001a18, type: 3}
   pState: {fileID: 0}
   rb: {fileID: 0}
-  unlockedWallJump: 1
-  unlockedDash: 1
-  unlockedVarJump: 1
-  unlockedSideCast: 1
-  unlockedUpCast: 1
-  unlockedDownCast: 1
+  unlockedWallJump: 0
+  unlockedDash: 0
+  unlockedVarJump: 0
+  unlockedSideCast: 0
+  unlockedUpCast: 0
+  unlockedDownCast: 0
 --- !u!70 &7881608528124680515
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
