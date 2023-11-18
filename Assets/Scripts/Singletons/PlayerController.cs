@@ -68,7 +68,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private LayerMask attackableLayer; //the layer the player can attack and recoil off of
 
-    private float timeBetweenAttack, timeSinceAttck;
+    private float timeBetweenAttack = 0.4f, timeSinceAttck;
 
     [SerializeField] private float damage; //the damage the player does to an enemy
 
