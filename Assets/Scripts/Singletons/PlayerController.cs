@@ -21,9 +21,7 @@ public class PlayerController : MonoBehaviour
 
     private int airJumpCounter = 0; //keeps track of how many times the player has jumped in the air
     [SerializeField] private int maxAirJumps; //the max no. of air jumps
-    [SerializeField] private int maxFallingSpeed; 
-    public float fallGravityMultiplier = 2.0f; // You can adjust this value
-
+    [SerializeField] private int maxFallingSpeed; //the max no. of air jumps
 
     private float gravity; //stores the gravity scale at start
     [Space(5)]
@@ -69,7 +67,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Vector2 DownAttackArea; //how large the area of down attack is
 
     [SerializeField] private LayerMask attackableLayer; //the layer the player can attack and recoil off of
-    [SerializeField] private float baseAttackSpeed = 0.5f;
 
     private float timeBetweenAttack, timeSinceAttck;
 
@@ -144,8 +141,7 @@ public class PlayerController : MonoBehaviour
     [Header("Audio")]
     [SerializeField] AudioClip landingSound;
     [SerializeField] AudioClip jumpSound;
-    [SerializeField] AudioClip attackSound;
-    [SerializeField] AudioClip dashSound;
+    [SerializeField] AudioClip dashAndAttackSound;
     [SerializeField] AudioClip spellCastSound;
     [SerializeField] AudioClip hurtSound;
 
@@ -221,7 +217,6 @@ public class PlayerController : MonoBehaviour
         manaStorage.fillAmount = Mana;
 
         Health = maxHealth;
-        timeBetweenAttack = baseAttackSpeed;
         Debug.Log(transform.position);
     }
 
@@ -399,7 +394,7 @@ public class PlayerController : MonoBehaviour
         canDash = false;
         pState.dashing = true;
         anim.SetTrigger("Dashing");
-        audioSource.PlayOneShot(dashSound);
+        audioSource.PlayOneShot(dashAndAttackSound);
         rb.gravityScale = 0;
         int _dir = pState.lookingRight ? 1 : -1;
         rb.velocity = new Vector2(_dir * dashSpeed, 0);
@@ -436,11 +431,10 @@ public class PlayerController : MonoBehaviour
     {
         timeSinceAttck += Time.deltaTime;
         if (attack && timeSinceAttck >= timeBetweenAttack)
-        {    
-            timeBetweenAttack = baseAttackSpeed / 2.0f;
-            timeSinceAttck = 0f;
+        {
+            timeSinceAttck = 0;
             anim.SetTrigger("Attacking");
-            audioSource.PlayOneShot(attackSound);
+            audioSource.PlayOneShot(dashAndAttackSound);
 
             if (yAxis == 0 || yAxis < 0 && Grounded())
             {
@@ -471,6 +465,7 @@ public class PlayerController : MonoBehaviour
         if (objectsToHit.Length > 0)
         {
             _recoilBool = true;
+            dashed = false;
         }
         for (int i = 0; i < objectsToHit.Length; i++)
         {
@@ -677,6 +672,23 @@ IEnumerator StopTakingDamage()
 
     }
 
+    public int Health
+    {
+        get { return health; }
+        set
+        {
+            if (health != value)
+            {
+                health = Mathf.Clamp(value, 0, maxHealth);
+
+                if (onHealthChangedCallback != null)
+                {
+                    onHealthChangedCallback.Invoke();
+                }
+            }
+        }
+    }
+
     public void Respawned()
     {
         if(!pState.alive)
@@ -695,23 +707,6 @@ IEnumerator StopTakingDamage()
     {
         halfMana = false;
         UIManager.Instance.SwitchMana(UIManager.ManaState.FullMana);
-    }
-
-    public int Health
-    {
-        get { return health; }
-        set
-        {
-            if (health != value)
-            {
-                health = Mathf.Clamp(value, 0, maxHealth);
-
-                if (onHealthChangedCallback != null)
-                {
-                    onHealthChangedCallback.Invoke();
-                }
-            }
-        }
     }
 
     void Heal()
@@ -870,46 +865,38 @@ IEnumerator StopTakingDamage()
     }
 
      void Jump()
-{
-    if (jumpBufferCounter > 0 && coyoteTimeCounter > 0 && !pState.jumping)
     {
-        audioSource.PlayOneShot(jumpSound);
+        if (jumpBufferCounter > 0 && coyoteTimeCounter > 0 && !pState.jumping)
+        {
+            audioSource.PlayOneShot(jumpSound);
 
-        rb.velocity = new Vector3(rb.velocity.x, jumpForce);
+            rb.velocity = new Vector3(rb.velocity.x, jumpForce);
 
-        pState.jumping = true;
+            pState.jumping = true;
+        }
+        
+        if (!Grounded() && airJumpCounter < maxAirJumps && Input.GetButtonDown("Jump") && unlockedVarJump)
+        {
+            audioSource.PlayOneShot(jumpSound);
+
+            pState.jumping = true;
+
+            airJumpCounter++;
+
+            rb.velocity = new Vector3(rb.velocity.x, jumpForce);
+        }
+
+        if (Input.GetButtonUp("Jump") && rb.velocity.y > 3)
+        {
+            pState.jumping = false;
+
+            rb.velocity = new Vector2(rb.velocity.x, 0);
+        }
+
+        rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -maxFallingSpeed, rb.velocity.y));
+
+        anim.SetBool("Jumping", !Grounded());
     }
-
-    if (!Grounded() && airJumpCounter < maxAirJumps && Input.GetButtonDown("Jump") && unlockedVarJump)
-    {
-        audioSource.PlayOneShot(jumpSound);
-
-        pState.jumping = true;
-
-        airJumpCounter++;
-
-        rb.velocity = new Vector3(rb.velocity.x, jumpForce);
-    }
-
-    if (Input.GetButtonUp("Jump") && rb.velocity.y > 3)
-    {
-        pState.jumping = false;
-
-        rb.velocity = new Vector2(rb.velocity.x, 0);
-    }
-
-    // Increase gravity while falling
-    if (rb.velocity.y < 0)
-    {
-        rb.velocity += Vector2.up * Physics2D.gravity.y * (fallGravityMultiplier - 1) * Time.deltaTime;
-    }
-
-    // Clamp the vertical velocity to control falling speed
-    rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -maxFallingSpeed, rb.velocity.y));
-
-    anim.SetBool("Jumping", !Grounded());
-}
-
  
     void UpdateJumpVariables()
     {
