@@ -30,6 +30,18 @@ public struct SaveData
 
     public bool playerUnlockedWallJump, playerUnlockedDash, playerUnlockedVarJump;
     public bool playerUnlockedSideCast, playerUnlockedUpCast, playerUnlockedDownCast;
+    
+    //serialized heart shards
+    public bool playerUnlockedHeartShard1, playerUnlockedHeartShard2, playerUnlockedHeartShard3, playerUnlockedHeartShard4, playerUnlockedHeartShard5, 
+    playerUnlockedHeartShard6, playerUnlockedHeartShard7, playerUnlockedHeartShard8, playerUnlockedHeartShard9, playerUnlockedHeartShard10, 
+    playerUnlockedHeartShard11, playerUnlockedHeartShard12, playerUnlockedHeartShard13, playerUnlockedHeartShard14, playerUnlockedHeartShard15, 
+    playerUnlockedHeartShard16, playerUnlockedHeartShard17, playerUnlockedHeartShard18, playerUnlockedHeartShard19, playerUnlockedHeartShard20;
+
+    //serialized orb shards
+    public bool playerUnlockedOrbShard1, playerUnlockedOrbShard2, playerUnlockedOrbShard3, playerUnlockedOrbShard4, playerUnlockedOrbShard5,
+    playerUnlockedOrbShard6, playerUnlockedOrbShard7, playerUnlockedOrbShard8, playerUnlockedOrbShard9;
+
+
 
     //enemies stuff
     //shade
@@ -129,6 +141,66 @@ public struct SaveData
             writer.Write(playerUnlockedUpCast);
             playerUnlockedDownCast = PlayerController.Instance.unlockedDownCast;
             writer.Write(playerUnlockedDownCast);
+            //each heart shard
+            playerUnlockedHeartShard1 = PlayerController.Instance.unlockedHeartShard1;
+            writer.Write(playerUnlockedHeartShard1);
+            playerUnlockedHeartShard2 = PlayerController.Instance.unlockedHeartShard2;
+            writer.Write(playerUnlockedHeartShard2);
+            playerUnlockedHeartShard3 = PlayerController.Instance.unlockedHeartShard3;
+            writer.Write(playerUnlockedHeartShard3);
+            playerUnlockedHeartShard4 = PlayerController.Instance.unlockedHeartShard4;
+            writer.Write(playerUnlockedHeartShard4);
+            playerUnlockedHeartShard5 = PlayerController.Instance.unlockedHeartShard5;
+            writer.Write(playerUnlockedHeartShard5);
+            playerUnlockedHeartShard6 = PlayerController.Instance.unlockedHeartShard6;
+            writer.Write(playerUnlockedHeartShard6);
+            playerUnlockedHeartShard7 = PlayerController.Instance.unlockedHeartShard7;
+            writer.Write(playerUnlockedHeartShard7);
+            playerUnlockedHeartShard8 = PlayerController.Instance.unlockedHeartShard8;
+            writer.Write(playerUnlockedHeartShard8);
+            playerUnlockedHeartShard9 = PlayerController.Instance.unlockedHeartShard9;
+            writer.Write(playerUnlockedHeartShard9);
+            playerUnlockedHeartShard10 = PlayerController.Instance.unlockedHeartShard10;
+            writer.Write(playerUnlockedHeartShard10);
+            playerUnlockedHeartShard11 = PlayerController.Instance.unlockedHeartShard11;
+            writer.Write(playerUnlockedHeartShard11);
+            playerUnlockedHeartShard12 = PlayerController.Instance.unlockedHeartShard12;
+            writer.Write(playerUnlockedHeartShard12);
+            playerUnlockedHeartShard13 = PlayerController.Instance.unlockedHeartShard13;
+            writer.Write(playerUnlockedHeartShard13);
+            playerUnlockedHeartShard14 = PlayerController.Instance.unlockedHeartShard14;
+            writer.Write(playerUnlockedHeartShard14);
+            playerUnlockedHeartShard15 = PlayerController.Instance.unlockedHeartShard15;
+            writer.Write(playerUnlockedHeartShard15);
+            playerUnlockedHeartShard16 = PlayerController.Instance.unlockedHeartShard16;
+            writer.Write(playerUnlockedHeartShard16);
+            playerUnlockedHeartShard17 = PlayerController.Instance.unlockedHeartShard17;
+            writer.Write(playerUnlockedHeartShard17);
+            playerUnlockedHeartShard18 = PlayerController.Instance.unlockedHeartShard18;
+            writer.Write(playerUnlockedHeartShard18);
+            playerUnlockedHeartShard19 = PlayerController.Instance.unlockedHeartShard19;
+            writer.Write(playerUnlockedHeartShard19);
+            playerUnlockedHeartShard20 = PlayerController.Instance.unlockedHeartShard20;
+            writer.Write(playerUnlockedHeartShard20);
+            //each orb shard
+            playerUnlockedOrbShard1 = PlayerController.Instance.unlockedOrbShard1;
+            writer.Write(playerUnlockedOrbShard1);
+            playerUnlockedOrbShard2 = PlayerController.Instance.unlockedOrbShard2;
+            writer.Write(playerUnlockedOrbShard2);
+            playerUnlockedOrbShard3 = PlayerController.Instance.unlockedOrbShard3;
+            writer.Write(playerUnlockedOrbShard3);
+            playerUnlockedOrbShard4 = PlayerController.Instance.unlockedOrbShard4;
+            writer.Write(playerUnlockedOrbShard4);
+            playerUnlockedOrbShard5 = PlayerController.Instance.unlockedOrbShard5;
+            writer.Write(playerUnlockedOrbShard5);
+            playerUnlockedOrbShard6 = PlayerController.Instance.unlockedOrbShard6;
+            writer.Write(playerUnlockedOrbShard6);
+            playerUnlockedOrbShard7 = PlayerController.Instance.unlockedOrbShard7;
+            writer.Write(playerUnlockedOrbShard7);
+            playerUnlockedOrbShard8 = PlayerController.Instance.unlockedOrbShard8;
+            writer.Write(playerUnlockedOrbShard8);
+            playerUnlockedOrbShard9 = PlayerController.Instance.unlockedOrbShard9;
+            writer.Write(playerUnlockedOrbShard9);
 
             playerPosition = PlayerController.Instance.transform.position;
             writer.Write(playerPosition.x);
@@ -170,6 +242,39 @@ public struct SaveData
                 playerUnlockedSideCast = reader.ReadBoolean();
                 playerUnlockedUpCast = reader.ReadBoolean();
                 playerUnlockedDownCast = reader.ReadBoolean();
+                
+                //each heart shard
+                playerUnlockedHeartShard1 = reader.ReadBoolean();
+                playerUnlockedHeartShard2 = reader.ReadBoolean();
+                playerUnlockedHeartShard3 = reader.ReadBoolean();
+                playerUnlockedHeartShard4 = reader.ReadBoolean();
+                playerUnlockedHeartShard5 = reader.ReadBoolean();
+                playerUnlockedHeartShard6 = reader.ReadBoolean();
+                playerUnlockedHeartShard7 = reader.ReadBoolean();
+                playerUnlockedHeartShard8 = reader.ReadBoolean();
+                playerUnlockedHeartShard9 = reader.ReadBoolean();
+                playerUnlockedHeartShard10 = reader.ReadBoolean();
+                playerUnlockedHeartShard11 = reader.ReadBoolean();
+                playerUnlockedHeartShard12 = reader.ReadBoolean();
+                playerUnlockedHeartShard13 = reader.ReadBoolean();
+                playerUnlockedHeartShard14 = reader.ReadBoolean();
+                playerUnlockedHeartShard15 = reader.ReadBoolean();
+                playerUnlockedHeartShard16 = reader.ReadBoolean();
+                playerUnlockedHeartShard17 = reader.ReadBoolean();
+                playerUnlockedHeartShard18 = reader.ReadBoolean();
+                playerUnlockedHeartShard19 = reader.ReadBoolean();
+                playerUnlockedHeartShard20 = reader.ReadBoolean();
+
+                //each mana orb
+                playerUnlockedOrbShard1 = reader.ReadBoolean();
+                playerUnlockedOrbShard2 = reader.ReadBoolean();
+                playerUnlockedOrbShard3 = reader.ReadBoolean();
+                playerUnlockedOrbShard4 = reader.ReadBoolean();
+                playerUnlockedOrbShard5 = reader.ReadBoolean();
+                playerUnlockedOrbShard6 = reader.ReadBoolean();
+                playerUnlockedOrbShard7 = reader.ReadBoolean();
+                playerUnlockedOrbShard8 = reader.ReadBoolean();
+                playerUnlockedOrbShard9 = reader.ReadBoolean();
 
                 playerPosition.x = reader.ReadSingle();
                 playerPosition.y = reader.ReadSingle();
@@ -195,6 +300,39 @@ public struct SaveData
                 PlayerController.Instance.unlockedSideCast = playerUnlockedSideCast;
                 PlayerController.Instance.unlockedUpCast = playerUnlockedUpCast;
                 PlayerController.Instance.unlockedDownCast = playerUnlockedDownCast;
+                
+                //each heart shard
+                PlayerController.Instance.unlockedHeartShard1 = playerUnlockedHeartShard1;
+                PlayerController.Instance.unlockedHeartShard2 = playerUnlockedHeartShard2;
+                PlayerController.Instance.unlockedHeartShard3 = playerUnlockedHeartShard3;
+                PlayerController.Instance.unlockedHeartShard4 = playerUnlockedHeartShard4;
+                PlayerController.Instance.unlockedHeartShard5 = playerUnlockedHeartShard5;
+                PlayerController.Instance.unlockedHeartShard6 = playerUnlockedHeartShard6;
+                PlayerController.Instance.unlockedHeartShard7 = playerUnlockedHeartShard7;
+                PlayerController.Instance.unlockedHeartShard8 = playerUnlockedHeartShard8;
+                PlayerController.Instance.unlockedHeartShard9 = playerUnlockedHeartShard9;
+                PlayerController.Instance.unlockedHeartShard10 = playerUnlockedHeartShard10;
+                PlayerController.Instance.unlockedHeartShard11 = playerUnlockedHeartShard11;
+                PlayerController.Instance.unlockedHeartShard12 = playerUnlockedHeartShard12;
+                PlayerController.Instance.unlockedHeartShard13 = playerUnlockedHeartShard13;
+                PlayerController.Instance.unlockedHeartShard14 = playerUnlockedHeartShard14;
+                PlayerController.Instance.unlockedHeartShard15 = playerUnlockedHeartShard15;
+                PlayerController.Instance.unlockedHeartShard16 = playerUnlockedHeartShard16;
+                PlayerController.Instance.unlockedHeartShard17 = playerUnlockedHeartShard17;
+                PlayerController.Instance.unlockedHeartShard18 = playerUnlockedHeartShard18;
+                PlayerController.Instance.unlockedHeartShard19 = playerUnlockedHeartShard19;
+                PlayerController.Instance.unlockedHeartShard20 = playerUnlockedHeartShard20;
+
+                //each mana orb
+                PlayerController.Instance.unlockedOrbShard1 = playerUnlockedOrbShard1;
+                PlayerController.Instance.unlockedOrbShard2 = playerUnlockedOrbShard2;
+                PlayerController.Instance.unlockedOrbShard3 = playerUnlockedOrbShard3;
+                PlayerController.Instance.unlockedOrbShard4 = playerUnlockedOrbShard4;
+                PlayerController.Instance.unlockedOrbShard5 = playerUnlockedOrbShard5;
+                PlayerController.Instance.unlockedOrbShard6 = playerUnlockedOrbShard6;
+                PlayerController.Instance.unlockedOrbShard7 = playerUnlockedOrbShard7;
+                PlayerController.Instance.unlockedOrbShard8 = playerUnlockedOrbShard8;
+                PlayerController.Instance.unlockedOrbShard9 = playerUnlockedOrbShard9;
             }
             Debug.Log("load player data");
             Debug.Log(playerHalfMana);
@@ -214,6 +352,39 @@ public struct SaveData
             PlayerController.Instance.unlockedSideCast = false;
             PlayerController.Instance.unlockedUpCast = false;
             PlayerController.Instance.unlockedDownCast = false;
+
+            //each heart shard
+            PlayerController.Instance.unlockedHeartShard1 = false;
+            PlayerController.Instance.unlockedHeartShard2 = false;
+            PlayerController.Instance.unlockedHeartShard3 = false;
+            PlayerController.Instance.unlockedHeartShard4 = false;
+            PlayerController.Instance.unlockedHeartShard5 = false;
+            PlayerController.Instance.unlockedHeartShard6 = false;
+            PlayerController.Instance.unlockedHeartShard7 = false;
+            PlayerController.Instance.unlockedHeartShard8 = false;
+            PlayerController.Instance.unlockedHeartShard9 = false;
+            PlayerController.Instance.unlockedHeartShard10 = false;
+            PlayerController.Instance.unlockedHeartShard11 = false;
+            PlayerController.Instance.unlockedHeartShard12 = false;
+            PlayerController.Instance.unlockedHeartShard13 = false;
+            PlayerController.Instance.unlockedHeartShard14 = false;
+            PlayerController.Instance.unlockedHeartShard15 = false;
+            PlayerController.Instance.unlockedHeartShard16 = false;
+            PlayerController.Instance.unlockedHeartShard17 = false;
+            PlayerController.Instance.unlockedHeartShard18 = false;
+            PlayerController.Instance.unlockedHeartShard19 = false;
+            PlayerController.Instance.unlockedHeartShard20 = false;
+
+            //each orb shard
+            PlayerController.Instance.unlockedOrbShard1 = false;
+            PlayerController.Instance.unlockedOrbShard2 = false;
+            PlayerController.Instance.unlockedOrbShard3 = false;
+            PlayerController.Instance.unlockedOrbShard4 = false;
+            PlayerController.Instance.unlockedOrbShard5 = false;
+            PlayerController.Instance.unlockedOrbShard6 = false;
+            PlayerController.Instance.unlockedOrbShard7 = false;
+            PlayerController.Instance.unlockedOrbShard8 = false;
+            PlayerController.Instance.unlockedOrbShard9 = false;
         }
     }
 

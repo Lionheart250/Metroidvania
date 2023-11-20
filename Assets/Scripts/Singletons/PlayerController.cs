@@ -174,6 +174,20 @@ public class PlayerController : MonoBehaviour
     public bool unlockedSideCast;
     public bool unlockedUpCast;
     public bool unlockedDownCast;
+    [Space(5)]
+
+    [Header("Health Shards")]
+    public bool unlockedHeartShard1;
+    public bool unlockedHeartShard2, unlockedHeartShard3, unlockedHeartShard4, unlockedHeartShard5, unlockedHeartShard6,
+    unlockedHeartShard7, unlockedHeartShard8, unlockedHeartShard9, unlockedHeartShard10, unlockedHeartShard11, unlockedHeartShard12, unlockedHeartShard13,
+    unlockedHeartShard14, unlockedHeartShard15, unlockedHeartShard16, unlockedHeartShard17, unlockedHeartShard18, unlockedHeartShard19, unlockedHeartShard20;
+    [Space(5)]
+
+    [Header("Orb Shards")]
+    public bool unlockedOrbShard1;
+    public bool unlockedOrbShard2, unlockedOrbShard3, unlockedOrbShard4, unlockedOrbShard5,
+    unlockedOrbShard6, unlockedOrbShard7, unlockedOrbShard8, unlockedOrbShard9;     
+    
 
     private void Awake()
     {

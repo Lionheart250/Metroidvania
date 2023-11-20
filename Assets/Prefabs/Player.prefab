@@ -416,14 +416,14 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   wallJumpingDuration: 0.2
-  wallJumpingPower: {x: 60, y: 180}
+  wallJumpingPower: {x: 60, y: 110}
   groundCheckPoint: {fileID: 6081919134884060294}
   groundCheckY: 0.2
   groundCheckX: 1
   whatIsGround:
     serializedVersion: 2
     m_Bits: 64
-  dashSpeed: 250
+  dashSpeed: 150
   dashTime: 0.2
   dashCooldown: 0.1
   dashEffect: {fileID: 8902779006071723231, guid: 9042fa1c9d75d430788014ec956f31d3, type: 3}
@@ -455,7 +455,7 @@ MonoBehaviour:
   manaGain: 0.3
   halfMana: 0
   manaOrbsHandler: {fileID: 0}
-  orbShard: 50
+  orbShard: 0
   manaOrbs: 0
   manaSpellCost: 0.3
   timeBetweenCast: 0.5
@@ -478,6 +478,26 @@ MonoBehaviour:
   unlockedSideCast: 0
   unlockedUpCast: 0
   unlockedDownCast: 0
+  unlockedHeartShard1: 0
+  unlockedHeartShard2: 0
+  unlockedHeartShard3: 0
+  unlockedHeartShard4: 0
+  unlockedHeartShard5: 0
+  unlockedHeartShard6: 0
+  unlockedHeartShard7: 0
+  unlockedHeartShard8: 0
+  unlockedHeartShard9: 0
+  unlockedHeartShard10: 0
+  unlockedHeartShard11: 0
+  unlockedHeartShard12: 0
+  unlockedHeartShard13: 0
+  unlockedHeartShard14: 0
+  unlockedHeartShard15: 0
+  unlockedHeartShard16: 0
+  unlockedHeartShard17: 0
+  unlockedHeartShard18: 0
+  unlockedHeartShard19: 0
+  unlockedHeartShard20: 0
 --- !u!70 &7881608528124680515
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
