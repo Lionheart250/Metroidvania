@@ -230,7 +230,7 @@ public class PlayerController : MonoBehaviour
         Mana = mana;
         manaStorage.fillAmount = Mana;
 
-        Health = maxHealth;
+        //Health = maxHealth;
         Debug.Log(transform.position);
     }
 
@@ -849,6 +849,7 @@ IEnumerator StopTakingDamage()
         else if((yAxis < 0 && !Grounded()) && unlockedDownCast)
         {
             anim.SetBool("Casting", true);
+            
             yield return new WaitForSeconds(0.15f);
 
             downSpellFireball.SetActive(true);

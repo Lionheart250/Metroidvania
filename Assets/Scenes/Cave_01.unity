@@ -13433,7 +13433,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 762836288451511198, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1035998199444528312, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
       propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -13442,6 +13442,10 @@ PrefabInstance:
     - target: {fileID: 1035998199444528312, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
       propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: SoundOnHover
+      objectReference: {fileID: 0}
+    - target: {fileID: 1437904493255529704, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1589548627404402475, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
       propertyPath: m_Name
@@ -13525,6 +13529,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1752919832411396500, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2117445771159888667, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2389871411381653832, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}

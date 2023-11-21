@@ -218,7 +218,7 @@ public struct SaveData
         if(File.Exists(Application.persistentDataPath + "/save.player.data"))
         {
             using(BinaryReader reader = new BinaryReader(File.OpenRead(Application.persistentDataPath + "/save.player.data")))
-            {
+            {   
                 playerHealth = reader.ReadInt32();
                 playerHeartShards = reader.ReadInt32();
 
@@ -333,6 +333,8 @@ public struct SaveData
                 PlayerController.Instance.unlockedOrbShard7 = playerUnlockedOrbShard7;
                 PlayerController.Instance.unlockedOrbShard8 = playerUnlockedOrbShard8;
                 PlayerController.Instance.unlockedOrbShard9 = playerUnlockedOrbShard9;
+
+                
             }
             Debug.Log("load player data");
             Debug.Log(playerHalfMana);
