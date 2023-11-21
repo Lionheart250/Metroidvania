@@ -73,7 +73,7 @@ public class SceneFader : MonoBehaviour
 
     public IEnumerator FadeAndLoadScene(FadeDirection _fadeDirection, string _sceneToLoad)
     {   
-        SaveData.Instance.SavePlayerData();
+        
 
         fadeOutUIImage.enabled = true;
 
