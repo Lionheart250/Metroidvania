@@ -30,6 +30,7 @@ public class UnlockOrbShard3 : MonoBehaviour
 private void UnlockAndDestroy()
     {
     PlayerController.Instance.unlockedOrbShard3 = true;
+    SaveData.Instance.SavePlayerData();
     gameObject.SetActive(false); // Deactivate the game object
     Destroy(gameObject);
     }

@@ -30,6 +30,7 @@ public class UnlockHeartShard10  : MonoBehaviour
 private void UnlockAndDestroy()
     {
     PlayerController.Instance.unlockedHeartShard10 = true;
+    SaveData.Instance.SavePlayerData();
     gameObject.SetActive(false); // Deactivate the game object
     Destroy(gameObject);
     }
