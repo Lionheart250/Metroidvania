@@ -97,4 +97,16 @@ public class GameManager : MonoBehaviour
         StartCoroutine(UIManager.Instance.DeactivateDeathScreen());
         PlayerController.Instance.Respawned();
     }
+
+    public void FreezeTime()
+    {
+        Time.timeScale = 0;    
+    }
+
+    public void UnFreezeTime()
+    {
+        Time.timeScale = 1;    
+    }
+
+   
 }

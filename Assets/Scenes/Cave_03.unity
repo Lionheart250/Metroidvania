@@ -1296,8 +1296,8 @@ MonoBehaviour:
   m_ShadowVolumeIntensityEnabled: 0
   m_ShadowVolumeIntensity: 0.75
   m_LocalBounds:
-    m_Center: {x: 0.003549993, y: 0.00030004978, z: 0}
-    m_Extent: {x: 0.99935, y: 1.005, z: 0}
+    m_Center: {x: -0.0016499758, y: 0.00034999847, z: 0}
+    m_Extent: {x: 1.00525, y: 0.99925, z: 0}
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 14.72
@@ -9827,12 +9827,40 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4723149257235478081, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4723149257235478081, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4723149257235478081, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
       objectReference: {fileID: 1603598884}
     - target: {fileID: 4723149257235478081, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Target
+      value: 
+      objectReference: {fileID: 461846067771931452, guid: 240079ef6b43545a0941d758601dbc45, type: 3}
+    - target: {fileID: 4723149257235478081, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4723149257235478081, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
       value: UnpauseGame
+      objectReference: {fileID: 0}
+    - target: {fileID: 4723149257235478081, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
+      value: FreezeTime
+      objectReference: {fileID: 0}
+    - target: {fileID: 4723149257235478081, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
+      value: GameManager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 4723149257235478081, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 7191597420740865831, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
       propertyPath: m_IsActive

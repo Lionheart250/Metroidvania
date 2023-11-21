@@ -32444,6 +32444,22 @@ PrefabInstance:
       propertyPath: pauseMenu
       value: 
       objectReference: {fileID: 357238849}
+    - target: {fileID: 461846067771931452, guid: 240079ef6b43545a0941d758601dbc45, type: 3}
+      propertyPath: respawnPoint.x
+      value: -191
+      objectReference: {fileID: 0}
+    - target: {fileID: 461846067771931452, guid: 240079ef6b43545a0941d758601dbc45, type: 3}
+      propertyPath: respawnPoint.y
+      value: -28
+      objectReference: {fileID: 0}
+    - target: {fileID: 461846067771931452, guid: 240079ef6b43545a0941d758601dbc45, type: 3}
+      propertyPath: defaultRespawnPoint.x
+      value: -191
+      objectReference: {fileID: 0}
+    - target: {fileID: 461846067771931452, guid: 240079ef6b43545a0941d758601dbc45, type: 3}
+      propertyPath: defaultRespawnPoint.y
+      value: -28
+      objectReference: {fileID: 0}
     - target: {fileID: 748030824758861161, guid: 240079ef6b43545a0941d758601dbc45, type: 3}
       propertyPath: m_Name
       value: GameManager

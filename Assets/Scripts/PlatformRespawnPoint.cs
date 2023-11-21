@@ -9,6 +9,7 @@ public class PlatformRespawnPoint : MonoBehaviour
         if (_other.CompareTag("Player"))
         {
             GameManager.Instance.platformingRespawnPoint = transform.position;
+            SaveData.Instance.SavePlayerData();
         }
     }
 }

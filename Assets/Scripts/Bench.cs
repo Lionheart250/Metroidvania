@@ -22,7 +22,7 @@ public class Bench : MonoBehaviour
         if(_collision.CompareTag("Player") && Input.GetButtonDown("Interact"))
         {
             interacted = true;
-            
+            PlayerController.Instance.Health = PlayerController.Instance.maxHealth;
             SaveData.Instance.benchSceneName = SceneManager.GetActiveScene().name;
             SaveData.Instance.benchPos = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y);
             SaveData.Instance.SaveBench();
