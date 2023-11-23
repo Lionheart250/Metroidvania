@@ -478,6 +478,7 @@ MonoBehaviour:
   unlockedSideCast: 0
   unlockedUpCast: 0
   unlockedDownCast: 0
+  unlockedReflect: 0
   unlockedHeartShard1: 0
   unlockedHeartShard2: 0
   unlockedHeartShard3: 0
@@ -498,6 +499,15 @@ MonoBehaviour:
   unlockedHeartShard18: 0
   unlockedHeartShard19: 0
   unlockedHeartShard20: 0
+  unlockedOrbShard1: 0
+  unlockedOrbShard2: 0
+  unlockedOrbShard3: 0
+  unlockedOrbShard4: 0
+  unlockedOrbShard5: 0
+  unlockedOrbShard6: 0
+  unlockedOrbShard7: 0
+  unlockedOrbShard8: 0
+  unlockedOrbShard9: 0
 --- !u!70 &7881608528124680515
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

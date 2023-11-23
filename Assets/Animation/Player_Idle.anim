@@ -22,10 +22,10 @@ AnimationClip:
     curve:
     - time: 0
       value: {fileID: 21300000, guid: 0738b4e1e84a34b8cad6bdce42a7e16a, type: 3}
-    attribute: m_LightCookieSprite
+    attribute: m_Sprite
     path: 
-    classID: 114
-    script: {fileID: 11500000, guid: 073797afb82c5a1438f328866b10b3f0, type: 3}
+    classID: 212
+    script: {fileID: 0}
     flags: 2
   m_SampleRate: 60
   m_WrapMode: 0
@@ -36,10 +36,10 @@ AnimationClip:
     genericBindings:
     - serializedVersion: 2
       path: 0
-      attribute: 993967319
-      script: {fileID: 11500000, guid: 073797afb82c5a1438f328866b10b3f0, type: 3}
-      typeID: 114
-      customType: 0
+      attribute: 0
+      script: {fileID: 0}
+      typeID: 212
+      customType: 23
       isPPtrCurve: 1
       isIntCurve: 0
       isSerializeReferenceCurve: 0

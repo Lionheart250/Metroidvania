@@ -732,7 +732,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &45363363
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -849,6 +849,10 @@ PrefabInstance:
     - target: {fileID: 5525631626558927138, guid: 438eae19f150c4538be9b1d00f9e20ed, type: 3}
       propertyPath: m_Name
       value: Add OrbShard 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5525631626558927138, guid: 438eae19f150c4538be9b1d00f9e20ed, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7698305973356664325, guid: 438eae19f150c4538be9b1d00f9e20ed, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1456,6 +1460,67 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1001 &167360413
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 8910545193787072979, guid: 7f72ea94f2ae04b158644a7d48214407, type: 3}
+      propertyPath: m_Name
+      value: Charger
+      objectReference: {fileID: 0}
+    - target: {fileID: 8910545193787072980, guid: 7f72ea94f2ae04b158644a7d48214407, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -34.36071
+      objectReference: {fileID: 0}
+    - target: {fileID: 8910545193787072980, guid: 7f72ea94f2ae04b158644a7d48214407, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 4.4771695
+      objectReference: {fileID: 0}
+    - target: {fileID: 8910545193787072980, guid: 7f72ea94f2ae04b158644a7d48214407, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8910545193787072980, guid: 7f72ea94f2ae04b158644a7d48214407, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.999962
+      objectReference: {fileID: 0}
+    - target: {fileID: 8910545193787072980, guid: 7f72ea94f2ae04b158644a7d48214407, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8910545193787072980, guid: 7f72ea94f2ae04b158644a7d48214407, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8910545193787072980, guid: 7f72ea94f2ae04b158644a7d48214407, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.008726558
+      objectReference: {fileID: 0}
+    - target: {fileID: 8910545193787072980, guid: 7f72ea94f2ae04b158644a7d48214407, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8910545193787072980, guid: 7f72ea94f2ae04b158644a7d48214407, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8910545193787072980, guid: 7f72ea94f2ae04b158644a7d48214407, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8910545193787072983, guid: 7f72ea94f2ae04b158644a7d48214407, type: 3}
+      propertyPath: m_FlipX
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 7f72ea94f2ae04b158644a7d48214407, type: 3}
 --- !u!1001 &167377281
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1467,6 +1532,10 @@ PrefabInstance:
     - target: {fileID: 5525631626558927138, guid: 3ab535f814a5e4224b1e2d14243911cb, type: 3}
       propertyPath: m_Name
       value: Add OrbShard 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5525631626558927138, guid: 3ab535f814a5e4224b1e2d14243911cb, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7698305973356664325, guid: 3ab535f814a5e4224b1e2d14243911cb, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1813,6 +1882,17 @@ Transform:
   - {fileID: 1292234180}
   m_Father: {fileID: 48099980}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &221714792 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1721975736593546506, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+  m_PrefabInstance: {fileID: 604428978921768286}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 073797afb82c5a1438f328866b10b3f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &229537906
 GameObject:
   m_ObjectHideFlags: 0
@@ -1992,6 +2072,10 @@ PrefabInstance:
     - target: {fileID: 5525631626558927138, guid: 4c5f42c4b6cf44a329087ee087a1b9ed, type: 3}
       propertyPath: m_Name
       value: Add OrbShard 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5525631626558927138, guid: 4c5f42c4b6cf44a329087ee087a1b9ed, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7698305973356664325, guid: 4c5f42c4b6cf44a329087ee087a1b9ed, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2313,6 +2397,63 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e3704ebca65747dc881114b015bdcfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1001 &289602260
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 6103786662675091270, guid: 5aa118d072fba45bcb10d454f8fea137, type: 3}
+      propertyPath: m_Name
+      value: Unlock Reflect
+      objectReference: {fileID: 0}
+    - target: {fileID: 8272581930302597217, guid: 5aa118d072fba45bcb10d454f8fea137, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -121.87784
+      objectReference: {fileID: 0}
+    - target: {fileID: 8272581930302597217, guid: 5aa118d072fba45bcb10d454f8fea137, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.967457
+      objectReference: {fileID: 0}
+    - target: {fileID: 8272581930302597217, guid: 5aa118d072fba45bcb10d454f8fea137, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8272581930302597217, guid: 5aa118d072fba45bcb10d454f8fea137, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8272581930302597217, guid: 5aa118d072fba45bcb10d454f8fea137, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8272581930302597217, guid: 5aa118d072fba45bcb10d454f8fea137, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8272581930302597217, guid: 5aa118d072fba45bcb10d454f8fea137, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8272581930302597217, guid: 5aa118d072fba45bcb10d454f8fea137, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8272581930302597217, guid: 5aa118d072fba45bcb10d454f8fea137, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8272581930302597217, guid: 5aa118d072fba45bcb10d454f8fea137, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5aa118d072fba45bcb10d454f8fea137, type: 3}
 --- !u!1 &293974790
 GameObject:
   m_ObjectHideFlags: 0
@@ -3087,6 +3228,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Add OrbShard 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5525631626558927138, guid: 9dcfee79713f946538a66ed2db85e7f6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7698305973356664325, guid: 9dcfee79713f946538a66ed2db85e7f6, type: 3}
       propertyPath: m_LocalPosition.x
       value: -129.93044
@@ -3227,6 +3372,10 @@ PrefabInstance:
     - target: {fileID: 5525631626558927138, guid: ae690312619b848f0ba82c34a9d033c8, type: 3}
       propertyPath: m_Name
       value: Add OrbShard 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5525631626558927138, guid: ae690312619b848f0ba82c34a9d033c8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7698305973356664325, guid: ae690312619b848f0ba82c34a9d033c8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -5211,6 +5360,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Add OrbShard 3
       objectReference: {fileID: 0}
+    - target: {fileID: 5525631626558927138, guid: 268846f9716694c55a3383be645a3185, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7698305973356664325, guid: 268846f9716694c55a3383be645a3185, type: 3}
       propertyPath: m_LocalPosition.x
       value: -102.1074
@@ -5267,6 +5420,10 @@ PrefabInstance:
     - target: {fileID: 5525631626558927138, guid: cbc914e0d504b404a90d60b73cadb5ea, type: 3}
       propertyPath: m_Name
       value: Add OrbShard 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 5525631626558927138, guid: cbc914e0d504b404a90d60b73cadb5ea, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7698305973356664325, guid: cbc914e0d504b404a90d60b73cadb5ea, type: 3}
       propertyPath: m_LocalPosition.x
@@ -5884,6 +6041,63 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1001 &921382447
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 710593041294272555, guid: ed47fd9a8f14e40d39ab17ef2c746824, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -157.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 710593041294272555, guid: ed47fd9a8f14e40d39ab17ef2c746824, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 10.006279
+      objectReference: {fileID: 0}
+    - target: {fileID: 710593041294272555, guid: ed47fd9a8f14e40d39ab17ef2c746824, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 710593041294272555, guid: ed47fd9a8f14e40d39ab17ef2c746824, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 710593041294272555, guid: ed47fd9a8f14e40d39ab17ef2c746824, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 710593041294272555, guid: ed47fd9a8f14e40d39ab17ef2c746824, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 710593041294272555, guid: ed47fd9a8f14e40d39ab17ef2c746824, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 710593041294272555, guid: ed47fd9a8f14e40d39ab17ef2c746824, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 710593041294272555, guid: ed47fd9a8f14e40d39ab17ef2c746824, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 710593041294272555, guid: ed47fd9a8f14e40d39ab17ef2c746824, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5358448221518609470, guid: ed47fd9a8f14e40d39ab17ef2c746824, type: 3}
+      propertyPath: m_Name
+      value: Respawn Point (2)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ed47fd9a8f14e40d39ab17ef2c746824, type: 3}
 --- !u!1 &935851570
 GameObject:
   m_ObjectHideFlags: 0
@@ -8715,7 +8929,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &1415577099
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -9192,7 +9406,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &1477662686
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -9276,6 +9490,10 @@ PrefabInstance:
     - target: {fileID: 5525631626558927138, guid: 119b52185b7cc473cb47988d041697c8, type: 3}
       propertyPath: m_Name
       value: Add OrbShard 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5525631626558927138, guid: 119b52185b7cc473cb47988d041697c8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7698305973356664325, guid: 119b52185b7cc473cb47988d041697c8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -9888,7 +10106,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &1590337850
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -10675,7 +10893,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &1755259699
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -12768,6 +12986,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Add OrbShard 8
       objectReference: {fileID: 0}
+    - target: {fileID: 5525631626558927138, guid: 769dfee7281754ae3ad6b7ff91eb186d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7698305973356664325, guid: 769dfee7281754ae3ad6b7ff91eb186d, type: 3}
       propertyPath: m_LocalPosition.x
       value: -30.562462
@@ -13474,6 +13696,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 674465900}
     - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: playerLight
+      value: 
+      objectReference: {fileID: 221714792}
+    - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
       propertyPath: manaOrbsHandler
       value: 
       objectReference: {fileID: 285601737}
@@ -13871,6 +14097,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Canvas
       objectReference: {fileID: 0}
+    - target: {fileID: 1589548627404402475, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1752919832411396500, guid: fcbdde3893181486ca6f905ac3cba867, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -14213,6 +14443,7 @@ SceneRoots:
   - {fileID: 604428978921768286}
   - {fileID: 825218147}
   - {fileID: 1441571369}
+  - {fileID: 921382447}
   - {fileID: 376210823}
   - {fileID: 2420367789335681006}
   - {fileID: 619394802}
@@ -14236,3 +14467,5 @@ SceneRoots:
   - {fileID: 45363364}
   - {fileID: 1477662687}
   - {fileID: 1590337851}
+  - {fileID: 167360413}
+  - {fileID: 289602260}

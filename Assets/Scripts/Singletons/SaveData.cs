@@ -30,6 +30,7 @@ public struct SaveData
 
     public bool playerUnlockedWallJump, playerUnlockedDash, playerUnlockedVarJump;
     public bool playerUnlockedSideCast, playerUnlockedUpCast, playerUnlockedDownCast;
+    public bool playerUnlockedReflect;
     
     //serialized heart shards
     public bool playerUnlockedHeartShard1, playerUnlockedHeartShard2, playerUnlockedHeartShard3, playerUnlockedHeartShard4, playerUnlockedHeartShard5, 
@@ -141,6 +142,9 @@ public struct SaveData
             writer.Write(playerUnlockedUpCast);
             playerUnlockedDownCast = PlayerController.Instance.unlockedDownCast;
             writer.Write(playerUnlockedDownCast);
+            playerUnlockedReflect = PlayerController.Instance.unlockedReflect;
+            writer.Write(playerUnlockedReflect);
+
             //each heart shard
             playerUnlockedHeartShard1 = PlayerController.Instance.unlockedHeartShard1;
             writer.Write(playerUnlockedHeartShard1);
@@ -242,6 +246,7 @@ public struct SaveData
                 playerUnlockedSideCast = reader.ReadBoolean();
                 playerUnlockedUpCast = reader.ReadBoolean();
                 playerUnlockedDownCast = reader.ReadBoolean();
+                playerUnlockedReflect = reader.ReadBoolean();
                 
                 //each heart shard
                 playerUnlockedHeartShard1 = reader.ReadBoolean();
@@ -300,6 +305,7 @@ public struct SaveData
                 PlayerController.Instance.unlockedSideCast = playerUnlockedSideCast;
                 PlayerController.Instance.unlockedUpCast = playerUnlockedUpCast;
                 PlayerController.Instance.unlockedDownCast = playerUnlockedDownCast;
+                PlayerController.Instance.unlockedReflect = playerUnlockedReflect;
                 
                 //each heart shard
                 PlayerController.Instance.unlockedHeartShard1 = playerUnlockedHeartShard1;
@@ -354,6 +360,7 @@ public struct SaveData
             PlayerController.Instance.unlockedSideCast = false;
             PlayerController.Instance.unlockedUpCast = false;
             PlayerController.Instance.unlockedDownCast = false;
+            PlayerController.Instance.unlockedReflect = false;
 
             //each heart shard
             PlayerController.Instance.unlockedHeartShard1 = false;

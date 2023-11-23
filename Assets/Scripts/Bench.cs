@@ -23,6 +23,9 @@ public class Bench : MonoBehaviour
         {
             interacted = true;
             PlayerController.Instance.Health = PlayerController.Instance.maxHealth;
+            //
+            PlayerController.Instance.Mana = 1;// will move this to a seperate game object specifically for refilling the mana 
+            //
             SaveData.Instance.benchSceneName = SceneManager.GetActiveScene().name;
             SaveData.Instance.benchPos = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y);
             SaveData.Instance.SaveBench();

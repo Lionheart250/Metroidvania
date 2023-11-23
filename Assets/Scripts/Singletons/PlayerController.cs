@@ -2,6 +2,8 @@ using System.Collections;
 using UnityEditor.Build;
 using UnityEngine;
 
+
+
 public class PlayerController : MonoBehaviour
 {
     [Header("Horizontal Movement Settings:")]
@@ -144,6 +146,13 @@ public class PlayerController : MonoBehaviour
     [SerializeField] AudioClip dashAndAttackSound;
     [SerializeField] AudioClip spellCastSound;
     [SerializeField] AudioClip hurtSound;
+    [Space(5)]
+
+    [Header("Reflect Settings")]
+    public UnityEngine.Rendering.Universal.Light2D playerLight;
+    private float timeBetweenReflect = 0.4f, timeSinceReflect;
+    [Space(5)]
+    
 
     
 
@@ -156,6 +165,7 @@ public class PlayerController : MonoBehaviour
     //Input Variables
     private float xAxis, yAxis;
     private bool attack = false;
+    private bool reflect = false;
     bool openMap;
     bool openInventory;
 
@@ -174,6 +184,7 @@ public class PlayerController : MonoBehaviour
     public bool unlockedSideCast;
     public bool unlockedUpCast;
     public bool unlockedDownCast;
+    public bool unlockedReflect;
     [Space(5)]
 
     [Header("Health Shards")]
@@ -284,6 +295,7 @@ public class PlayerController : MonoBehaviour
             }            
             Attack();
             CastSpell();
+            Reflect();
         }        
         FlashWhileInvincible();     
         
@@ -319,6 +331,7 @@ public class PlayerController : MonoBehaviour
        xAxis = Input.GetAxisRaw("Horizontal");
        yAxis = Input.GetAxisRaw("Vertical");
        attack = Input.GetButtonDown("Attack");
+       reflect = Input.GetButtonDown("Reflect");
        openMap = Input.GetButton("Map");
        openInventory = Input.GetButton("Inventory");
        if (Input.GetButton("Cast/Heal"))
@@ -864,6 +877,61 @@ IEnumerator StopTakingDamage()
         anim.SetBool("Casting", false);
         pState.casting = false;
     }
+
+    void Reflect()
+    {   
+        timeSinceReflect += Time.deltaTime;
+        if (reflect && timeSinceReflect >= timeBetweenReflect && Input.GetButtonDown("Reflect") )
+        {
+            if (audioSource != null && jumpSound != null)
+            {   
+                timeSinceReflect = 0;
+                audioSource.PlayOneShot(jumpSound);
+                anim.SetBool("Casting", true);
+
+                // Assuming playerLight is assigned in the Unity Editor
+                if (playerLight != null)
+                {
+                    StartCoroutine(ReflectCoroutine());
+                    
+                }
+                else
+                {
+                    Debug.LogError("Player Light2D is not properly set!");
+                }
+            }
+            else
+            {
+                Debug.LogError("AudioSource or JumpSound is not properly set!");
+            }
+        }
+    }
+    
+    IEnumerator ReflectCoroutine()
+    {
+        // Save the original intensity, falloffIntensity, color, and falloffColor
+        float originalIntensity = playerLight.intensity;
+        float originalFalloffIntensity = playerLight.falloffIntensity;
+        Color originalColor = playerLight.color;
+        Color angelicColor = new Color(1f, 0.9f, 0.7f); 
+        
+
+        // Set the new intensity, falloffIntensity, color, and falloffColor
+        playerLight.intensity = 50f;
+        playerLight.falloffIntensity = 0f; // Change this value as needed
+        playerLight.color = angelicColor;
+        
+
+        // Wait for 1 second
+        yield return new WaitForSeconds(0.1f);
+
+        // Restore the original intensity, falloffIntensity, color, and falloffColor
+        playerLight.intensity = originalIntensity;
+        playerLight.falloffIntensity = originalFalloffIntensity;
+        playerLight.color = originalColor;
+    
+    }
+
 
     public bool Grounded()
     {
