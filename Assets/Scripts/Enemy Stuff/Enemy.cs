@@ -79,7 +79,7 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {
-        //if (GameManager.Instance.gameIsPaused) return;
+        if (GameManager.Instance.gameIsPaused) return;
 
         if(isRecoiling)
         {
@@ -105,15 +105,25 @@ public class Enemy : MonoBehaviour
         {
             health -= _damageDone;
             if (!isRecoiling)
-            {
+            {   
+                isRecoiling = true;
                 audioSource.PlayOneShot(hurtSound);
                 GameObject _orangeBlood = Instantiate(orangeBlood, transform.position, Quaternion.identity);
                 Destroy(_orangeBlood, 5.5f);
                 rb.velocity = _hitForce * recoilFactor * _hitDirection;
+
+                StartCoroutine(ResetRecoiling(1.0f));
             }
         }
     }
 
+private IEnumerator ResetRecoiling(float delay)
+{
+    yield return new WaitForSeconds(delay);
+
+    // After the delay, set isRecoiling back to false
+    isRecoiling = false;
+}
     protected virtual void OnCollisionStay2D(Collision2D _other)
     {
         if(_other.gameObject.CompareTag("Player") && !PlayerController.Instance.pState.invincible && health > 0)

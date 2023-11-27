@@ -470,6 +470,9 @@ MonoBehaviour:
   dashAndAttackSound: {fileID: 8300000, guid: 1d75a533349af4ae285b2394fe3d2b94, type: 3}
   spellCastSound: {fileID: 8300000, guid: 4dd755d93309642168dc69e7eed0e56f, type: 3}
   hurtSound: {fileID: 8300000, guid: d0806599436b24b6db29082182001a18, type: 3}
+  playerLight: {fileID: 1721975736593546506}
+  Shielded: 0
+  Shield: {fileID: 3929740575146288908, guid: 5e8b0af7b4db54539b933f90d50cdec4, type: 3}
   pState: {fileID: 0}
   rb: {fileID: 0}
   unlockedWallJump: 0
@@ -558,7 +561,7 @@ MonoBehaviour:
   m_ComponentVersion: 1
   m_LightType: 3
   m_BlendStyleIndex: 0
-  m_FalloffIntensity: 0.485
+  m_FalloffIntensity: 0.569
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 3
   m_LightVolumeIntensity: 1
