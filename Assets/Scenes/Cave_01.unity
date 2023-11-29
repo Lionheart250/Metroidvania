@@ -1474,7 +1474,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8756753723086063971, guid: 7f72ea94f2ae04b158644a7d48214407, type: 3}
       propertyPath: ledgeCheckX
-      value: 15
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 8756753723086063971, guid: 7f72ea94f2ae04b158644a7d48214407, type: 3}
+      propertyPath: playerCheckX
+      value: 500
       objectReference: {fileID: 0}
     - target: {fileID: 8756753723086063971, guid: 7f72ea94f2ae04b158644a7d48214407, type: 3}
       propertyPath: recoilFactor
@@ -7481,7 +7485,7 @@ GameObject:
   - component: {fileID: 1160235757}
   - component: {fileID: 1160235756}
   - component: {fileID: 1160235755}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: spikey block\
   m_TagString: Death
   m_Icon: {fileID: 0}

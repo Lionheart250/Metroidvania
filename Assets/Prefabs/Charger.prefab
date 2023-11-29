@@ -175,8 +175,8 @@ MonoBehaviour:
   ledgeCheckX: 15
   ledgeCheckY: 5
   chargeSpeedMultiplier: 6
-  chargeDuration: 10
-  jumpForce: 20
+  chargeDuration: 2
+  jumpForce: 50
   whatIsGround:
     serializedVersion: 2
     m_Bits: 64
