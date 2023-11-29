@@ -7,7 +7,7 @@ public class LightShield : MonoBehaviour
     [SerializeField] float damage;
     [SerializeField] float hitForce;
     [SerializeField] int speed;
-    [SerializeField] float lifetime = 0.1f;
+    [SerializeField] float lifetime = 1f;
     // Start is called before the first frame update
     void Start()
     {

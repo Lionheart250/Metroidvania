@@ -91,10 +91,10 @@ public class GameManager : MonoBehaviour
         {
             respawnPoint = defaultRespawnPoint;
         }
-
+        StartCoroutine(UIManager.Instance.DeactivateDeathScreen());
         PlayerController.Instance.transform.position = respawnPoint;
 
-        StartCoroutine(UIManager.Instance.DeactivateDeathScreen());
+        
         PlayerController.Instance.Respawned();
     }
 

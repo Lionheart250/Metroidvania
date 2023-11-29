@@ -151,7 +151,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Reflect Settings")]
     public UnityEngine.Rendering.Universal.Light2D playerLight;
-    private float timeBetweenReflect = 5f, timeSinceReflect;
+    private float timeBetweenReflect = 0f, timeSinceReflect;
     public bool Shielded = false;
     [SerializeField] GameObject Shield;
     [Space(5)]
@@ -885,83 +885,53 @@ IEnumerator StopTakingDamage()
 
     void Reflect()
     {   
-        timeSinceReflect += Time.deltaTime;
-        if (reflect && timeSinceReflect >= timeBetweenReflect && Input.GetButtonDown("Reflect") )
+        if (Input.GetButtonDown("Reflect") && !Shielded && Mana >= 0.5 && timeSinceReflect >= timeBetweenReflect && unlockedReflect )
+        {              
+        timeSinceReflect = 0;
+        audioSource.PlayOneShot(jumpSound);
+        anim.SetBool("Casting", true);
+        StartCoroutine(ReflectCoroutine());
+        }
+        else
         {
-            if (audioSource != null && jumpSound != null)
-            {   
-                timeSinceReflect = 0;
-                audioSource.PlayOneShot(jumpSound);
-                anim.SetBool("Casting", true);
-
-                // Assuming playerLight is assigned in the Unity Editor
-                if (playerLight != null)
-                {   
-                    
-                    StartCoroutine(ReflectCoroutine());
-                    
-                    
-                }
-                else
-                {
-                    Debug.LogError("Player Light2D is not properly set!");
-                }
-            }
-            else
-            {
-                Debug.LogError("AudioSource or JumpSound is not properly set!");
-            }
+        timeSinceReflect += Time.deltaTime;
         }
     }
-    
     IEnumerator ReflectCoroutine()
     {
-        // Save the original intensity, falloffIntensity, color, and falloffColor
-            RigidbodyConstraints2D originalConstraints = rb.constraints;
-
         float originalIntensity = playerLight.intensity;
         float originalFalloffIntensity = playerLight.falloffIntensity;
         Color originalColor = playerLight.color;
         Color angelicColor = new Color(1f, 0.9f, 0.7f); 
         Shield.SetActive(true);
         Shielded = true;
-             
-        
+        Mana = 0;
+                     
         anim.SetBool("Casting", true);
             
-            GameObject _lightshield = Instantiate(Shield, rb.position, Quaternion.identity);
+        GameObject _lightshield = Instantiate(Shield, rb.position, Quaternion.identity);            
+        if(pState.lookingRight)
+        {
+            _lightshield.transform.eulerAngles = Vector3.zero; 
+        }
+        else
+        {
+            _lightshield.transform.eulerAngles = new Vector2(_lightshield.transform.eulerAngles.x, 180); 
+        }
 
-
-            
-            if(pState.lookingRight)
-            {
-                _lightshield.transform.eulerAngles = Vector3.zero; 
-            }
-            else
-            {
-                _lightshield.transform.eulerAngles = new Vector2(_lightshield.transform.eulerAngles.x, 180); 
-            }
-
-        // Set the new intensity, falloffIntensity, color, and falloffColor
         playerLight.intensity = 50f;
-        playerLight.falloffIntensity = 0f; // Change this value as needed
+        playerLight.falloffIntensity = 0f; 
         playerLight.color = angelicColor;
 
-    rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY;
-
-       // Wait for 1 second
-        yield return new WaitForSeconds(0.1f);
-
-        // Restore the original intensity, falloffIntensity, color, and falloffColor
-        rb.constraints = originalConstraints;
+        yield return new WaitForSeconds(1f);
 
         playerLight.intensity = originalIntensity;
         playerLight.falloffIntensity = originalFalloffIntensity;
         playerLight.color = originalColor;
         Shield.SetActive(false);
-        Shielded = false;
-        
-    
+
+        yield return new WaitForSeconds(4f);
+        Shielded = false;            
     }
 
 
