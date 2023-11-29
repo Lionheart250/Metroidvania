@@ -151,7 +151,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Reflect Settings")]
     public UnityEngine.Rendering.Universal.Light2D playerLight;
-    private float timeBetweenReflect = 0f, timeSinceReflect;
+    private float timeBetweenReflect = 0.4f, timeSinceReflect;
     public bool Shielded = false;
     [SerializeField] GameObject Shield;
     [Space(5)]
@@ -930,7 +930,7 @@ IEnumerator StopTakingDamage()
         playerLight.color = originalColor;
         Shield.SetActive(false);
 
-        yield return new WaitForSeconds(4f);
+       
         Shielded = false;            
     }
 
