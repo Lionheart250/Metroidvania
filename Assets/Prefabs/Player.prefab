@@ -25,6 +25,37 @@ Transform:
   m_GameObject: {fileID: 2365255654489183447}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 17.9, y: -0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8393741681737554738}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3498523895896075617
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7864018728045345398}
+  m_Layer: 0
+  m_Name: Charge Attack Transform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7864018728045345398
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3498523895896075617}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 10, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -305,6 +336,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6081919134884060294}
+  - {fileID: 7864018728045345398}
   - {fileID: 1464652292267261723}
   - {fileID: 5273050065689229505}
   - {fileID: 4784169075175515984}
@@ -429,6 +461,8 @@ MonoBehaviour:
   dashEffect: {fileID: 8902779006071723231, guid: 9042fa1c9d75d430788014ec956f31d3, type: 3}
   SideAttackTransform: {fileID: 1464652292267261723}
   SideAttackArea: {x: 20, y: 15}
+  ChargeAttackTransform: {fileID: 7864018728045345398}
+  ChargeAttackArea: {x: 40, y: 23}
   UpAttackTransform: {fileID: 5273050065689229505}
   UpAttackArea: {x: 20, y: 20}
   DownAttackTransform: {fileID: 4784169075175515984}
@@ -438,6 +472,9 @@ MonoBehaviour:
     m_Bits: 8
   damage: 2
   slashEffect: {fileID: 8036702266434397819, guid: ad76ac7460de649b491fe07ded5743c9, type: 3}
+  chargeSlashEffect: {fileID: 8648911973234137180, guid: c97e8aade2b0e4d4c8f98bf6519fd559, type: 3}
+  chargeSpeed: 2
+  chargeTime: 3
   recoilXSteps: 4
   recoilYSteps: 4
   recoilXSpeed: 50

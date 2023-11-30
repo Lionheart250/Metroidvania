@@ -61,6 +61,8 @@ public class PlayerController : MonoBehaviour
     [Header("Attack Settings:")]
     [SerializeField] private Transform SideAttackTransform; //the middle of the side attack area
     [SerializeField] private Vector2 SideAttackArea; //how large the area of side attack is
+    [SerializeField] private Transform ChargeAttackTransform; //the middle of the side attack area
+    [SerializeField] private Vector2 ChargeAttackArea; //how large the area of side attack is
 
     [SerializeField] private Transform UpAttackTransform; //the middle of the up attack area
     [SerializeField] private Vector2 UpAttackArea; //how large the area of side attack is
@@ -75,6 +77,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float damage; //the damage the player does to an enemy
 
     [SerializeField] private GameObject slashEffect; //the effect of the slashs
+    [SerializeField] private GameObject chargeSlashEffect; 
+    [SerializeField] private float chargeSpeed;
+    [SerializeField] public float chargeTime;  // Adjust this value as needed
+    private bool isCharging = false;
     
 
     bool restoreTime;
@@ -254,6 +260,7 @@ public class PlayerController : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireCube(SideAttackTransform.position, SideAttackArea);
+        Gizmos.DrawWireCube(ChargeAttackTransform.position, ChargeAttackArea);
         Gizmos.DrawWireCube(UpAttackTransform.position, UpAttackArea);
         Gizmos.DrawWireCube(DownAttackTransform.position, DownAttackArea);
     }
@@ -311,6 +318,22 @@ public class PlayerController : MonoBehaviour
         if (manaOrbs > 3)
         {
             manaOrbs = 3;
+        }
+        if (Input.GetButton("Attack") && chargeTime < 2)
+        {
+            isCharging = true;
+            if (isCharging == true)
+            {
+                chargeTime += Time.deltaTime * chargeSpeed;
+            }
+        }
+        if (Input.GetButtonDown("Attack"))
+        {
+            chargeTime = 0;
+        }
+        else if (Input.GetButtonUp("Attack") && chargeTime >= 2)
+        {
+            ReleaseCharge();
         }
     }
 
@@ -487,9 +510,40 @@ public class PlayerController : MonoBehaviour
                 SlashEffectAtAngle(slashEffect, -90, DownAttackTransform);
             }
         }
-
-
     }
+    void ReleaseCharge()
+{
+    int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
+
+    // Manually set the damage value
+    int customDamage = 5; // Replace 20 with your desired damage value
+
+    Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(ChargeAttackTransform.position, ChargeAttackArea, 0, attackableLayer);
+
+    if (objectsToHit.Length > 0)
+    {
+        pState.recoilingX = true;
+        dashed = false;
+    }
+
+    for (int i = 0; i < objectsToHit.Length; i++)
+    {
+        if (objectsToHit[i].GetComponent<Enemy>() != null)
+        {
+            // Pass the custom damage to the EnemyGetsHit method
+            objectsToHit[i].GetComponent<Enemy>().EnemyGetsHit(customDamage, Vector2.right * _recoilLeftOrRight, recoilXSpeed);
+
+            // ... rest of the code ...
+        }
+    }
+
+    Instantiate(chargeSlashEffect, ChargeAttackTransform);
+    isCharging = false;
+    chargeTime = 0;
+    // Add code for the actual attack logic here
+    Debug.Log("Charge Released");
+}
+
 
     void Hit(Transform _attackTransform, Vector2 _attackArea, ref bool _recoilBool, Vector2 _recoilDir, float _recoilStrength)
     {
