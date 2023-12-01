@@ -80,9 +80,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject chargeSlashEffect; 
     [SerializeField] private float chargeSpeed;
     [SerializeField] public float chargeTime;  // Adjust this value as needed
-    private bool isCharging = false;
-    
-
+    private bool isCharging;
     bool restoreTime;
     float restoreTimeSpeed;
     [Space(5)]
@@ -318,23 +316,7 @@ public class PlayerController : MonoBehaviour
         if (manaOrbs > 3)
         {
             manaOrbs = 3;
-        }
-        if (Input.GetButton("Attack") && chargeTime < 2)
-        {
-            isCharging = true;
-            if (isCharging == true)
-            {
-                chargeTime += Time.deltaTime * chargeSpeed;
-            }
-        }
-        if (Input.GetButtonDown("Attack"))
-        {
-            chargeTime = 0;
-        }
-        else if (Input.GetButtonUp("Attack") && chargeTime >= 2)
-        {
-            ReleaseCharge();
-        }
+        }    
     }
 
     private void FixedUpdate()
@@ -485,32 +467,58 @@ public class PlayerController : MonoBehaviour
 
     void Attack()
     {
-        timeSinceAttck += Time.deltaTime;
-        if (attack && timeSinceAttck >= timeBetweenAttack)
+    timeSinceAttck += Time.deltaTime;
+
+    if (attack && timeSinceAttck >= timeBetweenAttack)
+    {
+        timeSinceAttck = 0;
+        anim.SetTrigger("Attacking");
+        audioSource.PlayOneShot(dashAndAttackSound);
+
+        // Handle different attack types based on input and conditions
+        if (yAxis == 0 || (yAxis < 0 && Grounded()))
         {
-            timeSinceAttck = 0;
-            anim.SetTrigger("Attacking");
-            audioSource.PlayOneShot(dashAndAttackSound);
+            int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
 
-            if (yAxis == 0 || yAxis < 0 && Grounded())
-            {
-                int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
-
-                Hit(SideAttackTransform, SideAttackArea, ref pState.recoilingX, Vector2.right * _recoilLeftOrRight, recoilXSpeed);
-                Instantiate(slashEffect, SideAttackTransform);
-            }
-            else if (yAxis > 0)
-            {
-                Hit(UpAttackTransform, UpAttackArea, ref pState.recoilingY, Vector2.up, recoilYSpeed);
-                SlashEffectAtAngle(slashEffect, 80, UpAttackTransform);
-            }
-            else if (yAxis < 0 && !Grounded())
-            {
-                Hit(DownAttackTransform, DownAttackArea, ref pState.recoilingY, Vector2.down, recoilYSpeed);
-                SlashEffectAtAngle(slashEffect, -90, DownAttackTransform);
-            }
+            // Handle regular attack
+            Hit(SideAttackTransform, SideAttackArea, ref pState.recoilingX, Vector2.right * _recoilLeftOrRight, recoilXSpeed);
+            Instantiate(slashEffect, SideAttackTransform);
+        }
+        else if (yAxis > 0)
+        {
+            // Handle up attack
+            Hit(UpAttackTransform, UpAttackArea, ref pState.recoilingY, Vector2.up, recoilYSpeed);
+            SlashEffectAtAngle(slashEffect, 80, UpAttackTransform);
+        }
+        else if (yAxis < 0 && !Grounded())
+        {
+            // Handle down attack
+            Hit(DownAttackTransform, DownAttackArea, ref pState.recoilingY, Vector2.down, recoilYSpeed);
+            SlashEffectAtAngle(slashEffect, -90, DownAttackTransform);
         }
     }
+
+    if (Input.GetButton("Attack") && chargeTime < 2)
+        {
+            isCharging = true;
+            chargeTime += Time.deltaTime * chargeSpeed;
+        }
+        else if (Input.GetButtonDown("Attack"))
+        {
+            // If the attack button is pressed, but not held, reset chargeTime
+            chargeTime = 0;
+        }
+        if (Input.GetButtonUp("Attack") && chargeTime <= 2)
+        {
+            chargeTime = 0;
+        }
+        else if (Input.GetButtonUp("Attack") && chargeTime >= 2)
+        {
+            // Release charge if the button is released and charging duration is sufficient
+            ReleaseCharge();
+        }
+}
+
     void ReleaseCharge()
 {
     int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
@@ -533,7 +541,19 @@ public class PlayerController : MonoBehaviour
             // Pass the custom damage to the EnemyGetsHit method
             objectsToHit[i].GetComponent<Enemy>().EnemyGetsHit(customDamage, Vector2.right * _recoilLeftOrRight, recoilXSpeed);
 
-            // ... rest of the code ...
+            if (objectsToHit[i].CompareTag("Enemy"))
+                {
+                    if(Mana < 1)
+                    {
+                        Mana += manaGain;
+                    }
+
+                    if(Mana >= 1 || (halfMana && Mana >= 0.5))
+                    {
+                        manaOrbsHandler.UpdateMana(manaGain * 3);
+                    }
+                                        
+                }
         }
     }
 
