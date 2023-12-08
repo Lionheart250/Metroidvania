@@ -29,6 +29,10 @@ public class Enemy : MonoBehaviour
         Crawler_Idle,
         Crawler_Flip,
 
+        //caster
+        Caster_Idle,
+        Caster_Flip,
+
         //Bat
         Bat_Idle,
         Bat_Chase,

@@ -1,6 +1,8 @@
 using System.Collections;
 using UnityEditor.Build;
 using UnityEngine;
+using UnityEngine.InputSystem;
+
 
 
 
@@ -80,9 +82,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject chargeSlashEffect; 
     [SerializeField] private float chargeSpeed;
     [SerializeField] public float chargeTime;  // Adjust this value as needed
-    private bool isCharging;
     bool restoreTime;
     float restoreTimeSpeed;
+    [SerializeField] GameObject chargeParticles;
     [Space(5)]
 
 
@@ -343,10 +345,11 @@ public class PlayerController : MonoBehaviour
        reflect = Input.GetButtonDown("Reflect");
        openMap = Input.GetButton("Map");
        openInventory = Input.GetButton("Inventory");
-       if (Input.GetButton("Cast/Heal"))
+       if (Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == true))
         {
             castOrHealTimer += Time.deltaTime;
         }
+        
     }
 
     void ToggleMap()
@@ -413,7 +416,7 @@ public class PlayerController : MonoBehaviour
 
     void StartDash()
     {
-        if (Input.GetButtonDown("Dash") && canDash && !dashed)
+        if ((Input.GetButtonDown("Dash")|| (Gamepad.current?.leftTrigger.wasPressedThisFrame == true)) && canDash && !dashed)
         {
             StartCoroutine(Dash());
             dashed = true;
@@ -469,7 +472,7 @@ public class PlayerController : MonoBehaviour
     {
     timeSinceAttck += Time.deltaTime;
 
-    if (attack && timeSinceAttck >= timeBetweenAttack)
+    if ((attack || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && timeSinceAttck >= timeBetweenAttack)
     {
         timeSinceAttck = 0;
         anim.SetTrigger("Attacking");
@@ -498,22 +501,41 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    if (Input.GetButton("Attack") && chargeTime < 2)
+        if ((Input.GetButton("Attack") || (Gamepad.current?.squareButton.isPressed == true)) && chargeTime <= 2)
         {
-            isCharging = true;
+            
             chargeTime += Time.deltaTime * chargeSpeed;
+
+    
+            chargeTime = Mathf.Clamp(chargeTime, 0f, 2f);
+
+            GameObject _chargeParticles = Instantiate(chargeParticles, transform.position, Quaternion.identity);
+
+            if (chargeTime >= 2f)
+            {
+                // Double the size
+                Vector3 newScale = _chargeParticles.transform.localScale * 2f;
+                _chargeParticles.transform.localScale = newScale;
+            }
+            
+            Destroy(_chargeParticles, 0.05f);
+
         }
-        else if (Input.GetButtonDown("Attack"))
+
+        else if ((Input.GetButtonDown("Attack") || (Gamepad.current?.squareButton.wasPressedThisFrame == true)))
         {
             // If the attack button is pressed, but not held, reset chargeTime
             chargeTime = 0;
         }
-        if (Input.GetButtonUp("Attack") && chargeTime <= 2)
+        if ((Input.GetButtonUp("Attack") || (Gamepad.current?.squareButton.wasReleasedThisFrame == true)) && chargeTime < 2)
         {
             chargeTime = 0;
+            
+            
         }
-        else if (Input.GetButtonUp("Attack") && chargeTime >= 2)
-        {
+        else if ((Input.GetButtonUp("Attack") || (Gamepad.current?.squareButton.wasReleasedThisFrame == true)) && chargeTime >= 2)
+        {   
+            audioSource.PlayOneShot(dashAndAttackSound);
             // Release charge if the button is released and charging duration is sufficient
             ReleaseCharge();
         }
@@ -556,9 +578,8 @@ public class PlayerController : MonoBehaviour
                 }
         }
     }
-
+    
     Instantiate(chargeSlashEffect, ChargeAttackTransform);
-    isCharging = false;
     chargeTime = 0;
     // Add code for the actual attack logic here
     Debug.Log("Charge Released");
@@ -817,7 +838,7 @@ IEnumerator StopTakingDamage()
 
     void Heal()
     {
-        if (Input.GetButton("Cast/Heal") && castOrHealTimer > 0.5f && Health < maxHealth && Mana > 0 && !pState.jumping && !pState.dashing)
+        if (((Gamepad.current?.circleButton.isPressed == true) || Input.GetButton("Cast/Heal")) && castOrHealTimer > 0.5f && Health < maxHealth && Mana > 0 && !pState.jumping && !pState.dashing)
         {
             pState.healing = true;
             anim.SetBool("Healing", true);
@@ -866,7 +887,7 @@ IEnumerator StopTakingDamage()
 
     void CastSpell()
     {
-        if (Input.GetButtonUp("Cast/Heal") && castOrHealTimer <= 0.5f && timeSinceCast >= timeBetweenCast && Mana >= manaSpellCost)
+        if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && castOrHealTimer <= 0.5f && timeSinceCast >= timeBetweenCast && Mana >= manaSpellCost)
         {
             pState.casting = true;
             timeSinceCast = 0;
@@ -877,7 +898,7 @@ IEnumerator StopTakingDamage()
             timeSinceCast += Time.deltaTime;
         }
 
-        if (!Input.GetButton("Cast/Heal"))
+        if ((!Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == false)))
         {
             castOrHealTimer = 0;
         }
@@ -959,7 +980,7 @@ IEnumerator StopTakingDamage()
 
     void Reflect()
     {   
-        if (Input.GetButtonDown("Reflect") && !Shielded && Mana >= 0.5 && timeSinceReflect >= timeBetweenReflect && unlockedReflect )
+        if ((Input.GetButtonDown("Reflect") || (Gamepad.current?.rightTrigger.wasPressedThisFrame == true)) && !Shielded && timeSinceReflect >= timeBetweenReflect && unlockedReflect)
         {              
         timeSinceReflect = 0;
         audioSource.PlayOneShot(jumpSound);
@@ -973,13 +994,17 @@ IEnumerator StopTakingDamage()
     }
     IEnumerator ReflectCoroutine()
     {
-        float originalIntensity = playerLight.intensity;
-        float originalFalloffIntensity = playerLight.falloffIntensity;
-        Color originalColor = playerLight.color;
-        Color angelicColor = new Color(1f, 0.9f, 0.7f); 
+        RigidbodyConstraints2D originalConstraints = rb.constraints;
+        Vector3 originalPosition = rb.position;
+
+        rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY;
+        //float originalIntensity = playerLight.intensity;
+        //float originalFalloffIntensity = playerLight.falloffIntensity;
+        //Color originalColor = playerLight.color;
+        //Color angelicColor = new Color(1f, 0.9f, 0.7f); 
         Shield.SetActive(true);
         Shielded = true;
-        Mana = 0;
+        
                      
         anim.SetBool("Casting", true);
             
@@ -993,19 +1018,19 @@ IEnumerator StopTakingDamage()
             _lightshield.transform.eulerAngles = new Vector2(_lightshield.transform.eulerAngles.x, 180); 
         }
 
-        playerLight.intensity = 50f;
-        playerLight.falloffIntensity = 0f; 
-        playerLight.color = angelicColor;
+        //playerLight.intensity = 50f;
+        //playerLight.falloffIntensity = 0f; 
+        //playerLight.color = angelicColor;
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.2f);
 
-        playerLight.intensity = originalIntensity;
-        playerLight.falloffIntensity = originalFalloffIntensity;
-        playerLight.color = originalColor;
+        //playerLight.intensity = originalIntensity;
+        //playerLight.falloffIntensity = originalFalloffIntensity;
+        //playerLight.color = originalColor;
         Shield.SetActive(false);
-
-       
-        Shielded = false;            
+        Shielded = false;       
+        Destroy(_lightshield);
+        rb.constraints = originalConstraints;   
     }
 
 
@@ -1035,7 +1060,7 @@ IEnumerator StopTakingDamage()
         pState.jumping = true;
     }
 
-    if (!Grounded() && airJumpCounter < maxAirJumps && Input.GetButtonDown("Jump") && unlockedVarJump)
+    if (!Grounded() && airJumpCounter < maxAirJumps && (Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump)
     {
         audioSource.PlayOneShot(jumpSound);
 
@@ -1046,7 +1071,7 @@ IEnumerator StopTakingDamage()
         rb.velocity = new Vector3(rb.velocity.x, jumpForce);
     }
 
-    if (Input.GetButtonUp("Jump") && rb.velocity.y > 3)
+    if ((Input.GetButtonUp("Jump") || (Gamepad.current?.crossButton.wasReleasedThisFrame == true)) && rb.velocity.y > 3)
     {
         pState.jumping = false;
 
@@ -1085,7 +1110,7 @@ IEnumerator StopTakingDamage()
             landingSoundPlayed = false;
         }
 
-        if (Input.GetButtonDown("Jump"))
+if ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)))
         {
             jumpBufferCounter = jumpBufferFrames;
         }
@@ -1122,7 +1147,7 @@ IEnumerator StopTakingDamage()
             CancelInvoke(nameof(StopWallJumping));
         }
 
-        if (Input.GetButtonDown("Jump") && isWallSliding)
+        if ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && isWallSliding)
         {
             isWallJumping = true;
             rb.velocity = new Vector2(wallJumpingDirection * wallJumpingPower.x, wallJumpingPower.y);
