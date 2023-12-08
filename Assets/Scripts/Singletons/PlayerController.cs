@@ -378,18 +378,27 @@ public class PlayerController : MonoBehaviour
     
 
     void Flip()
+{
+    if (xAxis < 0)
     {
-        if (xAxis < 0)
+        if (pState.lookingRight)
         {
             transform.eulerAngles = new Vector2(0, 180);
+            transform.localScale = new Vector3(1, 1, 1);
             pState.lookingRight = false;
         }
-        else if (xAxis > 0)
+    }
+    else if (xAxis > 0)
+    {
+        if (!pState.lookingRight)
         {
             transform.eulerAngles = new Vector2(0, 0);
+            transform.localScale = new Vector3(1, 1, 1);
             pState.lookingRight = true;
         }
     }
+}
+
 
     private void Move()
     {
