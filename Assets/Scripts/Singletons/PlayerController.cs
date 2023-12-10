@@ -211,6 +211,7 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
+        
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -227,6 +228,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         pState = GetComponent<PlayerStateList>();
+        
 
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
@@ -290,8 +292,8 @@ public class PlayerController : MonoBehaviour
         if(pState.alive)
         {
             if(!isWallJumping)
-            {
-                Flip();
+            {   
+                //Flip();
                 Move();
                 Jump();
             }
@@ -327,6 +329,14 @@ public class PlayerController : MonoBehaviour
 
         if (pState.dashing || pState.healing) return;
         Recoil();
+        if(pState.alive)
+        {
+            if(!isWallJumping)
+            {
+                Flip();
+                Move();
+            }
+    }
     }
 
     private void OnTriggerEnter2D(Collider2D _other) //for up and down cast spell
@@ -381,10 +391,10 @@ public class PlayerController : MonoBehaviour
 {
     if (xAxis < 0)
     {
-        if (pState.lookingRight)
+        if (pState.lookingRight || !pState.lookingRight)
         {
             transform.eulerAngles = new Vector2(0, 180);
-            transform.localScale = new Vector3(1, 1, 1);
+            //transform.localScale = new Vector3(1, 1, 1);
             pState.lookingRight = false;
         }
     }
@@ -393,7 +403,7 @@ public class PlayerController : MonoBehaviour
         if (!pState.lookingRight)
         {
             transform.eulerAngles = new Vector2(0, 0);
-            transform.localScale = new Vector3(1, 1, 1);
+           // transform.localScale = new Vector3(-1, 1, 1);
             pState.lookingRight = true;
         }
     }
