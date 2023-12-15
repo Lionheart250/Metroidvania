@@ -322,6 +322,9 @@ public class PlayerController : MonoBehaviour
             manaOrbs = 3;
         }    
     }
+    private Vector2 relativeTransform;
+   public bool isOnPlatform;
+   public Rigidbody2D platformRb;
 
     private void FixedUpdate()
     {
@@ -336,7 +339,22 @@ public class PlayerController : MonoBehaviour
                 Flip();
                 Move();
             }
+        float targetSpeed = walkSpeed * relativeTransform.x;
+
+if (isOnPlatform)
+{
+    // If on platform and not providing any input, match platform velocity
+        rb.velocity = new Vector2(walkSpeed * xAxis + platformRb.velocity.x, rb.velocity.y);
+
+}
+else
+{
+    // Allow regular horizontal movement
+    rb.velocity = new Vector2(walkSpeed * xAxis, rb.velocity.y);
+}
+
     }
+        
     }
 
     private void OnTriggerEnter2D(Collider2D _other) //for up and down cast spell
@@ -1114,7 +1132,7 @@ IEnumerator StopTakingDamage()
     {
         if (Grounded())
         { 
-            if (!landingSoundPlayed)
+            if (!landingSoundPlayed && !isOnPlatform)
             {
                 audioSource.PlayOneShot(landingSound);
                 landingSoundPlayed = true;

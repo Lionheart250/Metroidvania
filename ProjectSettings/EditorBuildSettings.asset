@@ -17,4 +17,22 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Tutorial/Tutorial_Room_3.unity
     guid: 967766958c5764e8fa445a8e039d1ed3
+  - enabled: 1
+    path: Assets/Scenes/Tutorial/Tutorial_Room_4.unity
+    guid: 986d660366fe849c6896c122d679ca0c
+  - enabled: 1
+    path: Assets/Scenes/Tutorial/Tutorial_Room_5.unity
+    guid: fef5fd17bed694366b42d869c71d96c9
+  - enabled: 1
+    path: Assets/Scenes/Tutorial/Tutorial_Room_6.unity
+    guid: fc548174fdc484f2a8f252d85150d621
+  - enabled: 1
+    path: Assets/Scenes/Tutorial/Tutorial_Room_7.unity
+    guid: 2b1fca7cb239a4767815796745f06266
+  - enabled: 1
+    path: Assets/Scenes/Tutorial/Tutorial_Room_8.unity
+    guid: aa3883c4877f248d587425492303665a
+  - enabled: 1
+    path: Assets/Scenes/Tutorial/Tutorial_Room_9.unity
+    guid: a5f6a2697ab1b458f8b782de3c37eb2b
   m_configObjects: {}
