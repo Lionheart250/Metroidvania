@@ -13,7 +13,8 @@ public class CameraManager : MonoBehaviour
     [Header("Y Damping Settings for Player Jump/Fall:")]
     [SerializeField] private float panAmount = 0.1f;
     [SerializeField] private float panTime = 0.2f;
-    public float playerFallSpeedTheshold = -10;
+    public float playerFallSpeedTheshold = -30
+;
     public bool isLerpingYDamping;
     public bool hasLerpedYDamping;
 

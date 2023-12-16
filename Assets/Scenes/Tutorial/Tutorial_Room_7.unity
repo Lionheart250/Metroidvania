@@ -7386,6 +7386,10 @@ PrefabInstance:
       value: -680
       objectReference: {fileID: 0}
     - target: {fileID: 8270585651975105996, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
+      propertyPath: allVirtualCameras.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8270585651975105996, guid: 5a10e54542bcc4051aad273bcc931488, type: 3}
       propertyPath: allVirtualCameras.Array.data[1]
       value: 
       objectReference: {fileID: 0}

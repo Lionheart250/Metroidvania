@@ -294,7 +294,7 @@ public class PlayerController : MonoBehaviour
             if(!isWallJumping)
             {   
                 //Flip();
-                Move();
+                //Move();
                 Jump();
             }
             if(unlockedWallJump)
@@ -339,18 +339,15 @@ public class PlayerController : MonoBehaviour
                 Flip();
                 Move();
             }
-        float targetSpeed = walkSpeed * relativeTransform.x;
+        
 
-if (isOnPlatform)
+if (isOnPlatform && platformRb != null)
 {
-    // If on platform and not providing any input, match platform velocity
+    if (platformRb != null)
+    {
+        // If on platform and not providing any input, match platform velocity
         rb.velocity = new Vector2(walkSpeed * xAxis + platformRb.velocity.x, rb.velocity.y);
-
-}
-else
-{
-    // Allow regular horizontal movement
-    rb.velocity = new Vector2(walkSpeed * xAxis, rb.velocity.y);
+    }
 }
 
     }
@@ -1175,34 +1172,38 @@ if ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThis
         }
     }
     void WallJump()
+{
+    if (isWallSliding)
     {
-        if(isWallSliding)
-        {
-            isWallJumping = false;
-            wallJumpingDirection = !pState.lookingRight ? 1 : -1;
+        isWallJumping = false;
+        wallJumpingDirection = !pState.lookingRight ? 1 : -1;
 
-            CancelInvoke(nameof(StopWallJumping));
-        }
-
-        if ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && isWallSliding)
-        {
-            isWallJumping = true;
-            rb.velocity = new Vector2(wallJumpingDirection * wallJumpingPower.x, wallJumpingPower.y);
-
-            dashed = false;
-            airJumpCounter = 0;
-
-            if((pState.lookingRight && transform.eulerAngles.y == 0) || (!pState.lookingRight && transform.eulerAngles.y != 0))
-            {
-                pState.lookingRight = !pState.lookingRight;
-                int _yRotation = pState.lookingRight ? 0 : 180;
-
-                transform.eulerAngles = new Vector2(transform.eulerAngles.x, _yRotation);
-            }
-
-            Invoke(nameof(StopWallJumping), wallJumpingDuration);
-        }
+        CancelInvoke(nameof(StopWallJumping));
     }
+
+    if ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && isWallSliding)
+    {
+        isWallJumping = true;
+        rb.velocity = new Vector2(wallJumpingDirection * wallJumpingPower.x, wallJumpingPower.y);
+
+        dashed = false;
+        airJumpCounter = 0;
+
+        if ((pState.lookingRight && transform.eulerAngles.y == 0) || (!pState.lookingRight && transform.eulerAngles.y != 0))
+        {
+            pState.lookingRight = !pState.lookingRight;
+            int _yRotation = pState.lookingRight ? 0 : 180;
+
+            transform.eulerAngles = new Vector2(transform.eulerAngles.x, _yRotation);
+        }
+
+        // Debug statement for wall jump
+        Debug.Log("Wall jump!");
+        
+        Invoke(nameof(StopWallJumping), wallJumpingDuration);
+    }
+}
+
     void StopWallJumping()
     {
         isWallJumping = false;

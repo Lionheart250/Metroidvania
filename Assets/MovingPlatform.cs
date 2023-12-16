@@ -6,9 +6,10 @@ public class MovingPlatform : MonoBehaviour
 {
     public Transform posA, posB;
     public float speed;
+    public float decelerationDistance = 1.0f;  // Adjust this value based on your requirements
     private Vector3 targetPos;
-    private bool isMoving = false;  // Flag to track if the platform is currently moving
-    private bool canTrigger = true;  // Flag to control trigger responsiveness
+    private bool isMoving = false;
+    private bool canTrigger = true;
     Rigidbody2D rb;
 
     PlayerController playerController;
@@ -24,19 +25,39 @@ public class MovingPlatform : MonoBehaviour
 
     private void Start()
     {
-        targetPos = transform.position;  // Start at the current position
+        targetPos = transform.position;
     }
 
     private void Update()
     {
-        // Check if the platform has reached the target position
-        if (isMoving && Vector2.Distance(transform.position, targetPos) < 0.05f)
+        if (isMoving)
         {
-            isMoving = false;
-            canTrigger = true;  // Allow triggering again
-            rb.velocity = Vector2.zero;  // Stop the platform
-            transform.position = targetPos; // this line is supposed to avoid floating away
+            float distanceToTarget = Vector2.Distance(transform.position, targetPos);
+
+            if (distanceToTarget < decelerationDistance)
+            {
+                // Calculate deceleration factor based on the remaining distance
+                float decelerationFactor = distanceToTarget / decelerationDistance;
+
+                // Slow down the platform as it nears the target
+                rb.velocity = moveDirection * speed * decelerationFactor;
+            }
+            else
+            {
+                // Move the platform at normal speed
+                rb.velocity = moveDirection * speed;
+            }
+
+            // Check if the platform has reached the target position
+            if (distanceToTarget < 0.05f)
+            {
+                isMoving = false;
+                canTrigger = true;
+                rb.velocity = Vector2.zero;
+                transform.position = targetPos;
+            }
         }
+
         if (!isMoving)
         {
             canTrigger = true;
@@ -48,7 +69,7 @@ public class MovingPlatform : MonoBehaviour
         // Move the platform only if it is currently set to move
         if (isMoving)
         {
-            rb.velocity = moveDirection * speed;
+            // The actual movement is handled in Update
         }
     }
 
@@ -63,25 +84,37 @@ public class MovingPlatform : MonoBehaviour
         {
             // Trigger movement when player enters
             isMoving = true;
-            canTrigger = false;  // Prevent further triggering until the platform stops
-            targetPos = (targetPos == posA.position) ? posB.position : posA.position;  // Move to the opposite position
+            canTrigger = false;
+            targetPos = (targetPos == posA.position) ? posB.position : posA.position;
             DirectionCalculate();
 
             playerController.isOnPlatform = true;
             playerController.platformRb = rb;
-            playerRb.gravityScale = playerRb.gravityScale * 4;
+            playerRb.gravityScale = playerRb.gravityScale * 8;
+        }
+        else
+        {
+            playerController.isOnPlatform = true;
+            playerRb.gravityScale = playerRb.gravityScale * 8;
+
         }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
-    {
+    {   
+        
         if (collision.CompareTag("Player") && !isMoving)
         {
             // Trigger stopping when player exits
             isMoving = false;
 
             playerController.isOnPlatform = false;
-            playerRb.gravityScale = playerRb.gravityScale / 4;
+            playerRb.gravityScale = playerRb.gravityScale / 8;
+        }
+        else
+        {
+            playerController.isOnPlatform = false;
+            playerRb.gravityScale = playerRb.gravityScale / 8;
         }
     }
 }
