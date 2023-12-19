@@ -451,7 +451,7 @@ if (isOnPlatform && platformRb != null)
 
     void StartDash()
     {
-        if ((Input.GetButtonDown("Dash")|| (Gamepad.current?.leftTrigger.wasPressedThisFrame == true)) && canDash && !dashed)
+        if ((Input.GetButtonDown("Dash")|| (Gamepad.current?.rightTrigger.wasPressedThisFrame == true)) && canDash && !dashed && xAxis != 0)
         {
             StartCoroutine(Dash());
             dashed = true;
@@ -460,6 +460,12 @@ if (isOnPlatform && platformRb != null)
         if (Grounded())
         {
             dashed = false;
+        }
+
+        if ((Input.GetButtonDown("Dash")|| (Gamepad.current?.rightTrigger.wasPressedThisFrame == true)) && canDash && !dashed && xAxis == 0 && Grounded())
+        {
+            StartCoroutine(Dodge());
+            dashed = true;
         }
     } 
 
@@ -477,6 +483,23 @@ if (isOnPlatform && platformRb != null)
         rb.gravityScale = gravity;
         pState.dashing = false;
         yield return new WaitForSeconds(dashCooldown);
+        canDash = true;
+    }
+
+    IEnumerator Dodge()
+    {
+        canDash = false;
+        pState.dashing = true;
+        anim.SetTrigger("Dashing");
+        audioSource.PlayOneShot(dashAndAttackSound);
+        rb.gravityScale = 0;
+        int _dir = pState.lookingRight ? 1 : -1;
+        rb.velocity = new Vector2(-_dir * dashSpeed, 0);
+        //if (Grounded()) Instantiate(dashEffect, transform);
+        yield return new WaitForSeconds(dashTime);
+        rb.gravityScale = gravity;
+        pState.dashing = false;
+        yield return new WaitForSeconds(dashCooldown * 4);
         canDash = true;
     }
 
@@ -965,6 +988,8 @@ IEnumerator StopTakingDamage()
             if(pState.lookingRight)
             {
                 _fireBall.transform.eulerAngles = Vector3.zero; // if facing right, fireball continues as per normal
+                //_fireBall.transform.eulerAngles = new Vector3(0, 0, 45);
+               // _fireBall.transform.eulerAngles = new Vector3(0, 0, -45);
             }
             else
             {

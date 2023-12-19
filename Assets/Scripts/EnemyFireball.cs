@@ -24,6 +24,7 @@ public class EnemyFireBall : MonoBehaviour
         if(_other.tag == "Player")
         {
             PlayerController.Instance.TakeDamage(damage);
+            Destroy(gameObject);
         }
     }
 }
