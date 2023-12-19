@@ -155,7 +155,11 @@ private IEnumerator ResetRecoiling(float delay)
 
     protected virtual void Attack()
     {
+        if(PlayerController.Instance.pState.alive)
+        {
         PlayerController.Instance.TakeDamage(damage);
+        
+        }
     }
     
 }

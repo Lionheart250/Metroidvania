@@ -112,10 +112,16 @@ public class Shade : Enemy
             Destroy(gameObject, 0.5f);
         }
     }
+   
+
     protected override void Attack()
     {
+        if(PlayerController.Instance.pState.alive)
+        {
         anim.SetTrigger("Attacking");
         PlayerController.Instance.TakeDamage(damage);
+        
+        }
     }
 
     void Flip()

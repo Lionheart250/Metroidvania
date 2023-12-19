@@ -23,7 +23,7 @@ public class FireBall : MonoBehaviour
     {
         if(_other.tag == "Enemy")
         {
-            _other.GetComponent<Enemy>().EnemyGetsHit(damage, (_other.transform.position - transform.position).normalized, -hitForce);
+            _other.GetComponent<Enemy>().EnemyGetsHit(damage, (_other.transform.position - transform.position).normalized, hitForce);
         }
     }
 }

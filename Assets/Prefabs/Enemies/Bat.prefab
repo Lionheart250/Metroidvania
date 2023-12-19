@@ -197,7 +197,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 10
   recoilLength: 0.1
-  recoilFactor: 0.1
+  recoilFactor: 0.5
   isRecoiling: 1
   speed: 80
   damage: 1
@@ -206,7 +206,7 @@ MonoBehaviour:
   rb: {fileID: 0}
   anim: {fileID: 0}
   chaseDistance: 50
-  stunDuration: 1
+  stunDuration: 0.25
 --- !u!114 &7334716137408773890
 MonoBehaviour:
   m_ObjectHideFlags: 0

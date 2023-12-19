@@ -132,7 +132,7 @@ public class PlayerController : MonoBehaviour
     [Header("Spell Settings")]
     //spell stats
     [SerializeField] float manaSpellCost = 0.3f;
-    [SerializeField] float timeBetweenCast = 0.5f;
+    [SerializeField] float timeBetweenCast = 2f;
     [SerializeField] float spellDamage; //upspellexplosion and downspellfireball
     [SerializeField] float downSpellForce; // desolate dive only
     //spell cast objects
@@ -294,7 +294,7 @@ public class PlayerController : MonoBehaviour
             if(!isWallJumping)
             {   
                 //Flip();
-                //Move();
+                Move();
                 Jump();
             }
             if(unlockedWallJump)
@@ -337,7 +337,8 @@ public class PlayerController : MonoBehaviour
             if(!isWallJumping)
             {
                 Flip();
-                Move();
+                //Move();
+                //Jump();
             }
         
 
@@ -726,7 +727,8 @@ if (isOnPlatform && platformRb != null)
     }
 
     public void TakeDamage(float _damage) 
-{
+{   
+    if(pState.alive)
     {
         audioSource.PlayOneShot(hurtSound);
 
@@ -1208,5 +1210,7 @@ if ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThis
     {
         isWallJumping = false;
     }
+
+    
 }
 

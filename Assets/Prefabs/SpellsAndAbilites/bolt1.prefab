@@ -166,6 +166,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 4
-  hitForce: 10
+  hitForce: 40
   speed: 5
-  lifetime: 5
+  lifetime: 4
