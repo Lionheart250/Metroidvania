@@ -56,6 +56,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float dashCooldown; //amount of time between dashes
     [SerializeField] GameObject dashEffect;
     private bool canDash = true, dashed;
+    private bool canDodge = true, dodged;
     [Space(5)]
 
 
@@ -188,6 +189,7 @@ public class PlayerController : MonoBehaviour
     //unlocking 
     public bool unlockedWallJump;
     public bool unlockedDash;
+    public bool unlockedDodge;
     public bool unlockedVarJump;
 
     public bool unlockedSideCast;
@@ -305,7 +307,11 @@ public class PlayerController : MonoBehaviour
             if(unlockedDash)
             {
                 StartDash();
-            }            
+            }   
+            if(unlockedDodge)
+            {
+                StartDodge();
+            }         
             Attack();
             CastSpell();
             Reflect();
@@ -371,10 +377,16 @@ if (isOnPlatform && platformRb != null)
        reflect = Input.GetButtonDown("Reflect");
        openMap = Input.GetButton("Map");
        openInventory = Input.GetButton("Inventory");
-       if (Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == true))
-        {
-            castOrHealTimer += Time.deltaTime;
-        }
+        if (Input.GetButton("Cast/Heal"))
+    {
+        castOrHealTimer += Time.deltaTime;
+    }
+
+    // New Input System
+    if (Gamepad.current != null && Gamepad.current.circleButton.isPressed)
+    {
+        castOrHealTimer += Time.deltaTime;
+    }
         
     }
 
@@ -461,12 +473,6 @@ if (isOnPlatform && platformRb != null)
         {
             dashed = false;
         }
-
-        if ((Input.GetButtonDown("Dash")|| (Gamepad.current?.rightTrigger.wasPressedThisFrame == true)) && canDash && !dashed && xAxis == 0 && Grounded())
-        {
-            StartCoroutine(Dodge());
-            dashed = true;
-        }
     } 
 
     IEnumerator Dash()
@@ -486,21 +492,32 @@ if (isOnPlatform && platformRb != null)
         canDash = true;
     }
 
+    void StartDodge()
+    {
+         if ((Input.GetButtonDown("Dash")|| (Gamepad.current?.rightTrigger.wasPressedThisFrame == true)) && canDodge && !dodged && xAxis == 0 && Grounded())
+        {
+            StartCoroutine(Dodge());
+            dodged = false;
+        }
+    }
+
     IEnumerator Dodge()
     {
-        canDash = false;
-        pState.dashing = true;
+        canDodge = false;
+        pState.invincible = true;
+        pState.dodging = true;
         anim.SetTrigger("Dashing");
         audioSource.PlayOneShot(dashAndAttackSound);
         rb.gravityScale = 0;
         int _dir = pState.lookingRight ? 1 : -1;
-        rb.velocity = new Vector2(-_dir * dashSpeed, 0);
+        rb.velocity = new Vector2(-_dir * (dashSpeed / 3), 0);
         //if (Grounded()) Instantiate(dashEffect, transform);
         yield return new WaitForSeconds(dashTime);
         rb.gravityScale = gravity;
-        pState.dashing = false;
+        pState.dodging = false;
         yield return new WaitForSeconds(dashCooldown * 4);
-        canDash = true;
+        pState.invincible = false;
+        canDodge = true;
     }
 
     public IEnumerator WalkIntoNewScene(Vector2 _exitDir, float _delay)
@@ -751,7 +768,7 @@ if (isOnPlatform && platformRb != null)
 
     public void TakeDamage(float _damage) 
 {   
-    if(pState.alive)
+    if(pState.alive && !pState.dodging)
     {
         audioSource.PlayOneShot(hurtSound);
 
@@ -762,7 +779,7 @@ if (isOnPlatform && platformRb != null)
             Health = 0;
             StartCoroutine(Death());
         }
-        else
+        else if(!pState.dodging)
         {
             StartCoroutine(StopTakingDamage());
         }
@@ -895,10 +912,18 @@ IEnumerator StopTakingDamage()
         UIManager.Instance.SwitchMana(UIManager.ManaState.FullMana);
     }
 
-    void Heal()
+   void Heal()
+{
+    bool isHealButtonPressed = Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == true);
+
+    if (isHealButtonPressed)
     {
-        if (((Gamepad.current?.circleButton.isPressed == true) || Input.GetButton("Cast/Heal")) && castOrHealTimer > 0.5f && Health < maxHealth && Mana > 0 && !pState.jumping && !pState.dashing)
-        {
+        castOrHealTimer += Time.deltaTime;
+        Debug.Log("castOrHealTimer: " + castOrHealTimer);
+    }
+
+    if (castOrHealTimer > 0.5f && Health < maxHealth && Mana > 0 && !pState.jumping && !pState.dashing)
+    {
             pState.healing = true;
             anim.SetBool("Healing", true);
 
@@ -957,7 +982,7 @@ IEnumerator StopTakingDamage()
             timeSinceCast += Time.deltaTime;
         }
 
-        if ((!Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == false)))
+        if (!Input.GetButton("Cast/Heal") && (Gamepad.current?.circleButton.isPressed == false))
         {
             castOrHealTimer = 0;
         }
@@ -1041,7 +1066,7 @@ IEnumerator StopTakingDamage()
 
     void Reflect()
     {   
-        if ((Input.GetButtonDown("Reflect") || (Gamepad.current?.rightTrigger.wasPressedThisFrame == true)) && !Shielded && timeSinceReflect >= timeBetweenReflect && unlockedReflect)
+        if ((Input.GetButtonDown("Reflect") || (Gamepad.current?.leftTrigger.wasPressedThisFrame == true)) && !Shielded && timeSinceReflect >= timeBetweenReflect && unlockedReflect)
         {              
         timeSinceReflect = 0;
         audioSource.PlayOneShot(jumpSound);

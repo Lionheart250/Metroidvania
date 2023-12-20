@@ -8,6 +8,7 @@ public class EnemyFireBall : MonoBehaviour
     [SerializeField] public float hitForce;
     [SerializeField] public int speed;
     [SerializeField] public float lifetime = 1;
+    [HideInInspector] public PlayerStateList pState;
     // Start is called before the first frame update
     void Start()
     {
@@ -24,6 +25,7 @@ public class EnemyFireBall : MonoBehaviour
         if(_other.tag == "Player")
         {
             PlayerController.Instance.TakeDamage(damage);
+            if(!PlayerController.Instance.pState.dodging)
             Destroy(gameObject);
         }
     }
