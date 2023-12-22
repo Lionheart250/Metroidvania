@@ -10,12 +10,14 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Horizontal Movement Settings:")]
     [SerializeField] private float walkSpeed = 1; //sets the players movement speed on the ground
+    private float originalWalkSpeed;
     [Space(5)]
 
 
 
     [Header("Vertical Movement Settings")]
     [SerializeField] private float jumpForce = 45f; //sets how hight the player can jump
+    [SerializeField] private float shadowJumpForce = 60f; 
 
     private int jumpBufferCounter = 0; //stores the jump button input
     [SerializeField] private int jumpBufferFrames; //sets the max amount of frames the jump buffer input is stored
@@ -27,6 +29,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private int maxAirJumps; //the max no. of air jumps
     [SerializeField] private int maxFallingSpeed; //the max no. of air jumps
     public float fallGravityMultiplier = 2.0f; // You can adjust this value
+    private float originalFallGravityMultiplier;
     private float gravity; //stores the gravity scale at start
     [Space(5)]
 
@@ -238,6 +241,8 @@ public class PlayerController : MonoBehaviour
         gravity = rb.gravityScale;
         anim = GetComponent<Animator>();
         manaOrbsHandler = FindObjectOfType<ManaOrbsHandler>();
+        originalWalkSpeed = walkSpeed;
+        originalFallGravityMultiplier = fallGravityMultiplier;
         
 
         SaveData.Instance.LoadPlayerData();
@@ -298,6 +303,7 @@ public class PlayerController : MonoBehaviour
                 //Flip();
                 Move();
                 Jump();
+                SwapForm();
             }
             if(unlockedWallJump)
             {
@@ -440,8 +446,11 @@ if (isOnPlatform && platformRb != null)
 
     private void Move()
     {
+        if(pState.shadowJumping == false)
+        {
         rb.velocity = new Vector2(walkSpeed * xAxis, rb.velocity.y);
         anim.SetBool("Walking", rb.velocity.x != 0 && Grounded());
+        }
     }
 
     void UpdateCameraYDampForPlayerFall()
@@ -504,6 +513,8 @@ if (isOnPlatform && platformRb != null)
     IEnumerator Dodge()
     {
         canDodge = false;
+        canDash = false;
+        pState.dashing = true;
         pState.invincible = true;
         pState.dodging = true;
         anim.SetTrigger("Dashing");
@@ -515,9 +526,12 @@ if (isOnPlatform && platformRb != null)
         yield return new WaitForSeconds(dashTime);
         rb.gravityScale = gravity;
         pState.dodging = false;
+         pState.dashing = false;
         yield return new WaitForSeconds(dashCooldown * 4);
         pState.invincible = false;
+       
         canDodge = true;
+        canDash = true;
     }
 
     public IEnumerator WalkIntoNewScene(Vector2 _exitDir, float _delay)
@@ -541,7 +555,38 @@ if (isOnPlatform && platformRb != null)
         pState.cutscene = false;
     }
 
-    
+    void SwapForm()
+    {
+        if (Gamepad.current?.triangleButton.wasPressedThisFrame == true)
+        {
+            pState.shadow = !pState.shadow;
+
+            // Ensure sr is not null
+            if (sr != null)
+            {
+                // Set the color based on the shadow state
+                sr.color = pState.shadow ? Color.black : Color.white;
+
+                // Modify walkSpeed and gravity if in shadow form
+                if (pState.shadow)
+                {
+                    walkSpeed *= 1.35f; // Increase walkSpeed by 25%
+                    rb.gravityScale *= 0.50f;
+                    fallGravityMultiplier *= 0f;
+                }
+                else
+                {
+                    // Reset to original walkSpeed if not in shadow form
+                    walkSpeed = originalWalkSpeed;
+                    rb.gravityScale = gravity;
+                    fallGravityMultiplier = originalFallGravityMultiplier;
+                }
+            }
+        }
+    }
+
+
+
 
     void Attack()
     {
@@ -1134,9 +1179,11 @@ IEnumerator StopTakingDamage()
             return false;
         }
     }
-
+    
+    private RigidbodyConstraints2D savedPositionConstraints;
      void Jump()
 {
+    
     if (jumpBufferCounter > 0 && coyoteTimeCounter > 0 && !pState.jumping)
     {
         audioSource.PlayOneShot(jumpSound);
@@ -1146,7 +1193,7 @@ IEnumerator StopTakingDamage()
         pState.jumping = true;
     }
 
-    if (!Grounded() && airJumpCounter < maxAirJumps && (Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump)
+    if (!Grounded() && airJumpCounter < maxAirJumps && (Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && pState.shadow == false)
     {
         audioSource.PlayOneShot(jumpSound);
 
@@ -1174,6 +1221,36 @@ IEnumerator StopTakingDamage()
     rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -maxFallingSpeed, rb.velocity.y));
 
     anim.SetBool("Jumping", !Grounded());
+
+    if (!Grounded() && airJumpCounter < maxAirJumps && (Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && pState.shadow == true)
+    {
+        rb.velocity = new Vector2(rb.velocity.x, 0);
+        savedPositionConstraints = rb.constraints & RigidbodyConstraints2D.FreezeRotation;
+
+        rb.constraints = RigidbodyConstraints2D.FreezePosition;
+       // airJumpCounter++;
+        pState.hovering = true;
+    }
+    if ((Input.GetButtonUp("Jump") || (Gamepad.current?.crossButton.wasReleasedThisFrame == true)) && pState.hovering)
+{
+    pState.shadowJumping = true;
+    // Calculate the launch direction based on input.
+    Vector2 launchDirection = new Vector2(xAxis, yAxis).normalized;
+
+
+    // Apply the hover launch force.
+   rb.velocity = launchDirection * shadowJumpForce;
+
+    //Debug.Log($"Horizontal Input: {horizontalInput}, Vertical Input: {verticalInput}, Launch Direction: {launchDirection}");
+
+    // Reset hovering state.
+    pState.hovering = false;
+    rb.constraints = savedPositionConstraints;
+
+}
+
+
+
 }
 
  
@@ -1187,6 +1264,7 @@ IEnumerator StopTakingDamage()
                 landingSoundPlayed = true;
             }
             pState.jumping = false;
+            pState.shadowJumping = false;
             coyoteTimeCounter = coyoteTime;
             airJumpCounter = 0;
         }

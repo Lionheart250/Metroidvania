@@ -6,7 +6,10 @@ public class PlayerStateList : MonoBehaviour
 {
     public static PlayerStateList Instance; // Singleton reference
 
+    public bool shadow = false;
     public bool jumping = false;
+    public bool shadowJumping = false;
+    public bool hovering = false;
     public bool dashing = false;
     public bool dodging = false;
     public bool recoilingX, recoilingY;
