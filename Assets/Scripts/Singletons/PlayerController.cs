@@ -18,6 +18,8 @@ public class PlayerController : MonoBehaviour
     [Header("Vertical Movement Settings")]
     [SerializeField] private float jumpForce = 45f; //sets how hight the player can jump
     [SerializeField] private float shadowJumpForce = 60f; 
+    [SerializeField] private float shadowJumpChargeSpeed;
+    [SerializeField] public float shadowJumpChargeTime; 
 
     private int jumpBufferCounter = 0; //stores the jump button input
     [SerializeField] private int jumpBufferFrames; //sets the max amount of frames the jump buffer input is stored
@@ -143,6 +145,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] GameObject sideSpellFireball;
     [SerializeField] GameObject upSpellExplosion;
     [SerializeField] GameObject downSpellFireball;
+    [SerializeField] GameObject shadowBall;
+    [SerializeField] float shadowJumpDamage;
+    [SerializeField] private Transform ShadowJumpTransform; //the middle of the up attack area
+    [SerializeField] private Vector2 ShadowJumpArea; //how large the area of side attack is
     float timeSinceCast;
     float castOrHealTimer;
     [Space(5)]
@@ -272,6 +278,8 @@ public class PlayerController : MonoBehaviour
         Gizmos.DrawWireCube(ChargeAttackTransform.position, ChargeAttackArea);
         Gizmos.DrawWireCube(UpAttackTransform.position, UpAttackArea);
         Gizmos.DrawWireCube(DownAttackTransform.position, DownAttackArea);
+        Gizmos.DrawWireSphere(ShadowJumpTransform.position, Mathf.Max(ShadowJumpArea.x, ShadowJumpArea.y) * 0.5f);
+
     }
     void Update()
     {
@@ -303,6 +311,7 @@ public class PlayerController : MonoBehaviour
                 //Flip();
                 Move();
                 Jump();
+                ShadowJump();
                 SwapForm();
             }
             if(unlockedWallJump)
@@ -367,12 +376,36 @@ if (isOnPlatform && platformRb != null)
         
     }
 
+    private Vector2 lastInputDirection;
+
     private void OnTriggerEnter2D(Collider2D _other) //for up and down cast spell
     {
         if(_other.GetComponent<Enemy>() != null && pState.casting)
         {
             _other.GetComponent<Enemy>().EnemyGetsHit(spellDamage, (_other.transform.position - transform.position).normalized, -recoilYSpeed);
         }
+        if(_other.GetComponent<Enemy>() != null && pState.shadowJumping)
+        {
+            int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
+            int _recoilUpOrDown = rb.velocity.y > 0 ? 1 : -1;
+            float recoilStrength = 1.0f;
+
+            _other.GetComponent<Enemy>().EnemyGetsHit(shadowJumpDamage, (_other.transform.position - transform.position).normalized, recoilYSpeed);
+            Hit(ShadowJumpTransform, ShadowJumpArea, ref pState.recoilingY, new Vector2(_recoilLeftOrRight, _recoilUpOrDown), recoilStrength);
+
+            if (xAxis != 0 || yAxis != 0)
+            {
+            // If there is input, update the last input direction
+            lastInputDirection = new Vector2(xAxis, yAxis).normalized;
+            }
+
+            // ...
+
+            // When you need to use the launch direction:
+            rb.velocity = -lastInputDirection * shadowJumpForce;
+            
+        }
+
     }
 
     void GetInputs()
@@ -557,7 +590,7 @@ if (isOnPlatform && platformRb != null)
 
     void SwapForm()
     {
-        if (Gamepad.current?.triangleButton.wasPressedThisFrame == true)
+        if (Gamepad.current?.triangleButton.wasPressedThisFrame == true && !Grounded())
         {
             pState.shadow = !pState.shadow;
 
@@ -736,6 +769,12 @@ if (isOnPlatform && platformRb != null)
                 }
             }
         }
+
+    transform.position += new Vector3(_recoilDir.x * _recoilStrength * Time.deltaTime, 0f, 0f);
+
+    // Apply vertical recoil to the player
+    // Modify the player's position based on the vertical recoil direction and strength
+    transform.position += new Vector3(0f, _recoilDir.y * _recoilStrength * Time.deltaTime, 0f);
     }
 
     void SlashEffectAtAngle(GameObject _slashEffect, int _effectAngle, Transform _attackTransform)
@@ -813,7 +852,7 @@ if (isOnPlatform && platformRb != null)
 
     public void TakeDamage(float _damage) 
 {   
-    if(pState.alive && !pState.dodging)
+    if(pState.alive && !pState.dodging && !pState.shadowJumping)
     {
         audioSource.PlayOneShot(hurtSound);
 
@@ -1036,6 +1075,7 @@ IEnumerator StopTakingDamage()
         {
             //disable downspell if on the ground
             downSpellFireball.SetActive(false);
+            shadowBall.SetActive(false);
         }
         //if down spell is active, force player down until grounded
         if(downSpellFireball.activeInHierarchy)
@@ -1180,9 +1220,10 @@ IEnumerator StopTakingDamage()
         }
     }
     
+
     private RigidbodyConstraints2D savedPositionConstraints;
      void Jump()
-{
+    {
     
     if (jumpBufferCounter > 0 && coyoteTimeCounter > 0 && !pState.jumping)
     {
@@ -1221,39 +1262,66 @@ IEnumerator StopTakingDamage()
     rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -maxFallingSpeed, rb.velocity.y));
 
     anim.SetBool("Jumping", !Grounded());
+}
 
-    if (!Grounded() && airJumpCounter < maxAirJumps && (Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && pState.shadow == true)
+
+    void ShadowJump()
     {
-        rb.velocity = new Vector2(rb.velocity.x, 0);
-        savedPositionConstraints = rb.constraints & RigidbodyConstraints2D.FreezeRotation;
+            Debug.Log($"Charge Time: {shadowJumpChargeTime}");
 
-        rb.constraints = RigidbodyConstraints2D.FreezePosition;
-       // airJumpCounter++;
-        pState.hovering = true;
+        if (!Grounded() && airJumpCounter < maxAirJumps && (Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && pState.shadow == true)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, 0);
+            savedPositionConstraints = rb.constraints & RigidbodyConstraints2D.FreezeRotation;
+
+            rb.constraints = RigidbodyConstraints2D.FreezePosition;
+            airJumpCounter++;
+            pState.hovering = true;
+        }
+        if (!Grounded() && (Input.GetButton("Jump") || (Gamepad.current?.crossButton.isPressed == true)) && shadowJumpChargeTime <= 2 && pState.hovering == true)
+        {
+            shadowJumpChargeTime += Time.deltaTime;
+
+            shadowJumpChargeTime = Mathf.Clamp(shadowJumpChargeTime, 0f, 2f);
+
+            GameObject _chargeParticles = Instantiate(chargeParticles, transform.position, Quaternion.identity);
+
+            if (shadowJumpChargeTime >= 2f)
+            {
+                // Double the size
+                Vector3 newScale = _chargeParticles.transform.localScale * 2f;
+                _chargeParticles.transform.localScale = newScale;
+            }
+            
+            Destroy(_chargeParticles, 0.05f);
+        }
+        if(!Grounded() && (Input.GetButton("Jump") || (Gamepad.current?.crossButton.isPressed == true)) && pState.shadowJumping)
+        {
+            pState.shadowJumping = false;
+            shadowBall.SetActive(false);
+        }
+        if ((Input.GetButtonUp("Jump") || (Gamepad.current?.crossButton.wasReleasedThisFrame == true)) && pState.hovering)
+        {
+            pState.shadowJumping = true;
+
+            // Calculate the launch direction based on input.
+            Vector2 launchDirection = new Vector2(xAxis, yAxis).normalized;
+            shadowJumpChargeTime = 0;
+
+
+            // Apply the hover launch force.
+            rb.velocity = launchDirection * shadowJumpForce;
+            shadowBall.SetActive(true);
+
+
+            //Debug.Log($"Horizontal Input: {horizontalInput}, Vertical Input: {verticalInput}, Launch Direction: {launchDirection}");
+
+            // Reset hovering state.
+            pState.hovering = false;
+            rb.constraints = savedPositionConstraints;
+
+        }
     }
-    if ((Input.GetButtonUp("Jump") || (Gamepad.current?.crossButton.wasReleasedThisFrame == true)) && pState.hovering)
-{
-    pState.shadowJumping = true;
-    // Calculate the launch direction based on input.
-    Vector2 launchDirection = new Vector2(xAxis, yAxis).normalized;
-
-
-    // Apply the hover launch force.
-   rb.velocity = launchDirection * shadowJumpForce;
-
-    //Debug.Log($"Horizontal Input: {horizontalInput}, Vertical Input: {verticalInput}, Launch Direction: {launchDirection}");
-
-    // Reset hovering state.
-    pState.hovering = false;
-    rb.constraints = savedPositionConstraints;
-
-}
-
-
-
-}
-
- 
     void UpdateJumpVariables()
     {
         if (Grounded())
