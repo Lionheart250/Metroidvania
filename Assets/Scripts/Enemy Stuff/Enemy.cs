@@ -133,7 +133,7 @@ private IEnumerator ResetRecoiling(float delay)
         if(_other.gameObject.CompareTag("Player") && !PlayerController.Instance.pState.invincible && health > 0)
         {
             Attack();
-            if(PlayerController.Instance.pState.alive)
+            if(PlayerController.Instance.pState.alive && !PlayerController.Instance.pState.lightJumping)
             {
                 PlayerController.Instance.HitStopTime(0, 5, 0.5f);
             }            

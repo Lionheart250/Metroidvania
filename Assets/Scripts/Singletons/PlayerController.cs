@@ -17,10 +17,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Vertical Movement Settings")]
     [SerializeField] private float jumpForce = 45f; //sets how hight the player can jump
-    [SerializeField] private float shadowJumpForce = 60f; 
-    [SerializeField] private float shadowJumpChargeSpeed;
-    [SerializeField] public float shadowJumpChargeTime; 
-
+    [SerializeField] private float lightJumpForce = 60f; 
     private int jumpBufferCounter = 0; //stores the jump button input
     [SerializeField] private int jumpBufferFrames; //sets the max amount of frames the jump buffer input is stored
 
@@ -28,7 +25,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float coyoteTime; ////sets the max amount of frames the Grounded() bool is stored
 
     private int airJumpCounter = 0; //keeps track of how many times the player has jumped in the air
+    private int lightJumpCounter = 0;
     [SerializeField] private int maxAirJumps; //the max no. of air jumps
+    [SerializeField] private int maxLightJumps;
     [SerializeField] private int maxFallingSpeed; //the max no. of air jumps
     public float fallGravityMultiplier = 2.0f; // You can adjust this value
     private float originalFallGravityMultiplier;
@@ -69,14 +68,19 @@ public class PlayerController : MonoBehaviour
     [Header("Attack Settings:")]
     [SerializeField] private Transform SideAttackTransform; //the middle of the side attack area
     [SerializeField] private Vector2 SideAttackArea; //how large the area of side attack is
-    [SerializeField] private Transform ChargeAttackTransform; //the middle of the side attack area
-    [SerializeField] private Vector2 ChargeAttackArea; //how large the area of side attack is
-
     [SerializeField] private Transform UpAttackTransform; //the middle of the up attack area
     [SerializeField] private Vector2 UpAttackArea; //how large the area of side attack is
 
     [SerializeField] private Transform DownAttackTransform; //the middle of the down attack area
     [SerializeField] private Vector2 DownAttackArea; //how large the area of down attack is
+    [SerializeField] private Transform ChargeAttackTransform; //the middle of the side attack area
+    [SerializeField] private Vector2 ChargeAttackArea; //how large the area of side attack is
+    [SerializeField] private Transform ShadowSideAttackTransform; //the middle of the side attack area
+    [SerializeField] private Vector2 ShadowSideAttackArea; //how large the area of side attack is
+    [SerializeField] private Transform ShadowUpAttackTransform; //the middle of the side attack area
+    [SerializeField] private Vector2 ShadowUpAttackArea; //how large the area of side attack is
+    [SerializeField] private Transform ShadowDownAttackTransform; //the middle of the side attack area
+    [SerializeField] private Vector2 ShadowDownAttackArea; //how large the area of side attack is
 
     [SerializeField] private LayerMask attackableLayer; //the layer the player can attack and recoil off of
 
@@ -145,10 +149,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] GameObject sideSpellFireball;
     [SerializeField] GameObject upSpellExplosion;
     [SerializeField] GameObject downSpellFireball;
-    [SerializeField] GameObject shadowBall;
-    [SerializeField] float shadowJumpDamage;
-    [SerializeField] private Transform ShadowJumpTransform; //the middle of the up attack area
-    [SerializeField] private Vector2 ShadowJumpArea; //how large the area of side attack is
+    [SerializeField] GameObject lightBall;
+    [SerializeField] float lightJumpDamage;
+    [SerializeField] private Transform LightJumpTransform; //the middle of the up attack area
+    [SerializeField] private Vector2 LightJumpArea; //how large the area of side attack is
     float timeSinceCast;
     float castOrHealTimer;
     [Space(5)]
@@ -162,6 +166,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] AudioClip jumpSound;
     [SerializeField] AudioClip dashAndAttackSound;
     [SerializeField] AudioClip spellCastSound;
+    [SerializeField] AudioClip ExplosionSpellCastSound;
     [SerializeField] AudioClip hurtSound;
     [Space(5)]
 
@@ -250,6 +255,7 @@ public class PlayerController : MonoBehaviour
         originalWalkSpeed = walkSpeed;
         originalFallGravityMultiplier = fallGravityMultiplier;
         
+        
 
         SaveData.Instance.LoadPlayerData();
         if(manaOrbs > 3)
@@ -272,15 +278,27 @@ public class PlayerController : MonoBehaviour
 
     // Update is called once per frame
     private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(SideAttackTransform.position, SideAttackArea);
-        Gizmos.DrawWireCube(ChargeAttackTransform.position, ChargeAttackArea);
-        Gizmos.DrawWireCube(UpAttackTransform.position, UpAttackArea);
-        Gizmos.DrawWireCube(DownAttackTransform.position, DownAttackArea);
-        Gizmos.DrawWireSphere(ShadowJumpTransform.position, Mathf.Max(ShadowJumpArea.x, ShadowJumpArea.y) * 0.5f);
+{
+    DrawGizmo(SideAttackTransform, SideAttackArea, Color.red);
+    DrawGizmo(ChargeAttackTransform, ChargeAttackArea, Color.red);
+    DrawGizmo(UpAttackTransform, UpAttackArea, Color.red);
+    DrawGizmo(DownAttackTransform, DownAttackArea, Color.red);
+    
+    // Draw shadow gizmos in a different color (e.g., blue)
+    DrawGizmo(ShadowSideAttackTransform, ShadowSideAttackArea, Color.blue);
+    DrawGizmo(ShadowUpAttackTransform, ShadowUpAttackArea, Color.blue);
+    DrawGizmo(ShadowDownAttackTransform, ShadowDownAttackArea, Color.blue);
+    
+    Gizmos.color = Color.red; // Reset color for the remaining gizmos
+    Gizmos.DrawWireSphere(LightJumpTransform.position, Mathf.Max(LightJumpArea.x, LightJumpArea.y) * 0.5f);
+}
 
-    }
+private void DrawGizmo(Transform transform, Vector3 area, Color color)
+{
+    Gizmos.color = color;
+    Gizmos.DrawWireCube(transform.position, area);
+}
+
     void Update()
     {
         if (GameManager.Instance.gameIsPaused) return;
@@ -291,6 +309,7 @@ public class PlayerController : MonoBehaviour
             GetInputs();
             ToggleMap();
             ToggleInventory();
+            
         }
         
         UpdateJumpVariables();
@@ -311,7 +330,7 @@ public class PlayerController : MonoBehaviour
                 //Flip();
                 Move();
                 Jump();
-                ShadowJump();
+                LightJump();
                 SwapForm();
             }
             if(unlockedWallJump)
@@ -328,6 +347,7 @@ public class PlayerController : MonoBehaviour
                 StartDodge();
             }         
             Attack();
+            ShadowAttack();
             CastSpell();
             Reflect();
         }        
@@ -342,6 +362,10 @@ public class PlayerController : MonoBehaviour
         {
             manaOrbs = 3;
         }    
+        if(!pState.hovering)
+        {
+            rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+        }
     }
     private Vector2 relativeTransform;
    public bool isOnPlatform;
@@ -363,50 +387,38 @@ public class PlayerController : MonoBehaviour
             }
         
 
-if (isOnPlatform && platformRb != null)
-{
-    if (platformRb != null)
+    if (isOnPlatform && platformRb != null)
     {
         // If on platform and not providing any input, match platform velocity
         rb.velocity = new Vector2(walkSpeed * xAxis + platformRb.velocity.x, rb.velocity.y);
     }
-}
-
     }
-        
     }
-
     private Vector2 lastInputDirection;
 
-    private void OnTriggerEnter2D(Collider2D _other) //for up and down cast spell
+    private void OnTriggerEnter2D(Collider2D _other)
+{
+    if (_other.GetComponent<Enemy>() != null && pState.casting && !pState.lightJumping) 
     {
-        if(_other.GetComponent<Enemy>() != null && pState.casting)
-        {
-            _other.GetComponent<Enemy>().EnemyGetsHit(spellDamage, (_other.transform.position - transform.position).normalized, -recoilYSpeed);
-        }
-        if(_other.GetComponent<Enemy>() != null && pState.shadowJumping)
-        {
-            int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
-            int _recoilUpOrDown = rb.velocity.y > 0 ? 1 : -1;
-            float recoilStrength = 1.0f;
-
-            _other.GetComponent<Enemy>().EnemyGetsHit(shadowJumpDamage, (_other.transform.position - transform.position).normalized, recoilYSpeed);
-            Hit(ShadowJumpTransform, ShadowJumpArea, ref pState.recoilingY, new Vector2(_recoilLeftOrRight, _recoilUpOrDown), recoilStrength);
-
-            if (xAxis != 0 || yAxis != 0)
-            {
-            // If there is input, update the last input direction
-            lastInputDirection = new Vector2(xAxis, yAxis).normalized;
-            }
-
-            // ...
-
-            // When you need to use the launch direction:
-            rb.velocity = -lastInputDirection * shadowJumpForce;
-            
-        }
-
+        _other.GetComponent<Enemy>().EnemyGetsHit(spellDamage, (_other.transform.position - transform.position).normalized, recoilYSpeed);
     }
+    if (_other.GetComponent<Enemy>() != null && pState.lightJumping)
+    {
+        int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
+        Vector2 hitDirection = new Vector2(_recoilLeftOrRight, -1);
+
+        
+        Hit(LightJumpTransform, LightJumpArea, ref pState.recoilingY, hitDirection, recoilYSpeed);
+
+    
+        Vector2 oppositeDirection = -hitDirection;
+
+    
+        rb.velocity = oppositeDirection * (lightJumpForce * 0.5f);
+    }
+}
+
+
 
     void GetInputs()
     {
@@ -479,7 +491,7 @@ if (isOnPlatform && platformRb != null)
 
     private void Move()
     {
-        if(pState.shadowJumping == false)
+        if(pState.lightJumping == false)
         {
         rb.velocity = new Vector2(walkSpeed * xAxis, rb.velocity.y);
         anim.SetBool("Walking", rb.velocity.x != 0 && Grounded());
@@ -589,50 +601,55 @@ if (isOnPlatform && platformRb != null)
     }
 
     void SwapForm()
+{
+    if ((Gamepad.current?.triangleButton.wasPressedThisFrame == true || Input.GetKeyDown(KeyCode.R)) && Grounded())
     {
-        if (Gamepad.current?.triangleButton.wasPressedThisFrame == true && !Grounded())
+        // Toggle between shadow form and light form
+        pState.shadowForm = !pState.shadowForm;
+        pState.lightForm = !pState.shadowForm;
+
+        // Ensure sr is not null
+        if (sr != null)
         {
-            pState.shadow = !pState.shadow;
+            // Set the color based on the current form
+            sr.color = pState.shadowForm ? Color.black : Color.white;
 
-            // Ensure sr is not null
-            if (sr != null)
+            // Modify walkSpeed and gravity based on the current form
+            if (pState.lightForm)
             {
-                // Set the color based on the shadow state
-                sr.color = pState.shadow ? Color.black : Color.white;
-
-                // Modify walkSpeed and gravity if in shadow form
-                if (pState.shadow)
-                {
-                    walkSpeed *= 1.35f; // Increase walkSpeed by 25%
-                    rb.gravityScale *= 0.50f;
-                    fallGravityMultiplier *= 0f;
-                }
-                else
-                {
-                    // Reset to original walkSpeed if not in shadow form
-                    walkSpeed = originalWalkSpeed;
-                    rb.gravityScale = gravity;
-                    fallGravityMultiplier = originalFallGravityMultiplier;
-                }
+                // Adjust parameters for light form
+                walkSpeed *= 1.35f; // Increase walkSpeed by 35%
+                rb.gravityScale *= 0.50f;
+                fallGravityMultiplier *= 0f;
+            }
+            else
+            {
+                // Adjust parameters for shadow form
+                // Reset to original walkSpeed if not in light form
+                walkSpeed = originalWalkSpeed;
+                rb.gravityScale = gravity;
+                fallGravityMultiplier = originalFallGravityMultiplier;
             }
         }
     }
+}
+
 
 
 
 
     void Attack()
-    {
+{
     timeSinceAttck += Time.deltaTime;
 
-    if ((attack || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && timeSinceAttck >= timeBetweenAttack)
+    if ((attack || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && timeSinceAttck >= timeBetweenAttack && !pState.shadowForm)
     {
         timeSinceAttck = 0;
         anim.SetTrigger("Attacking");
         audioSource.PlayOneShot(dashAndAttackSound);
 
         // Handle different attack types based on input and conditions
-        if (yAxis == 0 || (yAxis < 0 && Grounded()))
+        if (yAxis == 0 || (yAxis < 0 && Grounded()) && !pState.shadowForm)
         {
             int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
 
@@ -640,13 +657,13 @@ if (isOnPlatform && platformRb != null)
             Hit(SideAttackTransform, SideAttackArea, ref pState.recoilingX, Vector2.right * _recoilLeftOrRight, recoilXSpeed);
             Instantiate(slashEffect, SideAttackTransform);
         }
-        else if (yAxis > 0)
+        else if (yAxis > 0 && !pState.shadowForm)
         {
             // Handle up attack
             Hit(UpAttackTransform, UpAttackArea, ref pState.recoilingY, Vector2.up, recoilYSpeed);
             SlashEffectAtAngle(slashEffect, 80, UpAttackTransform);
         }
-        else if (yAxis < 0 && !Grounded())
+        else if (yAxis < 0 && !Grounded() && !pState.shadowForm)
         {
             // Handle down attack
             Hit(DownAttackTransform, DownAttackArea, ref pState.recoilingY, Vector2.down, recoilYSpeed);
@@ -654,44 +671,70 @@ if (isOnPlatform && platformRb != null)
         }
     }
 
-        if ((Input.GetButton("Attack") || (Gamepad.current?.squareButton.isPressed == true)) && chargeTime <= 2)
+    if ((Input.GetButton("Attack") || (Gamepad.current?.squareButton.isPressed == true)) && chargeTime <= 2 && !pState.shadowForm)
+    {
+        chargeTime += Time.deltaTime * chargeSpeed;
+        chargeTime = Mathf.Clamp(chargeTime, 0f, 2f);
+
+        GameObject _chargeParticles = Instantiate(chargeParticles, transform.position, Quaternion.identity);
+
+        if (chargeTime >= 2f)
         {
-            
-            chargeTime += Time.deltaTime * chargeSpeed;
-
-    
-            chargeTime = Mathf.Clamp(chargeTime, 0f, 2f);
-
-            GameObject _chargeParticles = Instantiate(chargeParticles, transform.position, Quaternion.identity);
-
-            if (chargeTime >= 2f)
-            {
-                // Double the size
-                Vector3 newScale = _chargeParticles.transform.localScale * 2f;
-                _chargeParticles.transform.localScale = newScale;
-            }
-            
-            Destroy(_chargeParticles, 0.05f);
-
+            // Double the size
+            Vector3 newScale = _chargeParticles.transform.localScale * 2f;
+            _chargeParticles.transform.localScale = newScale;
         }
 
-        else if ((Input.GetButtonDown("Attack") || (Gamepad.current?.squareButton.wasPressedThisFrame == true)))
+        Destroy(_chargeParticles, 0.05f);
+    }
+    else if ((Input.GetButtonDown("Attack") || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && !pState.shadowForm)
+    {
+        // If the attack button is pressed, but not held, reset chargeTime
+        chargeTime = 0;
+    }
+
+    if ((Input.GetButtonUp("Attack") || (Gamepad.current?.squareButton.wasReleasedThisFrame == true)) && chargeTime < 2 && !pState.shadowForm)
+    {
+        chargeTime = 0;
+    }
+    else if ((Input.GetButtonUp("Attack") || (Gamepad.current?.squareButton.wasReleasedThisFrame == true)) && chargeTime >= 2 && !pState.shadowForm)
+    {
+        audioSource.PlayOneShot(dashAndAttackSound);
+        // Release charge if the button is released and charging duration is sufficient
+        ReleaseCharge();
+    }
+}
+
+
+void ShadowAttack()
+{
+    if ((attack || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && timeSinceAttck >= timeBetweenAttack && !pState.lightForm)
+    {
+        timeSinceAttck = 0;
+        anim.SetTrigger("Attacking");
+        audioSource.PlayOneShot(dashAndAttackSound);
+
+        // Handle different attack types based on input and conditions
+        if (yAxis == 0 || (yAxis < 0 && Grounded()) && !pState.lightForm)
         {
-            // If the attack button is pressed, but not held, reset chargeTime
-            chargeTime = 0;
+            int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
+
+            ShadowHit(ShadowSideAttackTransform, ShadowSideAttackArea, ref pState.recoilingX, Vector2.right * _recoilLeftOrRight, recoilXSpeed);
+            Instantiate(chargeSlashEffect, ShadowSideAttackTransform);
         }
-        if ((Input.GetButtonUp("Attack") || (Gamepad.current?.squareButton.wasReleasedThisFrame == true)) && chargeTime < 2)
+        else if (yAxis > 0 && !pState.lightForm)
         {
-            chargeTime = 0;
-            
-            
+            // Handle up attack
+            Hit(ShadowUpAttackTransform, ShadowUpAttackArea, ref pState.recoilingY, Vector2.up, recoilYSpeed);
+            SlashEffectAtAngle(chargeSlashEffect, 80, ShadowUpAttackTransform);
         }
-        else if ((Input.GetButtonUp("Attack") || (Gamepad.current?.squareButton.wasReleasedThisFrame == true)) && chargeTime >= 2)
-        {   
-            audioSource.PlayOneShot(dashAndAttackSound);
-            // Release charge if the button is released and charging duration is sufficient
-            ReleaseCharge();
+        else if (yAxis < 0 && !Grounded() && !pState.lightForm)
+        {
+            // Handle down attack
+            Hit(ShadowDownAttackTransform, ShadowDownAttackArea, ref pState.recoilingY, Vector2.down, recoilYSpeed);
+            SlashEffectAtAngle(chargeSlashEffect, -90, ShadowDownAttackTransform);
         }
+    }
 }
 
     void ReleaseCharge()
@@ -770,14 +813,57 @@ if (isOnPlatform && platformRb != null)
             }
         }
 
-    transform.position += new Vector3(_recoilDir.x * _recoilStrength * Time.deltaTime, 0f, 0f);
+        transform.position += new Vector3(_recoilDir.x * _recoilStrength * Time.deltaTime, _recoilDir.y * _recoilStrength * Time.deltaTime, 0f);
 
-    // Apply vertical recoil to the player
-    // Modify the player's position based on the vertical recoil direction and strength
-    transform.position += new Vector3(0f, _recoilDir.y * _recoilStrength * Time.deltaTime, 0f);
+    }
+
+    void ShadowHit(Transform _attackTransform, Vector2 _attackArea, ref bool _recoilBool, Vector2 _recoilDir, float _recoilStrength)
+    {
+        Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
+
+        if (objectsToHit.Length > 0)
+        {
+            _recoilBool = true;
+            dashed = false;
+        }
+        for (int i = 0; i < objectsToHit.Length; i++)
+        {
+            if (objectsToHit[i].GetComponent<Enemy>() != null)
+            {
+                objectsToHit[i].GetComponent<Enemy>().EnemyGetsHit(damage, _recoilDir, _recoilStrength);
+
+                if (objectsToHit[i].CompareTag("Enemy"))
+                {
+                    if(Mana < 1)
+                    {
+                        Mana += manaGain;
+                    }
+
+                    if(Mana >= 1 || (halfMana && Mana >= 0.5))
+                    {
+                        manaOrbsHandler.UpdateMana(manaGain * 3);
+                    }
+                                        
+                }
+            }
+        }
+
+        transform.position += new Vector3(_recoilDir.x * _recoilStrength * Time.deltaTime, _recoilDir.y * _recoilStrength * Time.deltaTime, 0f);
+
     }
 
     void SlashEffectAtAngle(GameObject _slashEffect, int _effectAngle, Transform _attackTransform)
+{
+    _slashEffect = Instantiate(_slashEffect, _attackTransform);
+
+    // Flip the instantiated slash effect based on player direction
+    _slashEffect.transform.localScale = new Vector3(1, pState.lookingRight ? 1 : -1, 1);
+
+    // Set the angle of the slash effect
+    _slashEffect.transform.eulerAngles = new Vector3(0, 0, _effectAngle);
+}
+
+    void ShadowSlashEffectAtAngle(GameObject _slashEffect, int _effectAngle, Transform _attackTransform)
     {
         _slashEffect = Instantiate(_slashEffect, _attackTransform);
         _slashEffect.transform.eulerAngles = new Vector3(0, 0, _effectAngle);
@@ -810,6 +896,7 @@ if (isOnPlatform && platformRb != null)
                 rb.velocity = new Vector2(rb.velocity.x, -recoilYSpeed);
             }
             airJumpCounter = 0;
+            lightJumpCounter = 0;
         }
         else
         {
@@ -852,7 +939,7 @@ if (isOnPlatform && platformRb != null)
 
     public void TakeDamage(float _damage) 
 {   
-    if(pState.alive && !pState.dodging && !pState.shadowJumping)
+    if(pState.alive && !pState.dodging && !pState.lightJumping)
     {
         audioSource.PlayOneShot(hurtSound);
 
@@ -1075,7 +1162,7 @@ IEnumerator StopTakingDamage()
         {
             //disable downspell if on the ground
             downSpellFireball.SetActive(false);
-            shadowBall.SetActive(false);
+            lightBall.SetActive(false);
         }
         //if down spell is active, force player down until grounded
         if(downSpellFireball.activeInHierarchy)
@@ -1085,7 +1172,7 @@ IEnumerator StopTakingDamage()
     }
     IEnumerator CastCoroutine()
     {
-        audioSource.PlayOneShot(spellCastSound);
+        
 
         //side cast
         if ((yAxis == 0 || (yAxis < 0 && Grounded())) && unlockedSideCast)
@@ -1093,6 +1180,7 @@ IEnumerator StopTakingDamage()
             anim.SetBool("Casting", true);
             yield return new WaitForSeconds(0.15f);
             GameObject _fireBall = Instantiate(sideSpellFireball, SideAttackTransform.position, Quaternion.identity);
+            audioSource.PlayOneShot(spellCastSound);
 
             //flip fireball
             if(pState.lookingRight)
@@ -1126,6 +1214,7 @@ IEnumerator StopTakingDamage()
             Mana -= manaSpellCost;
             manaOrbsHandler.usedMana = true;
             manaOrbsHandler.countDown = 3f;
+            audioSource.PlayOneShot(ExplosionSpellCastSound);
             yield return new WaitForSeconds(0.35f);
         }
 
@@ -1137,11 +1226,13 @@ IEnumerator StopTakingDamage()
             yield return new WaitForSeconds(0.15f);
 
             downSpellFireball.SetActive(true);
+            audioSource.PlayOneShot(spellCastSound);
 
             Mana -= manaSpellCost;
             manaOrbsHandler.usedMana = true;
             manaOrbsHandler.countDown = 3f;
             yield return new WaitForSeconds(0.35f);
+            
         }
 
         
@@ -1234,7 +1325,7 @@ IEnumerator StopTakingDamage()
         pState.jumping = true;
     }
 
-    if (!Grounded() && airJumpCounter < maxAirJumps && (Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && pState.shadow == false)
+    if (!Grounded() && airJumpCounter < maxAirJumps && (Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && !pState.lightForm)
     {
         audioSource.PlayOneShot(jumpSound);
 
@@ -1245,7 +1336,7 @@ IEnumerator StopTakingDamage()
         rb.velocity = new Vector3(rb.velocity.x, jumpForce);
     }
 
-    if ((Input.GetButtonUp("Jump") || (Gamepad.current?.crossButton.wasReleasedThisFrame == true)) && rb.velocity.y > 3)
+    if ((Input.GetButtonUp("Jump") || (Gamepad.current?.crossButton.wasReleasedThisFrame == true)) && rb.velocity.y > 3 && !pState.lightForm)
     {
         pState.jumping = false;
 
@@ -1265,62 +1356,58 @@ IEnumerator StopTakingDamage()
 }
 
 
-    void ShadowJump()
+    void LightJump()
     {
-            Debug.Log($"Charge Time: {shadowJumpChargeTime}");
+            
 
-        if (!Grounded() && airJumpCounter < maxAirJumps && (Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && pState.shadow == true)
+        if (!Grounded() && lightJumpCounter < maxLightJumps && (Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && pState.lightForm && !pState.lightJumping)
         {
             rb.velocity = new Vector2(rb.velocity.x, 0);
             savedPositionConstraints = rb.constraints & RigidbodyConstraints2D.FreezeRotation;
 
             rb.constraints = RigidbodyConstraints2D.FreezePosition;
-            airJumpCounter++;
+            lightJumpCounter++;
             pState.hovering = true;
         }
-        if (!Grounded() && (Input.GetButton("Jump") || (Gamepad.current?.crossButton.isPressed == true)) && shadowJumpChargeTime <= 2 && pState.hovering == true)
+        if (!Grounded() && (Input.GetButton("Jump") || (Gamepad.current?.crossButton.isPressed == true)) && pState.hovering == true)
         {
-            shadowJumpChargeTime += Time.deltaTime;
-
-            shadowJumpChargeTime = Mathf.Clamp(shadowJumpChargeTime, 0f, 2f);
 
             GameObject _chargeParticles = Instantiate(chargeParticles, transform.position, Quaternion.identity);
-
-            if (shadowJumpChargeTime >= 2f)
-            {
-                // Double the size
-                Vector3 newScale = _chargeParticles.transform.localScale * 2f;
-                _chargeParticles.transform.localScale = newScale;
-            }
             
             Destroy(_chargeParticles, 0.05f);
         }
-        if(!Grounded() && (Input.GetButton("Jump") || (Gamepad.current?.crossButton.isPressed == true)) && pState.shadowJumping)
+        //if(!Grounded() && (Input.GetButton("Jump") || (Gamepad.current?.crossButton.isPressed == true)) && pState.lightJumping)
         {
-            pState.shadowJumping = false;
-            shadowBall.SetActive(false);
+           // pState.lightJumping = false;
+           // lightBall.SetActive(false);
         }
-        if ((Input.GetButtonUp("Jump") || (Gamepad.current?.crossButton.wasReleasedThisFrame == true)) && pState.hovering)
-        {
-            pState.shadowJumping = true;
+        
+        if ((Input.GetButtonUp("Jump") || (Gamepad.current?.crossButton.wasReleasedThisFrame == true)) && pState.hovering && !pState.lightJumping)
+{
+        StartCoroutine(LightJumpCoroutine());
+               
+        // Reset hovering state.
+        pState.hovering = false;
+        rb.constraints = savedPositionConstraints;
+        }   
+    }
 
-            // Calculate the launch direction based on input.
-            Vector2 launchDirection = new Vector2(xAxis, yAxis).normalized;
-            shadowJumpChargeTime = 0;
-
-
-            // Apply the hover launch force.
-            rb.velocity = launchDirection * shadowJumpForce;
-            shadowBall.SetActive(true);
-
-
-            //Debug.Log($"Horizontal Input: {horizontalInput}, Vertical Input: {verticalInput}, Launch Direction: {launchDirection}");
-
-            // Reset hovering state.
-            pState.hovering = false;
-            rb.constraints = savedPositionConstraints;
-
-        }
+    IEnumerator LightJumpCoroutine()
+    {
+        pState.lightJumping = true;
+        lightBall.SetActive(true);
+        anim.SetTrigger("Dashing");
+        //audioSource.PlayOneShot(dashAndAttackSound);
+        rb.gravityScale = 0;
+        Vector2 launchDirection = new Vector2(xAxis, yAxis).normalized;
+        rb.velocity = launchDirection * lightJumpForce;
+        //if (Grounded()) Instantiate(dashEffect, transform);
+        yield return new WaitForSeconds(dashTime);
+        rb.velocity = Vector2.zero;
+        rb.gravityScale = gravity;
+        lightBall.SetActive(false);
+        pState.lightJumping = false;
+        yield return new WaitForSeconds(dashCooldown);
     }
     void UpdateJumpVariables()
     {
@@ -1332,9 +1419,10 @@ IEnumerator StopTakingDamage()
                 landingSoundPlayed = true;
             }
             pState.jumping = false;
-            pState.shadowJumping = false;
+            pState.lightJumping = false;
             coyoteTimeCounter = coyoteTime;
             airJumpCounter = 0;
+            lightJumpCounter = 0;
         }
         else
         {
@@ -1363,6 +1451,8 @@ if ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThis
         {
             isWallSliding = true;
             rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -wallSlidingSpeed, float.MaxValue));
+            pState.lightJumping = false;
+            lightBall.SetActive(false);
         }
         else
         {
@@ -1386,6 +1476,7 @@ if ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThis
 
         dashed = false;
         airJumpCounter = 0;
+        lightJumpCounter = 0;
 
         if ((pState.lookingRight && transform.eulerAngles.y == 0) || (!pState.lookingRight && transform.eulerAngles.y != 0))
         {

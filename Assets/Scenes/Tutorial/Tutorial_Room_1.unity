@@ -990,7 +990,7 @@ Transform:
   m_GameObject: {fileID: 22364413}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -809, y: 583.1138, z: 0}
+  m_LocalPosition: {x: -807.8, y: 583, z: 0}
   m_LocalScale: {x: 3000, y: 2600, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -24306,6 +24306,11 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!4 &695185429 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8393741681737554738, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+  m_PrefabInstance: {fileID: 604428978921768286}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &701661074
 GameObject:
   m_ObjectHideFlags: 0
@@ -44355,6 +44360,37 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1274564800
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1274564801}
+  m_Layer: 0
+  m_Name: Light Jump Transform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1274564801
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1274564800}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 15, y: 15, z: 15}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 695185429}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1275561956
 GameObject:
   m_ObjectHideFlags: 0
@@ -55801,6 +55837,11 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1608893645 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5035203146021994808, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+  m_PrefabInstance: {fileID: 604428978921768286}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1612079873
 GameObject:
   m_ObjectHideFlags: 0
@@ -73547,6 +73588,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: lightBall
+      value: 
+      objectReference: {fileID: 1608893645}
+    - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
       propertyPath: walkSpeed
       value: 50
       objectReference: {fileID: 0}
@@ -73567,6 +73612,14 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: maxShadowJumps
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: shadowJumpTime
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
       propertyPath: unlockedUpCast
       value: 1
       objectReference: {fileID: 0}
@@ -73575,16 +73628,32 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2073226567710823729, guid: 62e221ae450a3e94c8f8f2d9083f8b33, type: 3}
     - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: lightJumpDamage
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
       propertyPath: manaOrbsHandler
       value: 
       objectReference: {fileID: 285601737}
     - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
       propertyPath: shadowJumpForce
-      value: 180
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: shadowJumpSpeed
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
       propertyPath: unlockedVarJump
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: ShadowJumpArea.x
+      value: 19
+      objectReference: {fileID: 0}
+    - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: ShadowJumpArea.y
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
       propertyPath: unlockedSideCast
@@ -73595,9 +73664,25 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: LightJumpTransform
+      value: 
+      objectReference: {fileID: 1274564801}
+    - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: shadowJumpCooldown
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: shadowJumpDuration
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
       propertyPath: wallJumpingPower.x
       value: 100
       objectReference: {fileID: 0}
+    - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: ShadowJumpTransform
+      value: 
+      objectReference: {fileID: 1274564801}
     - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
       propertyPath: wallJumpingDuration
       value: 0.2
@@ -73628,6 +73713,26 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1670897694765938384, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
       propertyPath: m_ExcludeLayers.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5035203146021994808, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5394612162651979642, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 5394612162651979642, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 5394612162651979642, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6299272671583195914, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: m_Color.a
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6347059120626767168, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
@@ -73686,9 +73791,24 @@ PrefabInstance:
       propertyPath: m_UpdateMode
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9012878364458396485, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: m_Radius
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 9012878364458396485, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: m_Offset.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9012878364458396485, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 8393741681737554738, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1274564801}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
 --- !u!1001 &2420367789335681006

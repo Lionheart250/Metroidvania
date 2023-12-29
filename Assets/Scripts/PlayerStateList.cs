@@ -6,9 +6,10 @@ public class PlayerStateList : MonoBehaviour
 {
     public static PlayerStateList Instance; // Singleton reference
 
-    public bool shadow = false;
+    public bool lightForm = false;
+    public bool shadowForm = false;
     public bool jumping = false;
-    public bool shadowJumping = false;
+    public bool lightJumping = false;
     public bool hovering = false;
     public bool dashing = false;
     public bool dodging = false;
@@ -27,6 +28,9 @@ public class PlayerStateList : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject); // Makes the object persist between scenes
+
+            lightForm = true; // Light form is true by default
+            shadowForm = false; // Shadow form is false by default
         }
         else
         {

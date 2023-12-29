@@ -31,6 +31,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8393741681737554738}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2606136242716413703
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4911160870353817340}
+  m_Layer: 0
+  m_Name: 'Shadow Up Attack Transform '
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4911160870353817340
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2606136242716413703}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 10, z: 0}
+  m_LocalScale: {x: 20, y: 3, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8393741681737554738}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3498523895896075617
 GameObject:
   m_ObjectHideFlags: 0
@@ -235,6 +266,37 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!1 &4555006765837358632
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3372852536265797950}
+  m_Layer: 0
+  m_Name: Shadow Down Attack Transform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3372852536265797950
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4555006765837358632}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -10, z: 0}
+  m_LocalScale: {x: 20, y: 3, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8393741681737554738}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5035203146021994808
 GameObject:
   m_ObjectHideFlags: 0
@@ -247,7 +309,7 @@ GameObject:
   - component: {fileID: 6299272671583195914}
   - component: {fileID: 9012878364458396485}
   m_Layer: 0
-  m_Name: ShadowBall
+  m_Name: LightBall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -310,7 +372,7 @@ SpriteRenderer:
   m_SortingLayer: 2
   m_SortingOrder: 11
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -457,12 +519,16 @@ Transform:
   m_Children:
   - {fileID: 6081919134884060294}
   - {fileID: 7864018728045345398}
+  - {fileID: 4495849649064230659}
+  - {fileID: 4911160870353817340}
+  - {fileID: 3372852536265797950}
   - {fileID: 1464652292267261723}
   - {fileID: 5273050065689229505}
   - {fileID: 4784169075175515984}
   - {fileID: 625061989439647171}
   - {fileID: 6347059120626767168}
   - {fileID: 5394612162651979642}
+  - {fileID: 3657028001340546573}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7521046159861858718
@@ -558,12 +624,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walkSpeed: 50
   jumpForce: 120
-  shadowJumpForce: 60
-  shadowJumpChargeSpeed: 0
-  shadowJumpChargeTime: 0
+  lightJumpForce: 60
   jumpBufferFrames: 8
   coyoteTime: 0.1
   maxAirJumps: 1
+  maxLightJumps: 0
   maxFallingSpeed: 200
   fallGravityMultiplier: 18
   wallSlidingSpeed: 12
@@ -584,13 +649,19 @@ MonoBehaviour:
   dashCooldown: 0.1
   dashEffect: {fileID: 8902779006071723231, guid: 9042fa1c9d75d430788014ec956f31d3, type: 3}
   SideAttackTransform: {fileID: 1464652292267261723}
-  SideAttackArea: {x: 20, y: 15}
-  ChargeAttackTransform: {fileID: 7864018728045345398}
-  ChargeAttackArea: {x: 40, y: 23}
+  SideAttackArea: {x: 20, y: 20}
   UpAttackTransform: {fileID: 5273050065689229505}
   UpAttackArea: {x: 20, y: 20}
   DownAttackTransform: {fileID: 4784169075175515984}
   DownAttackArea: {x: 20, y: 20}
+  ChargeAttackTransform: {fileID: 7864018728045345398}
+  ChargeAttackArea: {x: 40, y: 23}
+  ShadowSideAttackTransform: {fileID: 4495849649064230659}
+  ShadowSideAttackArea: {x: 15, y: 35}
+  ShadowUpAttackTransform: {fileID: 4911160870353817340}
+  ShadowUpAttackArea: {x: 35, y: 15}
+  ShadowDownAttackTransform: {fileID: 3372852536265797950}
+  ShadowDownAttackArea: {x: 35, y: 15}
   attackableLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -626,15 +697,16 @@ MonoBehaviour:
   sideSpellFireball: {fileID: 4360750681699512633, guid: cb80a4f36f17b4c23b368df31afc4a1a, type: 3}
   upSpellExplosion: {fileID: 4754368797262699346, guid: ccfe0e708d0c84a06998a3d0519f032c, type: 3}
   downSpellFireball: {fileID: 3657150963780276792}
-  shadowBall: {fileID: 5035203146021994808}
-  shadowJumpDamage: 1
-  ShadowJumpTransform: {fileID: 5394612162651979642}
-  ShadowJumpArea: {x: 15, y: 15}
+  lightBall: {fileID: 5035203146021994808}
+  lightJumpDamage: 1
+  LightJumpTransform: {fileID: 3657028001340546573}
+  LightJumpArea: {x: 15, y: 15}
   playerFallSpeedThreshold: -10
   landingSound: {fileID: 8300000, guid: 1ae743c895ba94e40b4a4e3acf2444b8, type: 3}
   jumpSound: {fileID: 8300000, guid: 4d4f3dc9a0ac048098209e7652d8a53a, type: 3}
   dashAndAttackSound: {fileID: 8300000, guid: 1d75a533349af4ae285b2394fe3d2b94, type: 3}
   spellCastSound: {fileID: 8300000, guid: 4dd755d93309642168dc69e7eed0e56f, type: 3}
+  ExplosionSpellCastSound: {fileID: 0}
   hurtSound: {fileID: 8300000, guid: d0806599436b24b6db29082182001a18, type: 3}
   playerLight: {fileID: 1721975736593546506}
   Shielded: 0
@@ -777,9 +849,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89bc17673c3644c2a82edb1f6fec3a8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shadow: 0
+  lightForm: 0
+  shadowForm: 0
   jumping: 0
-  shadowJumping: 0
+  lightJumping: 0
   hovering: 0
   dashing: 0
   dodging: 0
@@ -920,6 +993,68 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!1 &7418969857550439246
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3657028001340546573}
+  m_Layer: 0
+  m_Name: Light Jump Transform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3657028001340546573
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7418969857550439246}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 15, y: 15, z: 0}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8393741681737554738}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7942563851211924407
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4495849649064230659}
+  m_Layer: 0
+  m_Name: Shadow Side Attack Transform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4495849649064230659
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7942563851211924407}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 15.4, y: 0, z: 0}
+  m_LocalScale: {x: 0.3, y: 1.8, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8393741681737554738}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8416305689612616408
 GameObject:
   m_ObjectHideFlags: 0
