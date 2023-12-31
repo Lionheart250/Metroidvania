@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UnlockReflect : MonoBehaviour
+public class UnlockBlackShield : MonoBehaviour
 {
     [SerializeField] GameObject particles;
     [SerializeField] GameObject canvasUI;
@@ -12,7 +12,7 @@ public class UnlockReflect : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if(PlayerController.Instance.unlockedReflect)
+        if(PlayerController.Instance.unlockedBlackShield)
         {
             Destroy(gameObject);
         }
@@ -35,7 +35,7 @@ public class UnlockReflect : MonoBehaviour
         canvasUI.SetActive(true);
 
         yield return new WaitForSeconds(4f);
-        PlayerController.Instance.unlockedReflect = true;
+        PlayerController.Instance.unlockedBlackShield = true;
         SaveData.Instance.SavePlayerData();
         canvasUI.SetActive(false);
         Destroy(gameObject);

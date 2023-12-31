@@ -29,7 +29,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private int maxAirJumps; //the max no. of air jumps
     [SerializeField] private int maxLightJumps;
     [SerializeField] private int maxFallingSpeed; //the max no. of air jumps
-    public float fallGravityMultiplier = 2.0f; // You can adjust this value
+    public float fallGravityMultiplier; // You can adjust this value
     private float originalFallGravityMultiplier;
     private float gravity; //stores the gravity scale at start
     [Space(5)]
@@ -170,9 +170,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] AudioClip hurtSound;
     [Space(5)]
 
-    [Header("Reflect Settings")]
+    [Header("BlackShield Settings")]
     public UnityEngine.Rendering.Universal.Light2D playerLight;
-    private float timeBetweenReflect = 0.4f, timeSinceReflect;
     public bool Shielded = false;
     [SerializeField] GameObject Shield;
     [Space(5)]
@@ -189,7 +188,7 @@ public class PlayerController : MonoBehaviour
     //Input Variables
     private float xAxis, yAxis;
     private bool attack = false;
-    private bool reflect = false;
+    private bool blackShield = false;
     bool openMap;
     bool openInventory;
 
@@ -209,7 +208,7 @@ public class PlayerController : MonoBehaviour
     public bool unlockedSideCast;
     public bool unlockedUpCast;
     public bool unlockedDownCast;
-    public bool unlockedReflect;
+    public bool unlockedBlackShield;
     [Space(5)]
 
     [Header("Health Shards")]
@@ -254,7 +253,8 @@ public class PlayerController : MonoBehaviour
         manaOrbsHandler = FindObjectOfType<ManaOrbsHandler>();
         originalWalkSpeed = walkSpeed;
         originalFallGravityMultiplier = fallGravityMultiplier;
-        
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+
         
 
         SaveData.Instance.LoadPlayerData();
@@ -266,8 +266,6 @@ public class PlayerController : MonoBehaviour
         {
             UIManager.Instance.SwitchMana(UIManager.ManaState.HalfMana);
         }
-
-        gravity = rb.gravityScale;
 
         Mana = mana;
         manaStorage.fillAmount = Mana;
@@ -349,7 +347,7 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
             Attack();
             ShadowAttack();
             CastSpell();
-            Reflect();
+            BlackShield();
         }        
         FlashWhileInvincible();     
         
@@ -362,10 +360,6 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
         {
             manaOrbs = 3;
         }    
-        if(!pState.hovering)
-        {
-            rb.constraints = RigidbodyConstraints2D.FreezeRotation;
-        }
     }
     private Vector2 relativeTransform;
    public bool isOnPlatform;
@@ -425,7 +419,7 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
        xAxis = Input.GetAxisRaw("Horizontal");
        yAxis = Input.GetAxisRaw("Vertical");
        attack = Input.GetButtonDown("Attack");
-       reflect = Input.GetButtonDown("Reflect");
+       blackShield = Input.GetButtonDown("Shield");
        openMap = Input.GetButton("Map");
        openInventory = Input.GetButton("Inventory");
         if (Input.GetButton("Cast/Heal"))
@@ -440,6 +434,16 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
     }
         
     }
+    void FreezeRigidbodyPosition()
+    {
+        savedPositionConstraints = rb.constraints;
+        rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY;
+    }
+
+    void UnfreezeRigidbodyPosition()
+    {
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation;;
+    }    
 
     void ToggleMap()
     {
@@ -491,7 +495,7 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
 
     private void Move()
     {
-        if(pState.lightJumping == false)
+        if(!pState.lightJumping)
         {
         rb.velocity = new Vector2(walkSpeed * xAxis, rb.velocity.y);
         anim.SetBool("Walking", rb.velocity.x != 0 && Grounded());
@@ -548,7 +552,7 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
 
     void StartDodge()
     {
-         if ((Input.GetButtonDown("Dash")|| (Gamepad.current?.rightTrigger.wasPressedThisFrame == true)) && canDodge && !dodged && xAxis == 0 && Grounded())
+         if ((Input.GetButtonDown("Dash")|| (Gamepad.current?.rightTrigger.wasPressedThisFrame == true)) && canDodge && !dodged && xAxis == 0 && Grounded() && pState.lightForm)
         {
             StartCoroutine(Dodge());
             dodged = false;
@@ -566,7 +570,7 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
         audioSource.PlayOneShot(dashAndAttackSound);
         rb.gravityScale = 0;
         int _dir = pState.lookingRight ? 1 : -1;
-        rb.velocity = new Vector2(-_dir * (dashSpeed / 3), 0);
+        rb.velocity = new Vector2(-_dir * (dashSpeed / 8), 0);
         //if (Grounded()) Instantiate(dashEffect, transform);
         yield return new WaitForSeconds(dashTime);
         rb.gravityScale = gravity;
@@ -618,17 +622,19 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
             if (pState.lightForm)
             {
                 // Adjust parameters for light form
-                walkSpeed *= 1.35f; // Increase walkSpeed by 35%
+                walkSpeed = 70f; // Increase walkSpeed by 35%
                 rb.gravityScale *= 0.50f;
-                fallGravityMultiplier *= 0f;
+                fallGravityMultiplier = originalFallGravityMultiplier;
+                maxFallingSpeed = 100;
             }
             else
             {
                 // Adjust parameters for shadow form
                 // Reset to original walkSpeed if not in light form
-                walkSpeed = originalWalkSpeed;
+                walkSpeed = 50f;
                 rb.gravityScale = gravity;
-                fallGravityMultiplier = originalFallGravityMultiplier;
+                fallGravityMultiplier = originalFallGravityMultiplier * 3f;
+                maxFallingSpeed = 100;
             }
         }
     }
@@ -708,7 +714,7 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
 
 void ShadowAttack()
 {
-    if ((attack || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && timeSinceAttck >= timeBetweenAttack && !pState.lightForm)
+    if ((attack || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && timeSinceAttck >= timeBetweenAttack && pState.shadowForm)
     {
         timeSinceAttck = 0;
         anim.SetTrigger("Attacking");
@@ -722,16 +728,16 @@ void ShadowAttack()
             ShadowHit(ShadowSideAttackTransform, ShadowSideAttackArea, ref pState.recoilingX, Vector2.right * _recoilLeftOrRight, recoilXSpeed);
             Instantiate(chargeSlashEffect, ShadowSideAttackTransform);
         }
-        else if (yAxis > 0 && !pState.lightForm)
+        else if (yAxis > 0 && pState.shadowForm)
         {
             // Handle up attack
-            Hit(ShadowUpAttackTransform, ShadowUpAttackArea, ref pState.recoilingY, Vector2.up, recoilYSpeed);
+            ShadowHit(ShadowUpAttackTransform, ShadowUpAttackArea, ref pState.recoilingY, Vector2.up, recoilYSpeed);
             SlashEffectAtAngle(chargeSlashEffect, 80, ShadowUpAttackTransform);
         }
-        else if (yAxis < 0 && !Grounded() && !pState.lightForm)
+        else if (yAxis < 0 && !Grounded() && pState.shadowForm)
         {
             // Handle down attack
-            Hit(ShadowDownAttackTransform, ShadowDownAttackArea, ref pState.recoilingY, Vector2.down, recoilYSpeed);
+            ShadowHit(ShadowDownAttackTransform, ShadowDownAttackArea, ref pState.recoilingY, Vector2.down, recoilYSpeed);
             SlashEffectAtAngle(chargeSlashEffect, -90, ShadowDownAttackTransform);
         }
     }
@@ -831,20 +837,6 @@ void ShadowAttack()
             if (objectsToHit[i].GetComponent<Enemy>() != null)
             {
                 objectsToHit[i].GetComponent<Enemy>().EnemyGetsHit(damage, _recoilDir, _recoilStrength);
-
-                if (objectsToHit[i].CompareTag("Enemy"))
-                {
-                    if(Mana < 1)
-                    {
-                        Mana += manaGain;
-                    }
-
-                    if(Mana >= 1 || (halfMana && Mana >= 0.5))
-                    {
-                        manaOrbsHandler.UpdateMana(manaGain * 3);
-                    }
-                                        
-                }
             }
         }
 
@@ -1240,63 +1232,24 @@ IEnumerator StopTakingDamage()
         pState.casting = false;
     }
 
-    void Reflect()
+    void BlackShield()
     {   
-        if ((Input.GetButtonDown("Reflect") || (Gamepad.current?.leftTrigger.wasPressedThisFrame == true)) && !Shielded && timeSinceReflect >= timeBetweenReflect && unlockedReflect)
+        if ((Input.GetButtonDown("Shield") || (Gamepad.current?.leftTrigger.wasPressedThisFrame == true)) && !Shielded && unlockedBlackShield && pState.shadowForm && Grounded())
         {              
-        timeSinceReflect = 0;
-        audioSource.PlayOneShot(jumpSound);
-        anim.SetBool("Casting", true);
-        StartCoroutine(ReflectCoroutine());
+            audioSource.PlayOneShot(jumpSound);
+            anim.SetBool("Casting", true);
+            Shield.SetActive(true);
+            Shielded = true; 
+            FreezeRigidbodyPosition();          
         }
-        else
+        else if ((Input.GetButtonUp("Shield") || (Gamepad.current?.leftTrigger.wasReleasedThisFrame == true)) && Shielded && unlockedBlackShield && pState.shadowForm) 
         {
-        timeSinceReflect += Time.deltaTime;
+            Shield.SetActive(false);
+            Shielded = false;  
+            UnfreezeRigidbodyPosition();  
         }
     }
-    IEnumerator ReflectCoroutine()
-    {
-        RigidbodyConstraints2D originalConstraints = rb.constraints;
-        Vector3 originalPosition = rb.position;
-
-        rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY;
-        //float originalIntensity = playerLight.intensity;
-        //float originalFalloffIntensity = playerLight.falloffIntensity;
-        //Color originalColor = playerLight.color;
-        //Color angelicColor = new Color(1f, 0.9f, 0.7f); 
-        Shield.SetActive(true);
-        Shielded = true;
-        
-                     
-        anim.SetBool("Casting", true);
-            
-        GameObject _lightshield = Instantiate(Shield, rb.position, Quaternion.identity);            
-        if(pState.lookingRight)
-        {
-            _lightshield.transform.eulerAngles = Vector3.zero; 
-        }
-        else
-        {
-            _lightshield.transform.eulerAngles = new Vector2(_lightshield.transform.eulerAngles.x, 180); 
-        }
-
-        //playerLight.intensity = 50f;
-        //playerLight.falloffIntensity = 0f; 
-        //playerLight.color = angelicColor;
-
-        yield return new WaitForSeconds(0.2f);
-
-        //playerLight.intensity = originalIntensity;
-        //playerLight.falloffIntensity = originalFalloffIntensity;
-        //playerLight.color = originalColor;
-        Shield.SetActive(false);
-        Shielded = false;       
-        Destroy(_lightshield);
-        rb.constraints = originalConstraints;   
-    }
-
-
-
+    
     public bool Grounded()
     {
         if (Physics2D.Raycast(groundCheckPoint.position, Vector2.down, groundCheckY, whatIsGround) 
@@ -1357,46 +1310,36 @@ IEnumerator StopTakingDamage()
 
 
     void LightJump()
-    {
-            
-
+    {            
         if (!Grounded() && lightJumpCounter < maxLightJumps && (Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && pState.lightForm && !pState.lightJumping)
         {
             rb.velocity = new Vector2(rb.velocity.x, 0);
-            savedPositionConstraints = rb.constraints & RigidbodyConstraints2D.FreezeRotation;
-
-            rb.constraints = RigidbodyConstraints2D.FreezePosition;
+            FreezeRigidbodyPosition();
             lightJumpCounter++;
             pState.hovering = true;
         }
-        if (!Grounded() && (Input.GetButton("Jump") || (Gamepad.current?.crossButton.isPressed == true)) && pState.hovering == true)
+        if (!Grounded() && (Input.GetButton("Jump") || (Gamepad.current?.crossButton.isPressed == true)) && pState.hovering == true && pState.lightForm) 
         {
-
             GameObject _chargeParticles = Instantiate(chargeParticles, transform.position, Quaternion.identity);
             
             Destroy(_chargeParticles, 0.05f);
-        }
-        //if(!Grounded() && (Input.GetButton("Jump") || (Gamepad.current?.crossButton.isPressed == true)) && pState.lightJumping)
+        }   
+        if ((Input.GetButtonUp("Jump") || (Gamepad.current?.crossButton.wasReleasedThisFrame == true)) && pState.hovering && !pState.lightJumping && pState.lightForm)
         {
-           // pState.lightJumping = false;
-           // lightBall.SetActive(false);
-        }
-        
-        if ((Input.GetButtonUp("Jump") || (Gamepad.current?.crossButton.wasReleasedThisFrame == true)) && pState.hovering && !pState.lightJumping)
-{
         StartCoroutine(LightJumpCoroutine());
-               
-        // Reset hovering state.
         pState.hovering = false;
-        rb.constraints = savedPositionConstraints;
         }   
     }
 
     IEnumerator LightJumpCoroutine()
     {
+        UnfreezeRigidbodyPosition();
         pState.lightJumping = true;
         lightBall.SetActive(true);
         anim.SetTrigger("Dashing");
+        SpriteRenderer playerSpriteRenderer = GetComponent<SpriteRenderer>();
+    Color originalColor = playerSpriteRenderer.color;
+    playerSpriteRenderer.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.5f);
         //audioSource.PlayOneShot(dashAndAttackSound);
         rb.gravityScale = 0;
         Vector2 launchDirection = new Vector2(xAxis, yAxis).normalized;
@@ -1408,6 +1351,8 @@ IEnumerator StopTakingDamage()
         lightBall.SetActive(false);
         pState.lightJumping = false;
         yield return new WaitForSeconds(dashCooldown);
+        playerSpriteRenderer.color = originalColor;
+
     }
     void UpdateJumpVariables()
     {
@@ -1453,6 +1398,7 @@ if ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThis
             rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -wallSlidingSpeed, float.MaxValue));
             pState.lightJumping = false;
             lightBall.SetActive(false);
+            UnfreezeRigidbodyPosition();
         }
         else
         {

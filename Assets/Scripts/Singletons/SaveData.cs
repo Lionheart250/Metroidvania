@@ -30,7 +30,7 @@ public struct SaveData
 
     public bool playerUnlockedWallJump, playerUnlockedDash, playerUnlockedVarJump;
     public bool playerUnlockedSideCast, playerUnlockedUpCast, playerUnlockedDownCast;
-    public bool playerUnlockedReflect;
+    public bool playerUnlockedBlackShield;
     
     //serialized heart shards
     public bool playerUnlockedHeartShard1, playerUnlockedHeartShard2, playerUnlockedHeartShard3, playerUnlockedHeartShard4, playerUnlockedHeartShard5, 
@@ -142,8 +142,8 @@ public struct SaveData
             writer.Write(playerUnlockedUpCast);
             playerUnlockedDownCast = PlayerController.Instance.unlockedDownCast;
             writer.Write(playerUnlockedDownCast);
-            playerUnlockedReflect = PlayerController.Instance.unlockedReflect;
-            writer.Write(playerUnlockedReflect);
+            playerUnlockedBlackShield = PlayerController.Instance.unlockedBlackShield;
+            writer.Write(playerUnlockedBlackShield);
 
             //each heart shard
             playerUnlockedHeartShard1 = PlayerController.Instance.unlockedHeartShard1;
@@ -246,7 +246,7 @@ public struct SaveData
                 playerUnlockedSideCast = reader.ReadBoolean();
                 playerUnlockedUpCast = reader.ReadBoolean();
                 playerUnlockedDownCast = reader.ReadBoolean();
-                playerUnlockedReflect = reader.ReadBoolean();
+                playerUnlockedBlackShield = reader.ReadBoolean();
                 
                 //each heart shard
                 playerUnlockedHeartShard1 = reader.ReadBoolean();
@@ -305,7 +305,7 @@ public struct SaveData
                 PlayerController.Instance.unlockedSideCast = playerUnlockedSideCast;
                 PlayerController.Instance.unlockedUpCast = playerUnlockedUpCast;
                 PlayerController.Instance.unlockedDownCast = playerUnlockedDownCast;
-                PlayerController.Instance.unlockedReflect = playerUnlockedReflect;
+                PlayerController.Instance.unlockedBlackShield = playerUnlockedBlackShield;
                 
                 //each heart shard
                 PlayerController.Instance.unlockedHeartShard1 = playerUnlockedHeartShard1;
@@ -360,7 +360,7 @@ public struct SaveData
             PlayerController.Instance.unlockedSideCast = false;
             PlayerController.Instance.unlockedUpCast = false;
             PlayerController.Instance.unlockedDownCast = false;
-            PlayerController.Instance.unlockedReflect = false;
+            PlayerController.Instance.unlockedBlackShield = false;
 
             //each heart shard
             PlayerController.Instance.unlockedHeartShard1 = false;
