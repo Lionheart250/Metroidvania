@@ -18,6 +18,7 @@ public class PlayerStateList : MonoBehaviour
     public bool invincible;
     public bool healing;
     public bool casting;
+    public bool aiming = false;
     public bool cutscene = false;
     public bool alive = true; // Default to alive
 

@@ -150,6 +150,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] GameObject upSpellExplosion;
     [SerializeField] GameObject downSpellFireball;
     [SerializeField] GameObject lightBall;
+    [SerializeField] GameObject lightningBow;
     [SerializeField] float lightJumpDamage;
     [SerializeField] private Transform LightJumpTransform; //the middle of the up attack area
     [SerializeField] private Vector2 LightJumpArea; //how large the area of side attack is
@@ -348,6 +349,7 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
             ShadowAttack();
             CastSpell();
             BlackShield();
+            LightningBow();
         }        
         FlashWhileInvincible();     
         
@@ -1132,9 +1134,18 @@ IEnumerator StopTakingDamage()
         }
     }
 
+    void LightningBow()
+    {
+        if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && castOrHealTimer <= 0.5f && timeSinceCast >= timeBetweenCast && Mana >= manaSpellCost && pState.lightForm && yAxis > 0 && unlockedUpCast)
+        {
+            pState.aiming = true;
+            lightningBow.SetActive(true);
+        }
+    }
+
     void CastSpell()
     {
-        if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && castOrHealTimer <= 0.5f && timeSinceCast >= timeBetweenCast && Mana >= manaSpellCost)
+        if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && castOrHealTimer <= 0.5f && timeSinceCast >= timeBetweenCast && Mana >= manaSpellCost && pState.shadowForm)
         {
             pState.casting = true;
             timeSinceCast = 0;
@@ -1231,6 +1242,9 @@ IEnumerator StopTakingDamage()
         anim.SetBool("Casting", false);
         pState.casting = false;
     }
+
+
+    
 
     void BlackShield()
     {   
