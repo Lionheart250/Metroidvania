@@ -77,7 +77,7 @@ GameObject:
   - component: {fileID: 1188808188448220866}
   - component: {fileID: 1905702778342800599}
   - component: {fileID: 1547548588298761574}
-  - component: {fileID: 8006140090006676110}
+  - component: {fileID: 7486191895663548634}
   m_Layer: 6
   m_Name: Platform
   m_TagString: Untagged
@@ -224,21 +224,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 4.72, y: 1}
   m_EdgeRadius: 0
---- !u!114 &8006140090006676110
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 8954553053000096675, guid: 870b04d69aec5498e96f18b5aea1c288, type: 3}
-  m_PrefabInstance: {fileID: 8437535923074143979}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7237468788531853293}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd13c77d9a7ae4148a28f256d87ab64d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 50
-  minY: 452
-  maxY: 845
 --- !u!1 &9019449762864988266
 GameObject:
   m_ObjectHideFlags: 0
@@ -384,8 +369,28 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 8075868878630620191, guid: 870b04d69aec5498e96f18b5aea1c288, type: 3}
+    - {fileID: 0}
     m_RemovedGameObjects:
     - {fileID: 0}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2708661836608489182, guid: 870b04d69aec5498e96f18b5aea1c288, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7486191895663548634}
   m_SourcePrefab: {fileID: 100100000, guid: 870b04d69aec5498e96f18b5aea1c288, type: 3}
+--- !u!114 &7486191895663548634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7237468788531853293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd1aae35a65f54864b2c767445e565f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  posA: {fileID: 5030383955725229158}
+  posB: {fileID: 8162729145073615882}
+  speed: 5
+  decelerationDistance: 1

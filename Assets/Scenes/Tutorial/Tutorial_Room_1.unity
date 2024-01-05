@@ -41025,7 +41025,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1192350646}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 99583234fa2f8405db91492aaf4deb3d, type: 3}
+  m_Script: {fileID: 11500000, guid: fd1aae35a65f54864b2c767445e565f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   posA: {fileID: 195468928}
@@ -73923,12 +73923,20 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 285601737}
     - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: maxFallingSpeed
+      value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
       propertyPath: shadowJumpForce
       value: 200
       objectReference: {fileID: 0}
     - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
       propertyPath: shadowJumpSpeed
       value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: timeBetweenCast
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
       propertyPath: unlockedVarJump
@@ -73971,12 +73979,24 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1274564801}
     - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: lightJumpChargeTime
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
       propertyPath: wallJumpingDuration
       value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: lightJumpChargeSpeed
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
       propertyPath: fallGravityMultiplier
       value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: lightJumpBufferFrames
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
       propertyPath: ExplosionSpellCastSound

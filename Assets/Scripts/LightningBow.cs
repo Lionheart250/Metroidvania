@@ -6,9 +6,6 @@ public class LightningBow : MonoBehaviour
 {
     public float moveSpeed = 25f;  // Adjust this speed as needed
     public float maxRadius = 5f;  // Maximum distance from the player
-    public float projectileSpeed = 10f;
-    public GameObject projectilePrefab; 
-
     public string horizontalAxis = "Horizontal";  // Gamepad horizontal axis
     public string verticalAxis = "Vertical";      // Gamepad vertical axis
 
@@ -27,7 +24,7 @@ public class LightningBow : MonoBehaviour
         Vector2 moveDirection = new Vector2(horizontalInput, verticalInput).normalized;
 
         // Debugging: Output the move direction vector
-        Debug.DrawRay(lightningBowPosition, moveDirection, Color.green);
+        Debug.DrawRay(lightningBowPosition, moveDirection * 10f, Color.green);
 
         // Calculate the target position within the circular range
         Vector2 targetPosition = lightningBowPosition + moveDirection * moveSpeed * Time.deltaTime;
