@@ -8,6 +8,7 @@ public class PlayerStateList : MonoBehaviour
 
     public bool lightForm = false;
     public bool shadowForm = false;
+    public bool puddleForm = false;
     public bool jumping = false;
     public bool lightJumping = false;
     public bool hovering = false;
