@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ShadowBloodSpray : MonoBehaviour
 {
+    [SerializeField] GameObject bloodSpray;
     [SerializeField] float damage;
     [SerializeField] float hitForce;
     [SerializeField] int speed;
@@ -13,6 +14,9 @@ public class ShadowBloodSpray : MonoBehaviour
     void Start()
     {
         Destroy(gameObject, lifetime);
+        GameObject _bloodSpray = Instantiate(bloodSpray, transform.position, transform.rotation);
+        _bloodSpray.transform.parent = transform;
+
     }
 
     private void FixedUpdate()

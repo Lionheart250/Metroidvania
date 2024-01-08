@@ -8,6 +8,14 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("Light/ShadowForm Settings:")]
+    [SerializeField] GameObject lightFormSprite;
+    [SerializeField] GameObject shadowFormSprite;
+    [Space(5)]
+
+
+
+
     [Header("Horizontal Movement Settings:")]
     [SerializeField] private float walkSpeed = 1; //sets the players movement speed on the ground
     private float originalWalkSpeed;
@@ -62,6 +70,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float dashTime; //amount of time spent dashing
     [SerializeField] private float dashCooldown; //amount of time between dashes
     [SerializeField] GameObject dashEffect;
+    [SerializeField] GameObject puddleFormCollider;
     private bool canDash = true, dashed;
     private bool canDodge = true, dodged;
     [Space(5)]
@@ -148,6 +157,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float timeBetweenCast = 2f;
     [SerializeField] float spellDamage; //upspellexplosion and downspellfireball
     [SerializeField] float downSpellForce; // desolate dive only
+    [SerializeField] private Transform eyeAttackTransform;
     //spell cast objects
     [SerializeField] GameObject sideSpellFireball;
     [SerializeField] GameObject sideSpellShadowFireball;
@@ -155,7 +165,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] GameObject downSpellFireball;
     [SerializeField] GameObject downSpellShadowFireball;
     [SerializeField] GameObject shadowBloodSpray;
-    [SerializeField] GameObject shadowBloodParticles;
     [SerializeField] GameObject lightBall;
     [SerializeField] GameObject lightningBow;
     [SerializeField] GameObject lightningArrow;
@@ -369,6 +378,7 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
             LightningStrike();
             StartShadowDash();
             EndShadowDash();
+            EyeBloodSpray();
         }        
         FlashWhileInvincible();     
         
@@ -625,33 +635,24 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
         {
             sr.enabled = false;
             //StartCoroutine(ShadowDash());
-            dashed = true;
             Color spriteColor = sr.color;
             spriteColor.a = 0f;
             sr.color = spriteColor;
+            pState.puddleForm = true;
+            puddleFormCollider.SetActive(true);
             ToggleMainColliderOff();
 
             
-        }
-        if (Grounded())
-        {
-            dashed = false;
-        }
-        else
-        {
-            ToggleMainColliderOn();
-            sr.enabled = true;
-            Color spriteColor = sr.color;
-            spriteColor.a = originalColor.a;  // Use the original alpha value
-            sr.color = spriteColor;
         }
     }
 
     void EndShadowDash()
     {
          if (!(Input.GetButtonDown("Dash")|| (Gamepad.current?.rightTrigger.isPressed == true)) && pState.shadowForm)
-        {
+        {   
+            pState.puddleForm = false;
             ToggleMainColliderOn();
+            puddleFormCollider.SetActive(false);
             sr.enabled = true;
             Color spriteColor = sr.color;
             spriteColor.a = originalColor.a;  // Use the original alpha value
@@ -1356,6 +1357,33 @@ IEnumerator StopTakingDamage()
         manaOrbsHandler.countDown = 3f;
         yield return new WaitForSeconds(0.35f);
     }
+
+    void EyeBloodSpray()
+    {
+        if ((Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == true)) && castOrHealTimer <= 0.5f && timeSinceCast >= timeBetweenCast && Mana > 0 && pState.shadowForm)
+        {
+        if (yAxis == 0 && unlockedSideCast && pState.shadowForm)
+        {
+            anim.SetBool("Casting", true);
+            GameObject _shadowBloodSpray = Instantiate(shadowBloodSpray, eyeAttackTransform.position, Quaternion.identity);
+
+            if (pState.lookingRight)
+            {
+                _shadowBloodSpray.transform.eulerAngles = Vector3.zero;
+               
+            }
+            else
+            {
+                _shadowBloodSpray.transform.eulerAngles =  new Vector2(_shadowBloodSpray.transform.eulerAngles.x, 180);
+            }
+
+            Mana -= manaSpellCost / 64f;
+            manaOrbsHandler.usedMana = true;
+            manaOrbsHandler.countDown = 3f;
+            //pState.recoilingX = true;
+        }
+        }
+    }
     
     void CastSpell()
     {
@@ -1389,25 +1417,7 @@ IEnumerator StopTakingDamage()
     }
     IEnumerator CastCoroutine()
     {        
-        if (yAxis == 0 && unlockedSideCast && pState.shadowForm)
-        {
-            anim.SetBool("Casting", true);
-            
-            yield return new WaitForSeconds(0.15f);
-
-            Vector3 higherPosition = transform.position + new Vector3(0f, 4f, 0f);
-            Quaternion rotation = pState.lookingRight ? Quaternion.identity : Quaternion.Euler(0f, 180f, 0f);
-            Instantiate(shadowBloodSpray, higherPosition, Quaternion.identity);
-            GameObject _shadowBloodParticles = Instantiate(shadowBloodParticles, higherPosition, Quaternion.Euler(0f, 90f, 0f));
-
-
-            Mana -= manaSpellCost;
-            manaOrbsHandler.usedMana = true;
-            manaOrbsHandler.countDown = 3f;
-            pState.recoilingX = true;
-            yield return new WaitForSeconds(0.35f);
-        }
-        else if( yAxis > 0 && unlockedUpCast)
+        if( yAxis > 0 && unlockedUpCast)
         {
             anim.SetBool("Casting", true);
             yield return new WaitForSeconds(0.15f);
