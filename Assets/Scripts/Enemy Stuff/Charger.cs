@@ -57,20 +57,28 @@ public class Charger : Enemy
                 }
 
 
-                RaycastHit2D _hit = Physics2D.Raycast(transform.position + _ledgeCheckStart, _wallCheckDir, ledgeCheckX * 100);
-                if (_hit.collider != null && _hit.collider.gameObject.CompareTag("Player"))
-                {
-                    ChangeState(EnemyStates.Charger_Suprised);
-                }
+               RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position + _ledgeCheckStart, _wallCheckDir, ledgeCheckX * 3);
 
-                if (transform.localScale.x > 0)
-                {
-                    rb.velocity = new Vector2(speed, rb.velocity.y);
-                }
-                else
-                {
-                    rb.velocity = new Vector2(-speed, rb.velocity.y);
-                }
+                Debug.DrawRay(transform.position + _ledgeCheckStart, _wallCheckDir * (ledgeCheckX * 3), Color.red, 0.1f);
+
+                foreach (RaycastHit2D hit in hits)
+{
+    if (hit.collider != null && hit.collider.gameObject.CompareTag("Player"))
+    {
+        ChangeState(EnemyStates.Charger_Suprised);
+        break; // Break out of the loop once the player is found
+    }
+}
+
+if (transform.localScale.x > 0)
+{
+    rb.velocity = new Vector2(speed, rb.velocity.y);
+}
+else
+{
+    rb.velocity = new Vector2(-speed, rb.velocity.y);
+}
+
                 break;
 
             case EnemyStates.Charger_Suprised:

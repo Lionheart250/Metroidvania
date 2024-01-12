@@ -392,7 +392,6 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
             manaOrbs = 3;
         }    
     }
-    private Vector2 relativeTransform;
    public bool isOnPlatform;
    public Rigidbody2D platformRb;
 
@@ -628,57 +627,66 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
         yield return new WaitForSeconds(dashCooldown);    
         canDodge = true;
     }
-
+    
+    private bool isShadowDashing = false;
+    private bool canStartShadowDash = true;
     void StartShadowDash()
     {
-         if ((Input.GetButtonDown("Dash")|| (Gamepad.current?.rightTrigger.isPressed == true)) && pState.shadowForm)
+         if (canStartShadowDash && (Input.GetButtonDown("Dash") || (Gamepad.current?.rightTrigger.wasPressedThisFrame == true)) && pState.shadowForm)
         {
-            sr.enabled = false;
-            //StartCoroutine(ShadowDash());
-            Color spriteColor = sr.color;
-            spriteColor.a = 0f;
-            sr.color = spriteColor;
-            pState.puddleForm = true;
-            puddleFormCollider.SetActive(true);
-            ToggleMainColliderOff();
-
-            
+            StartCoroutine(ShadowDashSequence());
         }
     }
+    
+     IEnumerator ShadowDashSequence()
+{
+    isShadowDashing = true;
+    canStartShadowDash = false;
 
+    sr.enabled = false;
+    Color spriteColor = sr.color;
+    spriteColor.a = 0f;
+    sr.color = spriteColor;
+    pState.puddleForm = true;
+    puddleFormCollider.SetActive(true);
+    walkSpeed = 40f;
+    ToggleMainColliderOff();
+
+    // Wait for a set amount of time (adjust the time according to your needs)
+    yield return new WaitForSeconds(1f);
+
+    // Call EndShadowDash after the delay
+    isShadowDashing = false;
+
+    pState.puddleForm = false;
+    ToggleMainColliderOn();
+    walkSpeed = 50f;
+    puddleFormCollider.SetActive(false);
+    sr.enabled = true;
+    spriteColor.a = originalColor.a;  // Use the original alpha value
+    sr.color = spriteColor;
+
+    Debug.Log("EndShadowDash called.");
+
+    yield return new WaitForSeconds(1f);
+    canStartShadowDash = true;
+}     
     void EndShadowDash()
     {
-         if (!(Input.GetButtonDown("Dash")|| (Gamepad.current?.rightTrigger.isPressed == true)) && pState.shadowForm)
-        {   
-            pState.puddleForm = false;
-            ToggleMainColliderOn();
-            puddleFormCollider.SetActive(false);
-            sr.enabled = true;
-            Color spriteColor = sr.color;
-            spriteColor.a = originalColor.a;  // Use the original alpha value
-            sr.color = spriteColor;
-        }
+    if ((Input.GetButtonUp("Dash") || (Gamepad.current?.rightTrigger.wasReleasedThisFrame == true)) && pState.shadowForm && isShadowDashing)
+    {
+        isShadowDashing = false;
 
+        pState.puddleForm = false;
+        ToggleMainColliderOn();
+        walkSpeed = 50f;
+        puddleFormCollider.SetActive(false);
+        sr.enabled = true;
+        Color spriteColor = sr.color;
+        spriteColor.a = originalColor.a;  // Use the original alpha value
+        sr.color = spriteColor;
 
     }
-
-    IEnumerator ShadowDash()
-    {
-        
-        canDash = false;
-        pState.dashing = true;
-        anim.SetTrigger("ShadowPuddle");
-        audioSource.PlayOneShot(dashAndAttackSound);
-        rb.gravityScale = 0;
-        int _dir = pState.lookingRight ? 1 : -1;
-        //rb.velocity = new Vector2(_dir * dashSpeed, 0);
-        //if (Grounded()) Instantiate(dashEffect, transform);
-        yield return new WaitForSeconds(dashTime);
-        rb.gravityScale = gravity;
-        pState.dashing = false;
-        yield return new WaitForSeconds(dashCooldown);
-        canDash = true;
-        
     }
 
     public IEnumerator WalkIntoNewScene(Vector2 _exitDir, float _delay)
@@ -714,25 +722,29 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
         if (sr != null)
         {
             // Set the color based on the current form
-            sr.color = pState.shadowForm ? Color.black : Color.white;
+            //sr.color = pState.shadowForm ? Color.black : Color.white;
 
             // Modify walkSpeed and gravity based on the current form
             if (pState.lightForm)
-            {
+            {   
+                anim.SetBool("ShadowForm", false);
                 // Adjust parameters for light form
-                walkSpeed = 70f; // Increase walkSpeed by 35%
+                walkSpeed = 60f; // Increase walkSpeed by 35%
                 rb.gravityScale = gravity;
                 fallGravityMultiplier = originalFallGravityMultiplier * 1.5f;
                 maxFallingSpeed = 150;
+                anim.SetBool("LightForm", true);
             }
             else
-            {
+            {   
+                anim.SetBool("LightForm", false);
                 // Adjust parameters for shadow form
                 // Reset to original walkSpeed if not in light form
                 walkSpeed = 50f;
                 rb.gravityScale = gravity;
                 fallGravityMultiplier = originalFallGravityMultiplier * 1.5f;
                 maxFallingSpeed = 100;
+                anim.SetBool("ShadowForm", true);
             }
         }
     }
@@ -1175,14 +1187,15 @@ IEnumerator StopTakingDamage()
 
    void Heal()
 {
-    bool isHealButtonPressed = Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == true);
-
-    if (isHealButtonPressed)
+    if (Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == true))
     {
         castOrHealTimer += Time.deltaTime;
         Debug.Log("castOrHealTimer: " + castOrHealTimer);
     }
-
+    if (!Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == false))
+    {
+            castOrHealTimer = 0;
+    }
     if (castOrHealTimer > 0.5f && Health < maxHealth && Mana > 0 && !pState.jumping && !pState.dashing)
     {
             pState.healing = true;
@@ -1253,6 +1266,7 @@ IEnumerator StopTakingDamage()
             Mana -= manaSpellCost;
             manaOrbsHandler.usedMana = true;
             manaOrbsHandler.countDown = 3f;
+            castOrHealTimer = 0;
         }
     }
 
@@ -1295,6 +1309,7 @@ IEnumerator StopTakingDamage()
                     Mana -= manaSpellCost / 3f;
                     manaOrbsHandler.usedMana = true;
                     manaOrbsHandler.countDown = 3f;
+                    castOrHealTimer = 0;
             }
             else
             {
@@ -1311,10 +1326,12 @@ IEnumerator StopTakingDamage()
             if ((yAxis < 0 && Grounded()) && unlockedDownCast && pState.lightForm)
             {
                 StartCoroutine(LightningStrikeHit());
+                castOrHealTimer = 0;
             }
             if ((yAxis < 0 && !Grounded()) && unlockedDownCast && pState.lightForm)
             {
                 StartCoroutine(AirLightningStrikeHit());
+                castOrHealTimer = 0;
             }
         }
     }
@@ -1365,6 +1382,7 @@ IEnumerator StopTakingDamage()
         if (yAxis == 0 && unlockedSideCast && pState.shadowForm)
         {
             anim.SetBool("Casting", true);
+            pState.casting = true;
             GameObject _shadowBloodSpray = Instantiate(shadowBloodSpray, eyeAttackTransform.position, Quaternion.identity);
 
             if (pState.lookingRight)
@@ -1380,6 +1398,7 @@ IEnumerator StopTakingDamage()
             Mana -= manaSpellCost / 64f;
             manaOrbsHandler.usedMana = true;
             manaOrbsHandler.countDown = 3f;
+            pState.casting = false;
             //pState.recoilingX = true;
         }
         }
@@ -1398,7 +1417,7 @@ IEnumerator StopTakingDamage()
             timeSinceCast += Time.deltaTime;
         }
 
-        if (!Input.GetButton("Cast/Heal") && (Gamepad.current?.circleButton.isPressed == false))
+        if (!Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == false))
         {
             castOrHealTimer = 0;
         }
@@ -1413,6 +1432,10 @@ IEnumerator StopTakingDamage()
         if(downSpellFireball.activeInHierarchy)
         {
             rb.velocity += downSpellForce * Vector2.down;
+        }
+        if(downSpellShadowFireball.activeInHierarchy)
+        {
+            rb.velocity += (downSpellForce * 0.05f) * Vector2.up;
         }
     }
     IEnumerator CastCoroutine()
@@ -1438,6 +1461,7 @@ IEnumerator StopTakingDamage()
             yield return new WaitForSeconds(0.15f);
 
             downSpellShadowFireball.SetActive(true);
+
             audioSource.PlayOneShot(ExplosionSpellCastSound);
 
             Mana -= manaSpellCost;
@@ -1467,6 +1491,7 @@ IEnumerator StopTakingDamage()
         }          
         anim.SetBool("Casting", false);
         pState.casting = false;
+        castOrHealTimer = 0;
     }
 
 
@@ -1476,7 +1501,7 @@ IEnumerator StopTakingDamage()
     {   
         if ((Input.GetButtonDown("Shield") || (Gamepad.current?.leftTrigger.wasPressedThisFrame == true)) && !Shielded && unlockedBlackShield && pState.shadowForm && Grounded())
         {              
-            audioSource.PlayOneShot(jumpSound);
+            //audioSource.PlayOneShot(jumpSound);
             anim.SetBool("Casting", true);
             Shield.SetActive(true);
             Shielded = true; 
@@ -1491,25 +1516,34 @@ IEnumerator StopTakingDamage()
     }
     
     public bool Grounded()
+{
+    bool grounded = Physics2D.Raycast(groundCheckPoint.position, Vector2.down, groundCheckY, whatIsGround)
+        || Physics2D.Raycast(groundCheckPoint.position + new Vector3(groundCheckX, 0, 0), Vector2.down, groundCheckY, whatIsGround)
+        || Physics2D.Raycast(groundCheckPoint.position + new Vector3(-groundCheckX, 0, 0), Vector2.down, groundCheckY, whatIsGround);
+
+    if (grounded)
     {
-        if (Physics2D.Raycast(groundCheckPoint.position, Vector2.down, groundCheckY, whatIsGround) 
-            || Physics2D.Raycast(groundCheckPoint.position + new Vector3(groundCheckX, 0, 0), Vector2.down, groundCheckY, whatIsGround) 
-            || Physics2D.Raycast(groundCheckPoint.position + new Vector3(-groundCheckX, 0, 0), Vector2.down, groundCheckY, whatIsGround))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        Debug.DrawRay(groundCheckPoint.position, Vector2.down * groundCheckY, Color.green); // Visualize the first raycast
+        Debug.DrawRay(groundCheckPoint.position + new Vector3(groundCheckX, 0, 0), Vector2.down * groundCheckY, Color.green); // Visualize the second raycast
+        Debug.DrawRay(groundCheckPoint.position + new Vector3(-groundCheckX, 0, 0), Vector2.down * groundCheckY, Color.green); // Visualize the third raycast
     }
+    else
+    {
+        Debug.DrawRay(groundCheckPoint.position, Vector2.down * groundCheckY, Color.yellow); // Visualize the first raycast
+        Debug.DrawRay(groundCheckPoint.position + new Vector3(groundCheckX, 0, 0), Vector2.down * groundCheckY, Color.red); // Visualize the second raycast
+        Debug.DrawRay(groundCheckPoint.position + new Vector3(-groundCheckX, 0, 0), Vector2.down * groundCheckY, Color.red); // Visualize the third raycast
+    }
+
+    return grounded;
+}
+
     
 
     private RigidbodyConstraints2D savedPositionConstraints;
-     void Jump()
-    {
-    
-    if (jumpBufferCounter > 0 && coyoteTimeCounter > 0 && !pState.jumping)
+    void Jump()
+    {    
+
+    if (Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true) && jumpBufferCounter > 0 && coyoteTimeCounter > 0 && !pState.jumping)
     {
         audioSource.PlayOneShot(jumpSound);
 
@@ -1568,35 +1602,38 @@ IEnumerator StopTakingDamage()
             Destroy(_chargeParticles, 0.05f);
         }
         if ((!Grounded() && (Input.GetButton("Jump") || (Gamepad.current?.crossButton.isPressed == true)) && pState.hovering == true && pState.lightForm && lightJumpChargeTime >= 1 && !(yAxis < 0)) || (pState.hovering && lightJumpChargeTime >= 1)) 
-        {
+        {   
+            UnfreezeRigidbodyPosition();
             StartCoroutine(LightJumpCoroutine());
             pState.hovering = false;
             lightJumpChargeTime = 0;
         }
         if ((Input.GetButtonUp("Jump") || (Gamepad.current?.crossButton.wasReleasedThisFrame == true)) && pState.hovering && !pState.lightJumping && pState.lightForm && !(yAxis < 0))
         {
-        StartCoroutine(LightJumpCoroutine());
-        pState.hovering = false;
-        lightJumpChargeTime = 0;
+            UnfreezeRigidbodyPosition();
+            StartCoroutine(LightJumpCoroutine());
+            pState.hovering = false;
+            lightJumpChargeTime = 0;
         }
         if (!Grounded() && (Input.GetButton("Jump") || (Gamepad.current?.crossButton.isPressed == true)) && pState.hovering == true && pState.lightForm && lightJumpChargeTime >= 1 && (yAxis < 0))
         {
+            UnfreezeRigidbodyPosition();
             StartCoroutine(DownLightJumpCoroutine());
             pState.hovering = false;
             lightJumpChargeTime = 0;
         }
         if ((Input.GetButtonUp("Jump") || (Gamepad.current?.crossButton.wasReleasedThisFrame == true)) && pState.hovering && !pState.lightJumping && pState.lightForm && (yAxis < 0))
         {
-        StartCoroutine(DownLightJumpCoroutine());
-        pState.hovering = false;
-        lightJumpChargeTime = 0;
+            UnfreezeRigidbodyPosition();
+            StartCoroutine(DownLightJumpCoroutine());
+            pState.hovering = false;
+            lightJumpChargeTime = 0;
         }    
 
     }
 
     IEnumerator LightJumpCoroutine()
     {
-        UnfreezeRigidbodyPosition();
         pState.lightJumping = true;
         lightBall.SetActive(true);
         anim.SetTrigger("Dashing");
