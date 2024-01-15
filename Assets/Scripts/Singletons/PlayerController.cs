@@ -54,6 +54,7 @@ public class PlayerController : MonoBehaviour
     float wallJumpingDirection;
     bool isWallSliding;
     bool isWallJumping;
+    private bool canLightJump = true, lightJumped;
     [Space(5)]
 
     [Header("Ground Check Settings:")]
@@ -378,7 +379,6 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
             LightningStrike();
             StartShadowDash();
             EndShadowDash();
-            EyeBloodSpray();
         }        
         FlashWhileInvincible();     
         
@@ -1320,7 +1320,7 @@ IEnumerator StopTakingDamage()
     void LightningStrike()
     {
         if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && !pState.aiming &&  castOrHealTimer <= 0.5f && timeSinceCast >= timeBetweenCast 
-        && Mana >= manaSpellCost)
+        && Mana >= manaSpellCost && pState.lightForm)
         {
             if ((yAxis < 0 && Grounded()) && unlockedDownCast && pState.lightForm)
             {
@@ -1373,37 +1373,6 @@ IEnumerator StopTakingDamage()
         manaOrbsHandler.countDown = 3f;
         yield return new WaitForSeconds(0.35f);
     }
-
-    void EyeBloodSpray()
-    {
-        if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && castOrHealTimer <= 0.5f && timeSinceCast >= timeBetweenCast && Mana > 0 && pState.shadowForm && yAxis == 0 && unlockedSideCast)
-        {
-
-            anim.SetBool("Casting", true);
-            pState.casting = true;
-            GameObject _shadowBloodSpray = Instantiate(shadowBloodSpray, eyeAttackTransform.position, Quaternion.identity);
-
-            if (pState.lookingRight)
-            {
-                _shadowBloodSpray.transform.eulerAngles = Vector3.zero;
-               
-            }
-            else
-            {
-                _shadowBloodSpray.transform.eulerAngles =  new Vector2(_shadowBloodSpray.transform.eulerAngles.x, 180);
-            }
-
-            Mana -= manaSpellCost / 64f;
-            manaOrbsHandler.usedMana = true;
-            manaOrbsHandler.countDown = 3f;
-            pState.casting = false;
-            //pState.recoilingX = true;
-        }
-        else
-        {
-            anim.SetBool("Casting", false);
-        }
-    }
     
     void CastSpell()
     {
@@ -1440,7 +1409,27 @@ IEnumerator StopTakingDamage()
         }
     }
     IEnumerator CastCoroutine()
-    {        
+    {   if (yAxis == 0 && unlockedSideCast)
+        {
+            anim.SetBool("Casting", true);
+            pState.casting = true;
+            GameObject _shadowBloodSpray = Instantiate(shadowBloodSpray, eyeAttackTransform.position, Quaternion.identity);
+
+            if (pState.lookingRight)
+            {
+                _shadowBloodSpray.transform.eulerAngles = Vector3.zero;
+               
+            }
+            else
+            {
+                _shadowBloodSpray.transform.eulerAngles =  new Vector2(_shadowBloodSpray.transform.eulerAngles.x, 180);
+            }
+
+            Mana -= manaSpellCost;
+            manaOrbsHandler.usedMana = true;
+            manaOrbsHandler.countDown = 3f;
+            pState.casting = false;
+        }     
         if( yAxis > 0 && unlockedUpCast)
         {
             anim.SetBool("Casting", true);
@@ -1583,82 +1572,70 @@ IEnumerator StopTakingDamage()
     anim.SetBool("Jumping", !Grounded());
 }
 
+    // Add a variable to track the last light jump direction
+private Vector2 lastLightJumpDirection = Vector2.zero;
 
-    void LightJump()
-    {            
-        if (!Grounded() && lightJumpCounter < maxLightJumps && (Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && pState.lightForm)
-        {
-            rb.velocity = new Vector2(rb.velocity.x, 0);
-            FreezeRigidbodyPosition();
-            lightJumpCounter++;
-            pState.hovering = true;
-            lightJumpChargeTime = 0;
-        }
-        if ((!Grounded() && (Input.GetButton("Jump") || (Gamepad.current?.crossButton.isPressed == true)) && pState.hovering == true && pState.lightForm && lightJumpChargeTime <= 1) || (pState.hovering)) 
-        {
-            lightJumpChargeTime += Time.deltaTime * lightJumpChargeSpeed;
-            lightJumpChargeTime = Mathf.Clamp(lightJumpChargeTime, 0f, 1f);
-            GameObject _chargeParticles = Instantiate(chargeParticles, transform.position, Quaternion.identity);
-            
-            Destroy(_chargeParticles, 0.05f);
-        }
-        if ((!Grounded() && (Input.GetButton("Jump") || (Gamepad.current?.crossButton.isPressed == true)) && pState.hovering == true && pState.lightForm && lightJumpChargeTime >= 1|| (pState.hovering && lightJumpChargeTime >= 1))) 
-        {   
-            UnfreezeRigidbodyPosition();
-            StartCoroutine(LightJumpCoroutine());
-            pState.hovering = false;
-            lightJumpChargeTime = 0;
-        }
-        if (!Grounded() && (Input.GetButtonUp("Jump") || (Gamepad.current?.crossButton.wasReleasedThisFrame == true)) && pState.hovering && !pState.lightJumping && pState.lightForm)
-        {
-            UnfreezeRigidbodyPosition();
-            StartCoroutine(LightJumpCoroutine());
-            pState.hovering = false;
-            lightJumpChargeTime = 0;
-        }
+void LightJump()
+{
+    if (!Grounded() && lightJumpCounter < maxLightJumps && (Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && pState.lightForm && canLightJump)
+    {   
+        StartCoroutine(LightJumpCoroutine());
+        rb.velocity = new Vector2(rb.velocity.x, 0);
+        lightJumpCounter++;
+        canLightJump = true;
     }
-
-    IEnumerator LightJumpCoroutine()
+     if (Grounded())
     {
-        pState.lightJumping = true;
-        lightBall.SetActive(true);
-        anim.SetTrigger("Dashing");
-        SpriteRenderer playerSpriteRenderer = GetComponent<SpriteRenderer>();
-        Color originalColor = playerSpriteRenderer.color;
-        playerSpriteRenderer.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.5f);
-        //audioSource.PlayOneShot(dashAndAttackSound);
-        rb.gravityScale = 0;
-        Vector2 launchDirection = new Vector2(xAxis, yAxis).normalized;
-        rb.velocity = launchDirection * lightJumpForce;
-        //if (Grounded()) Instantiate(dashEffect, transform);
-        yield return new WaitForSeconds(dashTime);
-        rb.velocity = Vector2.zero;
-        rb.gravityScale = gravity;
-        lightBall.SetActive(false);
-        pState.lightJumping = false;
-        playerSpriteRenderer.color = originalColor;
-        yield return new WaitForSeconds(dashCooldown);
-        rb.gravityScale = gravity;
+        lastLightJumpDirection = Vector2.zero;
     }
+}
 
-    IEnumerator DownLightJumpCoroutine()
+IEnumerator LightJumpCoroutine()
+{   float angle = Mathf.Atan2(yAxis, xAxis) * Mathf.Rad2Deg;
+    angle = Mathf.Round(angle / 45) * 45;
+    float roundedX = Mathf.Cos(angle * Mathf.Deg2Rad);
+    float roundedY = Mathf.Sin(angle * Mathf.Deg2Rad);
+
+    Vector2 launchDirection = new Vector2(roundedX, roundedY).normalized;
+    if (launchDirection != lastLightJumpDirection)
     {
-        Debug.Log("Starting DownLightJumpCoroutine");
-        UnfreezeRigidbodyPosition();
-        pState.lightJumping = true;
-        lightBall.SetActive(true);
-        anim.SetTrigger("Dashing");
-        SpriteRenderer playerSpriteRenderer = GetComponent<SpriteRenderer>();
-        Color originalColor = playerSpriteRenderer.color;
-        playerSpriteRenderer.color = new Color(originalColor.r, originalColor.g, originalColor.b, 0.5f);
-        Vector2 launchDirection = new Vector2(xAxis, yAxis).normalized;
-        rb.velocity = launchDirection * lightJumpForce;
-        yield return new WaitForSeconds(dashTime * 1.5f);
-        lightBall.SetActive(false);
-        pState.lightJumping = false;
-        playerSpriteRenderer.color = originalColor;
-        yield return new WaitForSeconds(dashCooldown);
+    rb.velocity = new Vector2(rb.velocity.x, 0);
+    FreezeRigidbodyPosition();
+    yield return new WaitForSeconds(0.15f);
+    UnfreezeRigidbodyPosition();
+    
+    pState.lightJumping = true;
+    lightBall.SetActive(true);
+    anim.SetTrigger("Dashing");
+    //audioSource.PlayOneShot(dashAndAttackSound);
+    
+    rb.gravityScale = 0;
+
+    // Round input to the nearest 45-degree angle
+    
+
+    rb.velocity = launchDirection * lightJumpForce;
+    lastLightJumpDirection = launchDirection;
+
+    //if (Grounded()) Instantiate(dashEffect, transform);
+    
+    yield return new WaitForSeconds(dashTime);
+    
+    rb.velocity = Vector2.zero;
+    rb.gravityScale = gravity;
+    lightBall.SetActive(false);
+    pState.lightJumping = false;
+    canLightJump = true;
+    
+    yield return new WaitForSeconds(dashCooldown);
+    
+    rb.gravityScale = gravity;
     }
+}
+
+
+
+
     void UpdateJumpVariables()
     {
         if (Grounded())

@@ -74284,6 +74284,10 @@ PrefabInstance:
       value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
+      propertyPath: jumpBufferFrames
+      value: 3000
+      objectReference: {fileID: 0}
+    - target: {fileID: 438285571990529212, guid: 9e3ccb0b001be48deb9ef7c99e351a2f, type: 3}
       propertyPath: shadowBloodSpray
       value: 
       objectReference: {fileID: 4360750681699512633, guid: 41719350f3d4548989ece0282b406113, type: 3}
