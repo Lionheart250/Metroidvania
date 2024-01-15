@@ -33,7 +33,7 @@ public class PlayerController : MonoBehaviour
     private float coyoteTimeCounter = 0; //stores the Grounded() bool
     [SerializeField] private float coyoteTime; ////sets the max amount of frames the Grounded() bool is stored
 
-    private int airJumpCounter = 0; //keeps track of how many times the player has jumped in the air
+    [SerializeField] private int airJumpCounter = 0; //keeps track of how many times the player has jumped in the air
     private int lightJumpCounter = 0;
     [SerializeField] private float lightJumpChargeSpeed;
     [SerializeField] public float lightJumpChargeTime;
@@ -730,7 +730,6 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
                 anim.SetBool("ShadowForm", false);
                 // Adjust parameters for light form
                 walkSpeed = 60f; // Increase walkSpeed by 35%
-                rb.gravityScale = gravity;
                 fallGravityMultiplier = originalFallGravityMultiplier * 1.5f;
                 maxFallingSpeed = 150;
                 anim.SetBool("LightForm", true);
@@ -741,7 +740,6 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
                 // Adjust parameters for shadow form
                 // Reset to original walkSpeed if not in light form
                 walkSpeed = 50f;
-                rb.gravityScale = gravity;
                 fallGravityMultiplier = originalFallGravityMultiplier * 1.5f;
                 maxFallingSpeed = 100;
                 anim.SetBool("ShadowForm", true);
@@ -781,6 +779,7 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
         }
         else if (yAxis < 0 && !Grounded() && !pState.shadowForm)
         {
+            
             // Handle down attack
             Hit(DownAttackTransform, DownAttackArea, ref pState.recoilingY, Vector2.down, recoilYSpeed);
             SlashEffectAtAngle(slashEffect, -90, DownAttackTransform);
@@ -988,7 +987,7 @@ void ShadowAttack()
 
         if (pState.recoilingY)
         {
-            rb.gravityScale = 0;
+            //rb.gravityScale = 0;
             if (yAxis < 0)
             {
                 rb.velocity = new Vector2(rb.velocity.x, recoilYSpeed);
@@ -1000,7 +999,7 @@ void ShadowAttack()
             airJumpCounter = 0;
             lightJumpCounter = 0;
         }
-        else
+        else if (pState.lightJumping == false)
         {
             rb.gravityScale = gravity;
         }
@@ -1192,7 +1191,7 @@ IEnumerator StopTakingDamage()
         castOrHealTimer += Time.deltaTime;
         Debug.Log("castOrHealTimer: " + castOrHealTimer);
     }
-    if (!Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == false))
+    if (!Input.GetButton("Cast/Heal") && (Gamepad.current?.circleButton.isPressed == false))
     {
             castOrHealTimer = 0;
     }
@@ -1377,10 +1376,9 @@ IEnumerator StopTakingDamage()
 
     void EyeBloodSpray()
     {
-        if ((Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == true)) && castOrHealTimer <= 0.5f && timeSinceCast >= timeBetweenCast && Mana > 0 && pState.shadowForm)
+        if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && castOrHealTimer <= 0.5f && timeSinceCast >= timeBetweenCast && Mana > 0 && pState.shadowForm && yAxis == 0 && unlockedSideCast)
         {
-        if (yAxis == 0 && unlockedSideCast && pState.shadowForm)
-        {
+
             anim.SetBool("Casting", true);
             pState.casting = true;
             GameObject _shadowBloodSpray = Instantiate(shadowBloodSpray, eyeAttackTransform.position, Quaternion.identity);
@@ -1401,6 +1399,9 @@ IEnumerator StopTakingDamage()
             pState.casting = false;
             //pState.recoilingX = true;
         }
+        else
+        {
+            anim.SetBool("Casting", false);
         }
     }
     
@@ -1417,7 +1418,7 @@ IEnumerator StopTakingDamage()
             timeSinceCast += Time.deltaTime;
         }
 
-        if (!Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == false))
+        if (!Input.GetButton("Cast/Heal") && (Gamepad.current?.circleButton.isPressed == false))
         {
             castOrHealTimer = 0;
         }
@@ -1543,7 +1544,7 @@ IEnumerator StopTakingDamage()
     void Jump()
     {    
 
-    if (Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true) && jumpBufferCounter > 0 && coyoteTimeCounter > 0 && !pState.jumping)
+    if ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && jumpBufferCounter > 0 && coyoteTimeCounter > 0 && !pState.jumping)
     {
         audioSource.PlayOneShot(jumpSound);
 
@@ -1552,7 +1553,7 @@ IEnumerator StopTakingDamage()
         pState.jumping = true;
     }
 
-    if (!Grounded() && airJumpCounter < maxAirJumps && (Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && !pState.lightForm)
+    if (!Grounded() && airJumpCounter < maxAirJumps && ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && !pState.lightForm))
     {
         audioSource.PlayOneShot(jumpSound);
 
@@ -1601,35 +1602,20 @@ IEnumerator StopTakingDamage()
             
             Destroy(_chargeParticles, 0.05f);
         }
-        if ((!Grounded() && (Input.GetButton("Jump") || (Gamepad.current?.crossButton.isPressed == true)) && pState.hovering == true && pState.lightForm && lightJumpChargeTime >= 1 && !(yAxis < 0)) || (pState.hovering && lightJumpChargeTime >= 1)) 
+        if ((!Grounded() && (Input.GetButton("Jump") || (Gamepad.current?.crossButton.isPressed == true)) && pState.hovering == true && pState.lightForm && lightJumpChargeTime >= 1|| (pState.hovering && lightJumpChargeTime >= 1))) 
         {   
             UnfreezeRigidbodyPosition();
             StartCoroutine(LightJumpCoroutine());
             pState.hovering = false;
             lightJumpChargeTime = 0;
         }
-        if ((Input.GetButtonUp("Jump") || (Gamepad.current?.crossButton.wasReleasedThisFrame == true)) && pState.hovering && !pState.lightJumping && pState.lightForm && !(yAxis < 0))
+        if (!Grounded() && (Input.GetButtonUp("Jump") || (Gamepad.current?.crossButton.wasReleasedThisFrame == true)) && pState.hovering && !pState.lightJumping && pState.lightForm)
         {
             UnfreezeRigidbodyPosition();
             StartCoroutine(LightJumpCoroutine());
             pState.hovering = false;
             lightJumpChargeTime = 0;
         }
-        if (!Grounded() && (Input.GetButton("Jump") || (Gamepad.current?.crossButton.isPressed == true)) && pState.hovering == true && pState.lightForm && lightJumpChargeTime >= 1 && (yAxis < 0))
-        {
-            UnfreezeRigidbodyPosition();
-            StartCoroutine(DownLightJumpCoroutine());
-            pState.hovering = false;
-            lightJumpChargeTime = 0;
-        }
-        if ((Input.GetButtonUp("Jump") || (Gamepad.current?.crossButton.wasReleasedThisFrame == true)) && pState.hovering && !pState.lightJumping && pState.lightForm && (yAxis < 0))
-        {
-            UnfreezeRigidbodyPosition();
-            StartCoroutine(DownLightJumpCoroutine());
-            pState.hovering = false;
-            lightJumpChargeTime = 0;
-        }    
-
     }
 
     IEnumerator LightJumpCoroutine()

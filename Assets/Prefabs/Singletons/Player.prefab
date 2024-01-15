@@ -1386,7 +1386,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1433,7 +1433,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 35
+  m_GravityScale: 25
   m_Material: {fileID: 6200000, guid: 7fdfcecb5090f42fabba880cf918bd84, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
@@ -1460,11 +1460,12 @@ MonoBehaviour:
   lightFormSprite: {fileID: 0}
   shadowFormSprite: {fileID: 0}
   walkSpeed: 50
-  jumpForce: 120
+  jumpForce: 110
   lightJumpForce: 160
   jumpBufferFrames: 8
   lightJumpBufferFrames: 0
   coyoteTime: 0.1
+  airJumpCounter: 0
   lightJumpChargeSpeed: 2
   lightJumpChargeTime: 2
   maxAirJumps: 1
