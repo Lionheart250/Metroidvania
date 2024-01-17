@@ -30,7 +30,7 @@ public class Bench : MonoBehaviour
         benchRenderer.material.color = interactableColor;
     }
 
-        if(_collision.CompareTag("Player") && Input.GetButtonDown("Interact")|| (Gamepad.current?.leftStick.ReadValue().y > 0.5f))
+        if(_collision.CompareTag("Player") && Input.GetButton("Interact")|| (Gamepad.current?.leftStick.ReadValue().y > 0.5f))
         {
             interacted = true;
             PlayerController.Instance.Health = PlayerController.Instance.maxHealth;

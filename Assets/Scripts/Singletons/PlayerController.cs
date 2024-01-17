@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviour
     float wallJumpingDirection;
     bool isWallSliding;
     bool isWallJumping;
-    private bool canLightJump = true, lightJumped;
+    
     [Space(5)]
 
     [Header("Ground Check Settings:")]
@@ -422,23 +422,40 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
 
     private void OnTriggerEnter2D(Collider2D _other)
     {
-    if (_other.GetComponent<Enemy>() != null && pState.casting && !pState.lightJumping) 
-    {
-        _other.GetComponent<Enemy>().EnemyGetsHit(spellDamage, (_other.transform.position - transform.position).normalized, recoilYSpeed);
-    }
-    if (_other.GetComponent<Enemy>() != null && pState.lightJumping)
-    {
-        int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
-        Vector2 hitDirection = new Vector2(_recoilLeftOrRight, -1);
+        if (_other.CompareTag("StayShadowPuddle"))
+        {
+            pState.puddleForm = true;
+            // You may add additional logic or start a coroutine here if needed
+        }
+    
+        if (_other.GetComponent<Enemy>() != null && pState.casting && !pState.lightJumping) 
+        {
+            _other.GetComponent<Enemy>().EnemyGetsHit(spellDamage, (_other.transform.position - transform.position).normalized, recoilYSpeed);
+        }
+        if (_other.GetComponent<Enemy>() != null && pState.lightJumping)
+        {
+            int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
+            Vector2 hitDirection = new Vector2(_recoilLeftOrRight, -1);
 
         
-        Hit(LightJumpTransform, LightJumpArea, ref pState.recoilingY, hitDirection, recoilYSpeed);
+            Hit(LightJumpTransform, LightJumpArea, ref pState.recoilingY, hitDirection, recoilYSpeed);
 
     
-        Vector2 oppositeDirection = -hitDirection;
+            Vector2 oppositeDirection = -hitDirection;
 
     
-        rb.velocity = oppositeDirection * (lightJumpForce * 0.5f);
+            rb.velocity = oppositeDirection * (lightJumpForce * 0.5f);
+        }
+}
+
+private void OnTriggerExit2D(Collider2D _other)
+{
+    if (_other.CompareTag("StayShadowPuddle"))
+    {
+        pState.puddleForm = false;
+
+        // Coroutine should only run when puddleForm toggles from true to false
+        StartCoroutine(ShadowDashSequenceExitLongPuddle());
     }
 }
 
@@ -596,7 +613,7 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
 
     void StartDodge()
     {
-         if ((Input.GetButtonDown("Dash")|| (Gamepad.current?.leftTrigger.wasPressedThisFrame == true)) && canDodge && !dodged && pState.lightForm)
+        if ((Input.GetButtonDown("Dash")|| (Gamepad.current?.leftTrigger.wasPressedThisFrame == true)) && canDodge && !dodged && pState.lightForm)
         {
             StartCoroutine(Dodge());
             dodged = true;
@@ -632,63 +649,86 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
     private bool canStartShadowDash = true;
     void StartShadowDash()
     {
-         if (canStartShadowDash && (Input.GetButtonDown("Dash") || (Gamepad.current?.rightTrigger.wasPressedThisFrame == true)) && pState.shadowForm)
+        if (canStartShadowDash && (Input.GetButtonDown("Dash") || (Gamepad.current?.rightTrigger.wasPressedThisFrame == true)) && pState.shadowForm)
         {
             StartCoroutine(ShadowDashSequence());
         }
     }
     
      IEnumerator ShadowDashSequence()
-{
-    isShadowDashing = true;
-    canStartShadowDash = false;
+    {
+        isShadowDashing = true;
+        canStartShadowDash = false;
 
-    sr.enabled = false;
-    Color spriteColor = sr.color;
-    spriteColor.a = 0f;
-    sr.color = spriteColor;
-    pState.puddleForm = true;
-    puddleFormCollider.SetActive(true);
-    walkSpeed = 40f;
-    ToggleMainColliderOff();
-
+        sr.enabled = false;
+        Color spriteColor = sr.color;
+        spriteColor.a = 0f;
+        sr.color = spriteColor;
+    
+        puddleFormCollider.SetActive(true);
+        walkSpeed = 40f;
+        ToggleMainColliderOff();
+    
     // Wait for a set amount of time (adjust the time according to your needs)
-    yield return new WaitForSeconds(1f);
-
+        yield return new WaitForSeconds(1f);
+        if (!pState.puddleForm)
+        {
     // Call EndShadowDash after the delay
-    isShadowDashing = false;
-
-    pState.puddleForm = false;
-    ToggleMainColliderOn();
-    walkSpeed = 50f;
-    puddleFormCollider.SetActive(false);
-    sr.enabled = true;
-    spriteColor.a = originalColor.a;  // Use the original alpha value
-    sr.color = spriteColor;
-
-    Debug.Log("EndShadowDash called.");
-
-    yield return new WaitForSeconds(1f);
-    canStartShadowDash = true;
-}     
-    void EndShadowDash()
-    {
-    if ((Input.GetButtonUp("Dash") || (Gamepad.current?.rightTrigger.wasReleasedThisFrame == true)) && pState.shadowForm && isShadowDashing)
-    {
         isShadowDashing = false;
+    
+        ToggleMainColliderOn();
+        walkSpeed = 50f;
+        puddleFormCollider.SetActive(false);
+        sr.enabled = true;
+        spriteColor.a = originalColor.a;  // Use the original alpha value
+        sr.color = spriteColor;
 
-        pState.puddleForm = false;
+        Debug.Log("EndShadowDash called.");
+
+        yield return new WaitForSeconds(1f);
+        canStartShadowDash = true;
+        }
+    }  
+ 
+    void EndShadowDash()
+    {   
+        if ((Input.GetButtonUp("Dash") || (Gamepad.current?.rightTrigger.wasReleasedThisFrame == true)) && pState.shadowForm && isShadowDashing && !pState.puddleForm)
+        {
+        isShadowDashing = false;
         ToggleMainColliderOn();
         walkSpeed = 50f;
         puddleFormCollider.SetActive(false);
         sr.enabled = true;
         Color spriteColor = sr.color;
         spriteColor.a = originalColor.a;  // Use the original alpha value
+
+        StartCoroutine(ShadowDashSequenceExitLongPuddle());
+        
+
+        }
+    }
+    
+    IEnumerator ShadowDashSequenceExitLongPuddle()
+    {   
+        yield return new WaitForSeconds(0.2f);
+        isShadowDashing = false;
+        sr.enabled = false;
+        Color spriteColor = sr.color;
+        spriteColor.a = 0f;
+        sr.color = spriteColor;
+        ToggleMainColliderOn();
+        walkSpeed = 50f;
+        puddleFormCollider.SetActive(false);
+        sr.enabled = true;
+        spriteColor.a = originalColor.a;  // Use the original alpha value
         sr.color = spriteColor;
 
-    }
-    }
+        Debug.Log("EndShadowDash called.");
 
+        yield return new WaitForSeconds(1f);
+        canStartShadowDash = true;
+    }
+     
     public IEnumerator WalkIntoNewScene(Vector2 _exitDir, float _delay)
     {
         //If exit direction is upwards
@@ -734,7 +774,7 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
                 maxFallingSpeed = 150;
                 anim.SetBool("LightForm", true);
             }
-            else
+            else if (pState.shadowForm)
             {   
                 anim.SetBool("LightForm", false);
                 // Adjust parameters for shadow form
@@ -1250,6 +1290,7 @@ IEnumerator StopTakingDamage()
             lightningBow.SetActive(true);
             FreezeRigidbodyPosition(); 
             timeSinceCast = 0;
+            anim.SetBool("Casting", true);
         }
         else
         {
@@ -1282,6 +1323,7 @@ IEnumerator StopTakingDamage()
         yield return new WaitForSeconds(0.15f);
         pState.aiming = false;
         lightningBow.SetActive(false);
+        anim.SetBool("Casting", false);
     }
 
     void LightDart()
@@ -1309,6 +1351,7 @@ IEnumerator StopTakingDamage()
                     manaOrbsHandler.usedMana = true;
                     manaOrbsHandler.countDown = 3f;
                     castOrHealTimer = 0;
+                    anim.SetBool("Casting", false);
             }
             else
             {
@@ -1372,6 +1415,7 @@ IEnumerator StopTakingDamage()
         manaOrbsHandler.usedMana = true;
         manaOrbsHandler.countDown = 3f;
         yield return new WaitForSeconds(0.35f);
+        
     }
     
     void CastSpell()
@@ -1498,7 +1542,8 @@ IEnumerator StopTakingDamage()
             FreezeRigidbodyPosition();          
         }
         else if ((Input.GetButtonUp("Shield") || (Gamepad.current?.leftTrigger.wasReleasedThisFrame == true)) && Shielded && unlockedBlackShield && pState.shadowForm) 
-        {
+        {   
+            anim.SetBool("Casting", false);
             Shield.SetActive(false);
             Shielded = false;  
             UnfreezeRigidbodyPosition();  
@@ -1533,7 +1578,7 @@ IEnumerator StopTakingDamage()
     void Jump()
     {    
 
-    if ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && jumpBufferCounter > 0 && coyoteTimeCounter > 0 && !pState.jumping)
+    if (jumpBufferCounter > 0 && Grounded() && coyoteTimeCounter > 0 && !pState.jumping)
     {
         audioSource.PlayOneShot(jumpSound);
 
@@ -1553,7 +1598,7 @@ IEnumerator StopTakingDamage()
         rb.velocity = new Vector3(rb.velocity.x, jumpForce);
     }
 
-    if ((Input.GetButtonUp("Jump") || (Gamepad.current?.crossButton.wasReleasedThisFrame == true)) && rb.velocity.y > 3)
+    if ((Input.GetButtonUp("Jump") || (Gamepad.current?.crossButton.wasReleasedThisFrame == true)) && rb.velocity.y > 3 && !pState.lightJumping)
     {
         pState.jumping = false;
 
@@ -1561,7 +1606,7 @@ IEnumerator StopTakingDamage()
     }
 
     // Increase gravity while falling
-    if (rb.velocity.y < 0)
+    if (rb.velocity.y < 0 && !pState.lightJumping)
     {
         rb.velocity += Vector2.up * Physics2D.gravity.y * (fallGravityMultiplier - 1) * Time.deltaTime;
     }
@@ -1577,13 +1622,13 @@ private Vector2 lastLightJumpDirection = Vector2.zero;
 
 void LightJump()
 {
-    if (!Grounded() && lightJumpCounter < maxLightJumps && (Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && pState.lightForm && canLightJump)
+    if (!Grounded() && lightJumpCounter < maxLightJumps && (Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && pState.lightForm && !pState.lightJumping)
     {   
+        
         StartCoroutine(LightJumpCoroutine());
-        rb.velocity = new Vector2(rb.velocity.x, 0);
         lightJumpCounter++;
-        canLightJump = true;
     }
+
      if (Grounded())
     {
         lastLightJumpDirection = Vector2.zero;
@@ -1591,12 +1636,24 @@ void LightJump()
 }
 
 IEnumerator LightJumpCoroutine()
-{   float angle = Mathf.Atan2(yAxis, xAxis) * Mathf.Rad2Deg;
+{   
+    pState.lightJumping = true;
+    UnfreezeRigidbodyPosition();
+    Vector2 launchDirection;
+    if (Mathf.Approximately(xAxis, 0) && Mathf.Approximately(yAxis, 0))
+    {
+    // No input, use the current facing direction or another default direction.
+    launchDirection = lastLightJumpDirection;
+    }
+    else
+    {
+    float angle = Mathf.Atan2(yAxis, xAxis) * Mathf.Rad2Deg;
     angle = Mathf.Round(angle / 45) * 45;
     float roundedX = Mathf.Cos(angle * Mathf.Deg2Rad);
     float roundedY = Mathf.Sin(angle * Mathf.Deg2Rad);
-
-    Vector2 launchDirection = new Vector2(roundedX, roundedY).normalized;
+    
+    launchDirection = new Vector2(roundedX, roundedY).normalized;
+    }
     if (launchDirection != lastLightJumpDirection)
     {
     rb.velocity = new Vector2(rb.velocity.x, 0);
@@ -1604,37 +1661,28 @@ IEnumerator LightJumpCoroutine()
     yield return new WaitForSeconds(0.15f);
     UnfreezeRigidbodyPosition();
     
-    pState.lightJumping = true;
+    
     lightBall.SetActive(true);
     anim.SetTrigger("Dashing");
-    //audioSource.PlayOneShot(dashAndAttackSound);
+    audioSource.PlayOneShot(dashAndAttackSound);
     
     rb.gravityScale = 0;
 
-    // Round input to the nearest 45-degree angle
-    
-
     rb.velocity = launchDirection * lightJumpForce;
     lastLightJumpDirection = launchDirection;
-
-    //if (Grounded()) Instantiate(dashEffect, transform);
     
     yield return new WaitForSeconds(dashTime);
-    
-    rb.velocity = Vector2.zero;
-    rb.gravityScale = gravity;
-    lightBall.SetActive(false);
     pState.lightJumping = false;
-    canLightJump = true;
-    
-    yield return new WaitForSeconds(dashCooldown);
-    
+    FreezeRigidbodyPosition();
+    yield return new WaitForSeconds(0.1f);
+    UnfreezeRigidbodyPosition();
+    rb.velocity = Vector2.zero;
+    lightBall.SetActive(false);        
     rb.gravityScale = gravity;
+    
+
     }
 }
-
-
-
 
     void UpdateJumpVariables()
     {
@@ -1650,7 +1698,6 @@ IEnumerator LightJumpCoroutine()
             coyoteTimeCounter = coyoteTime;
             airJumpCounter = 0;
             lightJumpCounter = 0;
-            lightJumpChargeTime = 0;
         }
         else
         {
