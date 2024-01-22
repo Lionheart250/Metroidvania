@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviour
     float wallJumpingDirection;
     bool isWallSliding;
     bool isWallJumping;
-    
+
     [Space(5)]
 
     [Header("Ground Check Settings:")]
@@ -487,14 +487,15 @@ private void OnTriggerExit2D(Collider2D _other)
         {
             castOrHealTimer += Time.deltaTime;
         }
-
-    // New Input System
-    if (Gamepad.current != null && Gamepad.current.circleButton.isPressed)
-    {
-        castOrHealTimer += Time.deltaTime;
-    }
         
-}
+
+        // New Input System
+        if (Gamepad.current != null && Gamepad.current.circleButton.isPressed)
+        {
+            castOrHealTimer += Time.deltaTime;
+        }
+        
+    }
     void FreezeRigidbodyPosition()
     {
         savedPositionConstraints = rb.constraints;
@@ -1225,17 +1226,21 @@ IEnumerator StopTakingDamage()
     }
 
    void Heal()
-{
-    if (Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == true))
     {
-        castOrHealTimer += Time.deltaTime;
+     if (Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == true))
+    {
         Debug.Log("castOrHealTimer: " + castOrHealTimer);
+        castOrHealTimer = Mathf.Clamp(castOrHealTimer, 0f, 1.0f);
+       
     }
-    if (!Input.GetButton("Cast/Heal") && (Gamepad.current?.circleButton.isPressed == false))
+    else
     {
-            castOrHealTimer = 0;
+        Debug.Log("castOrHealTimer: " + castOrHealTimer);
+        // Decrease the timer when the button is not held down
+        castOrHealTimer -= Time.deltaTime;
+        castOrHealTimer = Mathf.Clamp(castOrHealTimer, 0f, 1.0f);
     }
-    if (castOrHealTimer > 0.5f && Health < maxHealth && Mana > 0 && !pState.jumping && !pState.dashing)
+    if (Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == true) && castOrHealTimer > 0.5f && Health < maxHealth && Mana > 0 && !pState.jumping && !pState.dashing)
     {
             pState.healing = true;
             anim.SetBool("Healing", true);
@@ -1306,7 +1311,6 @@ IEnumerator StopTakingDamage()
             Mana -= manaSpellCost;
             manaOrbsHandler.usedMana = true;
             manaOrbsHandler.countDown = 3f;
-            castOrHealTimer = 0;
         }
     }
 
@@ -1328,7 +1332,7 @@ IEnumerator StopTakingDamage()
 
     void LightDart()
     {  
-        if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && !pState.aiming &&  castOrHealTimer <= 0.5f && timeSinceCast >= timeBetweenCast 
+        if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && !pState.aiming && castOrHealTimer < 0.5f && timeSinceCast >= timeBetweenCast 
         && Mana >= manaSpellCost)
         {
             if (yAxis == 0 && Grounded() && unlockedSideCast && pState.lightForm)
@@ -1337,6 +1341,7 @@ IEnumerator StopTakingDamage()
                 GameObject _lightDart = Instantiate(lightningDart, SideAttackTransform.position, Quaternion.identity);
                 timeSinceCast = 1;
                 audioSource.PlayOneShot(spellCastSound);
+
 
         // Flip fireball based on the player's facing direction
                 if (pState.lookingRight)
@@ -1350,7 +1355,6 @@ IEnumerator StopTakingDamage()
                     Mana -= manaSpellCost / 3f;
                     manaOrbsHandler.usedMana = true;
                     manaOrbsHandler.countDown = 3f;
-                    castOrHealTimer = 0;
                     anim.SetBool("Casting", false);
             }
             else
@@ -1368,12 +1372,10 @@ IEnumerator StopTakingDamage()
             if ((yAxis < 0 && Grounded()) && unlockedDownCast && pState.lightForm)
             {
                 StartCoroutine(LightningStrikeHit());
-                castOrHealTimer = 0;
             }
             if ((yAxis < 0 && !Grounded()) && unlockedDownCast && pState.lightForm)
             {
                 StartCoroutine(AirLightningStrikeHit());
-                castOrHealTimer = 0;
             }
         }
     }
@@ -1433,7 +1435,8 @@ IEnumerator StopTakingDamage()
 
         if (!Input.GetButton("Cast/Heal") && (Gamepad.current?.circleButton.isPressed == false))
         {
-            castOrHealTimer = 0;
+            //castOrHealTimer = 0;
+            
         }
 
         if (Grounded())
@@ -1525,7 +1528,7 @@ IEnumerator StopTakingDamage()
         }          
         anim.SetBool("Casting", false);
         pState.casting = false;
-        castOrHealTimer = 0;
+        //castOrHealTimer = 0;
     }
 
 
@@ -1580,11 +1583,11 @@ IEnumerator StopTakingDamage()
 
     if (jumpBufferCounter > 0 && Grounded() && coyoteTimeCounter > 0 && !pState.jumping)
     {
+        pState.jumping = true;
+        
         audioSource.PlayOneShot(jumpSound);
 
-        rb.velocity = new Vector3(rb.velocity.x, jumpForce);
-
-        pState.jumping = true;
+        rb.velocity = new Vector3(rb.velocity.x, jumpForce);        
     }
 
     if (!Grounded() && airJumpCounter < maxAirJumps && ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && !pState.lightForm))

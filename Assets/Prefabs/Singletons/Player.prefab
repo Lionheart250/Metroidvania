@@ -1412,7 +1412,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 7.40625, y: 10.416667}
+  m_Size: {x: 7.11, y: 10}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -1462,7 +1462,7 @@ MonoBehaviour:
   walkSpeed: 50
   jumpForce: 110
   lightJumpForce: 160
-  jumpBufferFrames: 8
+  jumpBufferFrames: 5
   lightJumpBufferFrames: 30
   coyoteTime: 0.1
   airJumpCounter: 0
