@@ -8,13 +8,6 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("Light/ShadowForm Settings:")]
-    [SerializeField] GameObject lightFormSprite;
-    [SerializeField] GameObject shadowFormSprite;
-    [Space(5)]
-
-
-
 
     [Header("Horizontal Movement Settings:")]
     [SerializeField] private float walkSpeed = 1; //sets the players movement speed on the ground
@@ -113,8 +106,8 @@ public class PlayerController : MonoBehaviour
 
 
     [Header("Recoil Settings:")]
-    [SerializeField] private int recoilXSteps = 5; //how many FixedUpdates() the player recoils horizontally for
-    [SerializeField] private int recoilYSteps = 10; //how many FixedUpdates() the player recoils vertically for
+    [SerializeField] private int recoilXSteps = 1; //how many FixedUpdates() the player recoils horizontally for
+    [SerializeField] private int recoilYSteps = 1; //how many FixedUpdates() the player recoils vertically for
 
     [SerializeField] private float recoilXSpeed = 100; //the speed of horizontal recoil
     [SerializeField] private float recoilYSpeed = 100; //the speed of vertical recoil
@@ -178,6 +171,7 @@ public class PlayerController : MonoBehaviour
     float castOrHealTimer;
     [Space(5)]
 
+
     [Header("Camera Stuff")]
     [SerializeField] private float playerFallSpeedThreshold = -10;
     [Space(5)]
@@ -190,6 +184,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] AudioClip ExplosionSpellCastSound;
     [SerializeField] AudioClip hurtSound;
     [Space(5)]
+
 
     [Header("BlackShield Settings")]
     public UnityEngine.Rendering.Universal.Light2D playerLight;
@@ -1240,7 +1235,7 @@ IEnumerator StopTakingDamage()
         castOrHealTimer -= Time.deltaTime;
         castOrHealTimer = Mathf.Clamp(castOrHealTimer, 0f, 1.0f);
     }
-    if (Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == true) && castOrHealTimer > 0.5f && Health < maxHealth && Mana > 0 && !pState.jumping && !pState.dashing)
+    if ((Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == true)) && castOrHealTimer > 0.5f && Health < maxHealth && Mana > 0 && !pState.jumping && !pState.dashing)
     {
             pState.healing = true;
             anim.SetBool("Healing", true);
@@ -1333,36 +1328,52 @@ IEnumerator StopTakingDamage()
     void LightDart()
     {  
         if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && !pState.aiming && castOrHealTimer < 0.5f && timeSinceCast >= timeBetweenCast 
-        && Mana >= manaSpellCost)
+        && Mana >= manaSpellCost / 3.0f && pState.lightForm)
         {
-            if (yAxis == 0 && Grounded() && unlockedSideCast && pState.lightForm)
-            {
-                anim.SetBool("Casting", true);
-                GameObject _lightDart = Instantiate(lightningDart, SideAttackTransform.position, Quaternion.identity);
-                timeSinceCast = 1;
-                audioSource.PlayOneShot(spellCastSound);
-
-
-        // Flip fireball based on the player's facing direction
-                if (pState.lookingRight)
-                {
-                    _lightDart.transform.eulerAngles = Vector3.zero;
-                }
-                else
-                {
-                    _lightDart.transform.eulerAngles = new Vector2(_lightDart.transform.eulerAngles.x, 180); 
-                }
-                    Mana -= manaSpellCost / 3f;
-                    manaOrbsHandler.usedMana = true;
-                    manaOrbsHandler.countDown = 3f;
-                    anim.SetBool("Casting", false);
-            }
-            else
-            {
-                timeSinceCast += Time.deltaTime;
-            }
-        }    
+            pState.casting = true;
+            timeSinceCast = 0;
+            StartCoroutine(LightDartCoroutine());
+        }
+        else
+        {
+              timeSinceCast += Time.deltaTime;
+        }
     }
+    IEnumerator LightDartCoroutine()
+    {   
+    if (yAxis == 0 && unlockedSideCast)
+    {
+        anim.SetBool("Casting", true);
+        GameObject _lightDart = Instantiate(lightningDart, SideAttackTransform.position, Quaternion.identity);
+        timeSinceCast = 1;
+        audioSource.PlayOneShot(spellCastSound);
+
+    
+        // Flip fireball based on the player's facing direction
+        if (pState.lookingRight)
+        {
+            _lightDart.transform.eulerAngles = Vector3.zero;
+        }
+        else
+        {
+            _lightDart.transform.eulerAngles = new Vector2(_lightDart.transform.eulerAngles.x, 180); 
+        }
+        
+            Mana -= manaSpellCost / 3f;
+            manaOrbsHandler.usedMana = true;
+            manaOrbsHandler.countDown = 3f;
+            
+        }
+        else
+        {
+            timeSinceCast += Time.deltaTime;
+        }
+        yield return new WaitForSeconds(0.15f);
+        anim.SetBool("Casting", false);
+        castOrHealTimer = 0;
+    }
+
+
     
     void LightningStrike()
     {
@@ -1495,7 +1506,7 @@ IEnumerator StopTakingDamage()
         {
             anim.SetBool("Casting", true);
             
-            yield return new WaitForSeconds(0.15f);
+            
 
             downSpellShadowFireball.SetActive(true);
 
@@ -1585,7 +1596,7 @@ IEnumerator StopTakingDamage()
     {
         pState.jumping = true;
         
-        audioSource.PlayOneShot(jumpSound);
+        //audioSource.PlayOneShot(jumpSound);
 
         rb.velocity = new Vector3(rb.velocity.x, jumpForce);        
     }
@@ -1625,7 +1636,7 @@ private Vector2 lastLightJumpDirection = Vector2.zero;
 
 void LightJump()
 {
-    if (!Grounded() && lightJumpCounter < maxLightJumps && (Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && pState.lightForm && !pState.lightJumping)
+    if (!Grounded() && lightJumpCounter < maxLightJumps && (Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && pState.lightForm && !pState.lightJumping && !isWallJumping && !Walled())
     {   
         
         StartCoroutine(LightJumpCoroutine());
