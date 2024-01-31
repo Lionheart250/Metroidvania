@@ -9,6 +9,7 @@ TagManager:
   - LightShield
   - EnemyProjectile
   - StayShadowPuddle
+  - Navigation Static
   layers:
   - Default
   - TransparentFX

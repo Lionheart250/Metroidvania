@@ -1224,13 +1224,13 @@ IEnumerator StopTakingDamage()
     {
      if (Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == true))
     {
-        Debug.Log("castOrHealTimer: " + castOrHealTimer);
+        //Debug.Log("castOrHealTimer: " + castOrHealTimer);
         castOrHealTimer = Mathf.Clamp(castOrHealTimer, 0f, 1.0f);
        
     }
     else
     {
-        Debug.Log("castOrHealTimer: " + castOrHealTimer);
+        //Debug.Log("castOrHealTimer: " + castOrHealTimer);
         // Decrease the timer when the button is not held down
         castOrHealTimer -= Time.deltaTime;
         castOrHealTimer = Mathf.Clamp(castOrHealTimer, 0f, 1.0f);
@@ -1702,7 +1702,7 @@ IEnumerator LightJumpCoroutine()
     {
         if (Grounded())
         { 
-            if (!landingSoundPlayed && !isOnPlatform)
+            if (!landingSoundPlayed || (!landingSoundPlayed && !isOnPlatform))
             {
                 audioSource.PlayOneShot(landingSound);
                 landingSoundPlayed = true;

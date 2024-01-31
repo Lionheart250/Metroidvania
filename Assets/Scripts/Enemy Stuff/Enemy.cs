@@ -36,6 +36,7 @@ public class Enemy : MonoBehaviour
         //Bat
         Bat_Idle,
         Bat_Chase,
+        Bat_Attack,
         Bat_Stunned,
         Bat_Death,
 
