@@ -12,10 +12,10 @@ GameObject:
   - component: {fileID: 3149524685848451846}
   - component: {fileID: 6252239040768241330}
   - component: {fileID: 2451642168030285538}
-  - component: {fileID: 6629801745642565741}
   - component: {fileID: -1297765008329060979}
+  - component: {fileID: -8846886669918145529}
   m_Layer: 0
-  m_Name: EnemyFireball
+  m_Name: Bat Fireball
   m_TagString: EnemyProjectile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -70.98096, y: -12.82173, z: 0}
-  m_LocalScale: {x: 15, y: 15, z: 1}
+  m_LocalScale: {x: 7, y: 7, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -154,23 +154,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.36, y: 0.78}
   m_EdgeRadius: 0
---- !u!114 &6629801745642565741
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9066576656617623858}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c74bd2714043649e69d52f107b1dbce2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  damage: 1
-  hitForce: 2
-  speed: 10
-  lifetime: 3
-  pState: {fileID: 0}
 --- !u!50 &-1297765008329060979
 Rigidbody2D:
   serializedVersion: 4
@@ -198,3 +181,17 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 0
+--- !u!114 &-8846886669918145529
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9066576656617623858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1191347b0baa4b6bb5bb728934f6236, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 100
+  detectionRadius: 5

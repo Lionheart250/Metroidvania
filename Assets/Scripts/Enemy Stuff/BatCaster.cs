@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bat : Enemy
+public class BatCaster : Enemy
 {
     [SerializeField] private float chaseDistance;
     [SerializeField] private float stunDuration;
@@ -14,6 +14,9 @@ public class Bat : Enemy
     [SerializeField] private Transform groundCheckTransform;
     [SerializeField] private Transform roofCheckTransform;
     [SerializeField] private Transform wallCheckTransform;
+    [SerializeField] private float projectileCooldown = 2f;
+    private float projectileTimer = 0f;
+    public GameObject projectilePrefab;
 
     float timer;
     float obstacleAvoidanceRayLength = 1f;
@@ -51,6 +54,12 @@ public class Bat : Enemy
 
             case EnemyStates.Bat_Chase:
                 HandleChaseState();
+                projectileTimer += Time.deltaTime;
+                if (projectileTimer >= projectileCooldown)
+                {
+                    ShootProjectile();
+                    projectileTimer = 0f;
+                }
                 break;
 
             case EnemyStates.Bat_Stunned:
@@ -69,18 +78,58 @@ public class Bat : Enemy
         }
     }
     
+    private void ShootProjectile()
+{
+    GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+    Vector2 directionToPlayer = (PlayerController.Instance.transform.position - transform.position).normalized;
+    BatFireball batFireball = projectile.GetComponent<BatFireball>();
     
+    if (batFireball != null)
+    {
+        batFireball.SetDirection(directionToPlayer);
+    }
+    else
+    {
+        Debug.LogError("BatFireball component not found on the projectile prefab!");
+    }
+}
    private void HandleChaseState()
 {
-    Vector2 chaseDirection = (PlayerController.Instance.transform.position - transform.position).normalized;
+    float distanceOffset = 30.0f; // Adjust this value based on the desired distance
+    float stoppingDistance = 1.0f; // Adjust this value based on how close you want the enemy to get
 
-    // Calculate the desired velocity (direction towards player)
-    Vector2 desiredVelocity = chaseDirection * maxSpeed;
+    // Calculate the desired position above the player
+    Vector2 desiredPosition = new Vector2(PlayerController.Instance.transform.position.x + distanceOffset, PlayerController.Instance.transform.position.y + distanceOffset);
 
-    // CircleCast to detect obstacles in a wider area around the bat
-    RaycastHit2D hit = Physics2D.CircleCast(transform.position, obstacleAvoidanceRadius, chaseDirection, obstacleAvoidanceRayLength, obstacleLayer);
+    // Calculate the direction towards the desired position
+    Vector2 chaseDirection = (desiredPosition - (Vector2)transform.position).normalized;
+        Vector2 desiredVelocity = chaseDirection * maxSpeed;
+            RaycastHit2D hit = Physics2D.CircleCast(transform.position, obstacleAvoidanceRadius, chaseDirection, obstacleAvoidanceRayLength, obstacleLayer);
 
-    if (hit.collider != null)
+
+
+    float distanceToPlayer = Vector2.Distance(transform.position, desiredPosition);
+
+    Debug.DrawLine(transform.position, desiredPosition, Color.blue);
+
+
+    if (distanceToPlayer > stoppingDistance)
+    {
+        // Continue moving towards the player
+        // Calculate the desired velocity (direction towards player)
+
+        // Calculate the steering force to reach the desired velocity
+        Vector2 steeringForce = Vector2.ClampMagnitude(desiredVelocity - rb.velocity, maxSteeringForce);
+
+        // Apply the steering force to the rigidbody
+        rb.AddForce(steeringForce);
+
+        // Limit the maximum speed
+        rb.velocity = Vector2.ClampMagnitude(rb.velocity, maxSpeed);
+
+        FlipBat(); // You may need to adjust this method based on your game's specific requirements
+    }
+     if (hit.collider != null)
     {
         // If an obstacle is detected, adjust the desired velocity to avoid it
         Vector2 avoidanceDirection = Vector2.Perpendicular(hit.normal).normalized;
@@ -155,20 +204,8 @@ public class Bat : Enemy
     desiredVelocity += wallAvoidanceForce + verticalAvoidanceForce;
     Debug.Log("Wall!");
     }
-    }
-
-    // Calculate the steering force to reach the desired velocity
-    Vector2 steeringForce = Vector2.ClampMagnitude(desiredVelocity - rb.velocity, maxSteeringForce);
-
-    // Apply the steering force to the rigidbody
-    rb.AddForce(steeringForce);
-
-    // Limit the maximum speed
-    rb.velocity = Vector2.ClampMagnitude(rb.velocity, maxSpeed);
-
-    FlipBat();
 }
-
+}
 
 
 private void OnDrawGizmosSelected()
