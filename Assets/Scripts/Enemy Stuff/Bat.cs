@@ -64,7 +64,7 @@ public class Bat : Enemy
                 break;
 
             case EnemyStates.Bat_Death:
-                Death(Random.Range(5, 10));
+                Death(Random.Range(2, 3));
                 break;
         }
     }
@@ -113,7 +113,7 @@ public class Bat : Enemy
     Vector2 horizontalAvoidanceForce = Vector2.right * horizontalOffset * horizontalScalingFactor * avoidanceForce;
 
     desiredVelocity += groundAvoidanceForce + horizontalAvoidanceForce;
-    Debug.Log("Ground!");
+
     }
 
     if (nearRoof)
@@ -133,7 +133,7 @@ public class Bat : Enemy
     Vector2 horizontalAvoidanceForce = Vector2.right * horizontalOffset * horizontalScalingFactor * avoidanceForce;
 
     desiredVelocity += roofAvoidanceForce + horizontalAvoidanceForce;
-    Debug.Log("Roof!");
+
     }
 
     if (nearWall)
@@ -153,7 +153,7 @@ public class Bat : Enemy
     Vector2 verticalAvoidanceForce = Vector2.up * verticalOffset * verticalScalingFactor * avoidanceForce;
 
     desiredVelocity += wallAvoidanceForce + verticalAvoidanceForce;
-    Debug.Log("Wall!");
+
     }
     }
 

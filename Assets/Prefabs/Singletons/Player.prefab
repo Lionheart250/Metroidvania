@@ -1457,8 +1457,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6412131fb41b34c318aa79c502cfb9a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lightFormSprite: {fileID: 0}
-  shadowFormSprite: {fileID: 0}
   walkSpeed: 50
   jumpForce: 120
   lightJumpForce: 160
@@ -1762,7 +1760,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
-  m_Pitch: 1
+  m_Pitch: 0.33
   Loop: 0
   Mute: 0
   Spatialize: 0

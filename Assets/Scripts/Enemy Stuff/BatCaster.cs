@@ -73,14 +73,14 @@ public class BatCaster : Enemy
                 break;
 
             case EnemyStates.Bat_Death:
-                Death(Random.Range(5, 10));
+                Death(Random.Range(2, 3));
                 break;
         }
     }
     
     private void ShootProjectile()
 {
-    GameObject projectile = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+    GameObject projectile = Instantiate(projectilePrefab, wallCheckTransform.position, Quaternion.identity);
     Vector2 directionToPlayer = (PlayerController.Instance.transform.position - transform.position).normalized;
     BatFireball batFireball = projectile.GetComponent<BatFireball>();
     
@@ -98,20 +98,20 @@ public class BatCaster : Enemy
     float distanceOffset = 30.0f; // Adjust this value based on the desired distance
     float stoppingDistance = 1.0f; // Adjust this value based on how close you want the enemy to get
 
+    // Toggle between distanceOffset and -distanceOffset based on the enemy's position relative to the player
+    float offsetSign = (transform.position.x < PlayerController.Instance.transform.position.x) ? 1.0f : -1.0f;
+
     // Calculate the desired position above the player
-    Vector2 desiredPosition = new Vector2(PlayerController.Instance.transform.position.x + distanceOffset, PlayerController.Instance.transform.position.y + distanceOffset);
+    Vector2 desiredPosition = new Vector2(PlayerController.Instance.transform.position.x + offsetSign * distanceOffset, PlayerController.Instance.transform.position.y + distanceOffset);
 
     // Calculate the direction towards the desired position
     Vector2 chaseDirection = (desiredPosition - (Vector2)transform.position).normalized;
-        Vector2 desiredVelocity = chaseDirection * maxSpeed;
-            RaycastHit2D hit = Physics2D.CircleCast(transform.position, obstacleAvoidanceRadius, chaseDirection, obstacleAvoidanceRayLength, obstacleLayer);
-
-
+    Vector2 desiredVelocity = chaseDirection * maxSpeed;
+    RaycastHit2D hit = Physics2D.CircleCast(transform.position, obstacleAvoidanceRadius, chaseDirection, obstacleAvoidanceRayLength, obstacleLayer);
 
     float distanceToPlayer = Vector2.Distance(transform.position, desiredPosition);
 
     Debug.DrawLine(transform.position, desiredPosition, Color.blue);
-
 
     if (distanceToPlayer > stoppingDistance)
     {
@@ -162,7 +162,7 @@ public class BatCaster : Enemy
     Vector2 horizontalAvoidanceForce = Vector2.right * horizontalOffset * horizontalScalingFactor * avoidanceForce;
 
     desiredVelocity += groundAvoidanceForce + horizontalAvoidanceForce;
-    Debug.Log("Ground!");
+
     }
 
     if (nearRoof)
@@ -182,7 +182,7 @@ public class BatCaster : Enemy
     Vector2 horizontalAvoidanceForce = Vector2.right * horizontalOffset * horizontalScalingFactor * avoidanceForce;
 
     desiredVelocity += roofAvoidanceForce + horizontalAvoidanceForce;
-    Debug.Log("Roof!");
+
     }
 
     if (nearWall)
@@ -202,7 +202,7 @@ public class BatCaster : Enemy
     Vector2 verticalAvoidanceForce = Vector2.up * verticalOffset * verticalScalingFactor * avoidanceForce;
 
     desiredVelocity += wallAvoidanceForce + verticalAvoidanceForce;
-    Debug.Log("Wall!");
+
     }
 }
 }

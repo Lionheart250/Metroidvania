@@ -62,5 +62,9 @@ public class BatFireball : MonoBehaviour
             // You can add damage or any other logic here
             Destroy(gameObject);
         }
+        if (other.gameObject.layer == LayerMask.NameToLayer("Ground"))
+        {
+            Destroy(gameObject);
+        }
     }
 }
