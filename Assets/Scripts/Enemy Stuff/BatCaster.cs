@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Pathfinding;
 
 public class BatCaster : Enemy
 {
@@ -11,9 +12,16 @@ public class BatCaster : Enemy
     [SerializeField] private float maxSteeringForce = 1f; // Adjust this value for steering force
     [SerializeField] private float maxSpeed = 5f; 
     [SerializeField] private float obstacleAvoidanceRadius = 2f;
+    [SerializeField] private float nextWaypointDistance = 1f; 
     [SerializeField] private Transform groundCheckTransform;
     [SerializeField] private Transform roofCheckTransform;
     [SerializeField] private Transform wallCheckTransform;
+    [SerializeField] private Transform target;
+    [SerializeField] private bool isChasing = false;
+    Path path;
+    int currentWaypoint = 0;
+    bool reachedEndOfPath = false;
+    Seeker seeker;
     [SerializeField] private float projectileCooldown = 2f;
     private float projectileTimer = 0f;
     public GameObject projectilePrefab;
@@ -26,6 +34,34 @@ public class BatCaster : Enemy
     {
         base.Start();
         ChangeState(EnemyStates.Bat_Idle);
+        seeker = GetComponent<Seeker>();
+
+        InvokeRepeating("UpdatePath", 0f, .5f);
+
+        PlayerController playerController = PlayerController.Instance;
+        if (playerController != null)
+    {
+        target = playerController.transform;
+    }
+    else
+    {
+        Debug.LogError("PlayerController.Instance is null or the player controller script is missing.");
+    }
+    }
+
+     void UpdatePath()
+    {
+        if (seeker.IsDone())
+            seeker.StartPath(rb.position, target.position, OnPathComplete);
+    }
+
+    void OnPathComplete(Path p)
+    {
+        if (!p.error)
+        {
+            path = p;
+            currentWaypoint = 0;
+        }   
     }
 
     protected override void Update()
@@ -34,6 +70,34 @@ public class BatCaster : Enemy
         if (!PlayerController.Instance.pState.alive)
         {
             ChangeState(EnemyStates.Bat_Idle);
+        }
+    }
+
+    void FixedUpdate()
+    {
+        if(!isChasing)
+        return;
+        
+        if (path == null)
+        return;
+
+        if (currentWaypoint >= path.vectorPath.Count)
+        {
+            reachedEndOfPath = true;
+            return;
+        }
+        else
+        {
+            reachedEndOfPath = false;
+        }
+
+
+
+        float distance = Vector2.Distance(rb.position, path.vectorPath[currentWaypoint]);
+
+        if (distance < nextWaypointDistance)
+        {
+            currentWaypoint++;
         }
     }
 
@@ -75,6 +139,10 @@ public class BatCaster : Enemy
             case EnemyStates.Bat_Death:
                 Death(Random.Range(2, 3));
                 break;
+
+            default:
+                isChasing = false;
+                break;
         }
     }
     
@@ -95,6 +163,7 @@ public class BatCaster : Enemy
 }
    private void HandleChaseState()
 {
+    isChasing = true;
     float distanceOffset = 30.0f; // Adjust this value based on the desired distance
     float stoppingDistance = 1.0f; // Adjust this value based on how close you want the enemy to get
 

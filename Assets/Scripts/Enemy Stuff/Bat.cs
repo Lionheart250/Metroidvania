@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Pathfinding;
 
 public class Bat : Enemy
 {
@@ -10,10 +11,17 @@ public class Bat : Enemy
     [SerializeField] private float avoidanceForce = 5f; // Adjust this value for obstacle avoidance strength
     [SerializeField] private float maxSteeringForce = 1f; // Adjust this value for steering force
     [SerializeField] private float maxSpeed = 5f; 
-    [SerializeField] private float obstacleAvoidanceRadius = 2f;
+    [SerializeField] private float obstacleAvoidanceRadius = 5f;
+    [SerializeField] private float nextWaypointDistance = 1f; 
     [SerializeField] private Transform groundCheckTransform;
     [SerializeField] private Transform roofCheckTransform;
     [SerializeField] private Transform wallCheckTransform;
+    [SerializeField] private Transform target;
+    [SerializeField] private bool isChasing = false;
+    Path path;
+    int currentWaypoint = 0;
+    bool reachedEndOfPath = false;
+    Seeker seeker;
 
     float timer;
     float obstacleAvoidanceRayLength = 1f;
@@ -23,7 +31,38 @@ public class Bat : Enemy
     {
         base.Start();
         ChangeState(EnemyStates.Bat_Idle);
+        seeker = GetComponent<Seeker>();
+
+        InvokeRepeating("UpdatePath", 0f, .5f);
+
+        PlayerController playerController = PlayerController.Instance;
+        if (playerController != null)
+    {
+        target = playerController.transform;
     }
+    else
+    {
+        Debug.LogError("PlayerController.Instance is null or the player controller script is missing.");
+    }
+
+        
+    }
+
+    void UpdatePath()
+    {
+        if (seeker.IsDone())
+            seeker.StartPath(rb.position, target.position, OnPathComplete);
+    }
+
+    void OnPathComplete(Path p)
+    {
+        if (!p.error)
+        {
+            path = p;
+            currentWaypoint = 0;
+        }   
+    }
+
 
     protected override void Update()
     {
@@ -33,45 +72,82 @@ public class Bat : Enemy
             ChangeState(EnemyStates.Bat_Idle);
         }
     }
+    void FixedUpdate()
+    {
+        if(!isChasing)
+        return;
+        
+        if (path == null)
+        return;
+
+        if (currentWaypoint >= path.vectorPath.Count)
+        {
+            reachedEndOfPath = true;
+            return;
+        }
+        else
+        {
+            reachedEndOfPath = false;
+        }
+
+        Vector2 direction = ((Vector2)path.vectorPath[currentWaypoint]  - rb.position).normalized;
+
+        Vector2 force = direction * maxSpeed * Time.deltaTime;
+
+        rb.AddForce(force);
+
+        float distance = Vector2.Distance(rb.position, path.vectorPath[currentWaypoint]);
+
+        if (distance < nextWaypointDistance)
+        {
+            currentWaypoint++;
+        }
+    }
 
     
 
     protected override void UpdateEnemyStates()
+{
+    float _dist = Vector2.Distance(transform.position, PlayerController.Instance.transform.position);
+
+    switch (GetCurrentEnemyState)
     {
-        float _dist = Vector2.Distance(transform.position, PlayerController.Instance.transform.position);
+        case EnemyStates.Bat_Idle:
+            if (_dist < chaseDistance)
+            {
+                ChangeState(EnemyStates.Bat_Chase);
+            }
+            break;
 
-        switch (GetCurrentEnemyState)
-        {
-            case EnemyStates.Bat_Idle:
-                if (_dist < chaseDistance)
-                {
-                    ChangeState(EnemyStates.Bat_Chase);
-                }
-                break;
+        case EnemyStates.Bat_Chase:
+            HandleChaseState();
+            break;
 
-            case EnemyStates.Bat_Chase:
-                HandleChaseState();
-                break;
+        case EnemyStates.Bat_Stunned:
+            timer += Time.deltaTime;
 
-            case EnemyStates.Bat_Stunned:
-                timer += Time.deltaTime;
+            if (timer > stunDuration)
+            {
+                ChangeState(EnemyStates.Bat_Idle);
+                timer = 0;
+            }
+            break;
 
-                if (timer > stunDuration)
-                {
-                    ChangeState(EnemyStates.Bat_Idle);
-                    timer = 0;
-                }
-                break;
+        case EnemyStates.Bat_Death:
+            Death(Random.Range(2, 3));
+            break;
 
-            case EnemyStates.Bat_Death:
-                Death(Random.Range(2, 3));
-                break;
-        }
+        // Add this case to set isChasing to false when not in Bat_Chase state
+        default:
+            isChasing = false;
+            break;
     }
-    
+}
+
     
    private void HandleChaseState()
 {
+    isChasing = true;
     Vector2 chaseDirection = (PlayerController.Instance.transform.position - transform.position).normalized;
 
     // Calculate the desired velocity (direction towards player)
@@ -165,6 +241,7 @@ public class Bat : Enemy
 
     // Limit the maximum speed
     rb.velocity = Vector2.ClampMagnitude(rb.velocity, maxSpeed);
+    
 
     FlipBat();
 }

@@ -549,15 +549,45 @@ private void OnTriggerExit2D(Collider2D _other)
     }
 }
 
+   private float walkTimer = 0f;
+    private float maxWalkTimer = 1f;
 
     private void Move()
     {
-        if(!pState.lightJumping)
+        if (!pState.lightJumping)
         {
-        rb.velocity = new Vector2(walkSpeed * xAxis, rb.velocity.y);
-        anim.SetBool("Walking", rb.velocity.x != 0 && Grounded());
+            rb.velocity = new Vector2(walkSpeed * xAxis, rb.velocity.y);
+            if (rb.velocity.x != 0 && Grounded())
+            {
+                walkTimer += Time.deltaTime;
+
+                // Clamp walkTimer to ensure it never goes above 2 or below 0
+                walkTimer = Mathf.Clamp(walkTimer, 0f, maxWalkTimer);
+
+                anim.SetBool("Running", true);
+                anim.SetBool("Walking", false);
+
+                // Check if walkTimer is greater than or equal to 0.5
+                if (walkTimer >= 0.24f && rb.velocity.x != 0 && Grounded())
+                {
+                    anim.SetBool("Walking", true);
+                    anim.SetBool("Running", false);
+                }
+
+
+            }
+            else
+            {
+                // If not moving, reset walkTimer and set both Walking and Running to false
+                walkTimer = 0;
+                walkTimer = Mathf.Clamp(walkTimer, 0f, maxWalkTimer);
+                anim.SetBool("Running", false);
+                anim.SetBool("Walking", false);
+                Debug.Log("walkTimer: " + walkTimer);
+            }
         }
     }
+
 
     void UpdateCameraYDampForPlayerFall()
     {
