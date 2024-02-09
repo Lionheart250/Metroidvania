@@ -557,6 +557,7 @@ private void OnTriggerExit2D(Collider2D _other)
         if (!pState.lightJumping)
         {
             rb.velocity = new Vector2(walkSpeed * xAxis, rb.velocity.y);
+
             if (rb.velocity.x != 0 && Grounded())
             {
                 walkTimer += Time.deltaTime;
@@ -573,8 +574,6 @@ private void OnTriggerExit2D(Collider2D _other)
                     anim.SetBool("Walking", true);
                     anim.SetBool("Running", false);
                 }
-
-
             }
             else
             {
@@ -964,39 +963,44 @@ void ShadowAttack()
 
 
     void Hit(Transform _attackTransform, Vector2 _attackArea, ref bool _recoilBool, Vector2 _recoilDir, float _recoilStrength)
-    {
-        Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
+{
+    Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
 
-        if (objectsToHit.Length > 0)
-        {
-            _recoilBool = true;
-            dashed = false;
-        }
-        for (int i = 0; i < objectsToHit.Length; i++)
+    if (objectsToHit.Length > 0)
+    {
+        _recoilBool = true;
+        dashed = false;
+    }
+
+    for (int i = 0; i < objectsToHit.Length; i++)
+    {
+        if (objectsToHit[i].CompareTag("Enemy"))
         {
             if (objectsToHit[i].GetComponent<Enemy>() != null)
             {
                 objectsToHit[i].GetComponent<Enemy>().EnemyGetsHit(damage, _recoilDir, _recoilStrength);
+            }
+            if (Mana < 1)
+            {
+                Mana += manaGain;
+            }
 
-                if (objectsToHit[i].CompareTag("Enemy"))
-                {
-                    if(Mana < 1)
-                    {
-                        Mana += manaGain;
-                    }
-
-                    if(Mana >= 1 || (halfMana && Mana >= 0.5))
-                    {
-                        manaOrbsHandler.UpdateMana(manaGain * 3);
-                    }
-                                        
-                }
+            if (Mana >= 1 || (halfMana && Mana >= 0.5))
+            {
+                manaOrbsHandler.UpdateMana(manaGain * 3);
             }
         }
-
-        transform.position += new Vector3(_recoilDir.x * _recoilStrength * Time.deltaTime, _recoilDir.y * _recoilStrength * Time.deltaTime, 0f);
-
+         if (objectsToHit[i].CompareTag("Illusion"))
+            {
+                // Destroy the illusionary wall when hit
+                Destroy(objectsToHit[i].gameObject);
+            }
     }
+
+    transform.position += new Vector3(_recoilDir.x * _recoilStrength * Time.deltaTime, _recoilDir.y * _recoilStrength * Time.deltaTime, 0f);
+}
+
+    
 
     void ShadowHit(Transform _attackTransform, Vector2 _attackArea, ref bool _recoilBool, Vector2 _recoilDir, float _recoilStrength)
     {
@@ -1622,7 +1626,7 @@ IEnumerator StopTakingDamage()
     void Jump()
     {    
 
-    if (jumpBufferCounter > 0 && Grounded() && coyoteTimeCounter > 0 && !pState.jumping)
+    if (jumpBufferCounter > 0 && coyoteTimeCounter > 0 && !pState.jumping)
     {
         pState.jumping = true;
         

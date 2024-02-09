@@ -10,6 +10,8 @@ TagManager:
   - EnemyProjectile
   - StayShadowPuddle
   - Navigation Static
+  - PlayerAttack
+  - Illusion
   layers:
   - Default
   - TransparentFX

@@ -21,7 +21,7 @@ public class Enemy : MonoBehaviour
     protected SpriteRenderer sr;
     public Animator anim;
     protected AudioSource audioSource;
-     protected bool isInvincible;
+    protected bool isInvincible;
 
     protected enum EnemyStates
     {
