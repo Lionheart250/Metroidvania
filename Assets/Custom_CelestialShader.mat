@@ -23,8 +23,16 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _GalaxyTex:
+        m_Texture: {fileID: 2800000, guid: 7de649ee2f1ae46749880dea2f7ba682, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MaskTex:
+        m_Texture: {fileID: 2800000, guid: f4ac451764c774f57b88dbc19655bd15, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NoiseTex:
@@ -33,11 +41,23 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _BlendMode: 1
+    - _Contrast: 6.9
     - _EmissionStrength: 1
+    - _GalaxyIntensity: 0.05
+    - _HeadRadius: 0.282
+    - _HeadSize: 0.179
+    - _IntensityMultiplier: 10
     - _NoiseStrength: 0.5
+    - _PulsateSpeed: 2
     - _ScrollSpeed: 1
+    - _SwirlAmount: 0
+    - _SwirlSpeed: 0.97
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
+    - _HeadCenter: {r: 0.65, g: 0.66, b: 0, a: 0}
+    - _HeadPosition: {r: 0, g: 0, b: 0, a: 0}
     - _NotVisibleColor: {r: 0, g: 1, b: 0, a: 1}
+    - _ScrollSpeed: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
