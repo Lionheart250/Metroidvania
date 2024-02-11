@@ -23,13 +23,28 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _GalaxyTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _BlendMode: 0.5
+    - _Contrast: 5
+    - _GalaxyIntensity: 0.5
+    - _GlowIntensity: 5
+    - _IntensityMultiplier: 1
+    - _PulsateSpeed: 2
     - _Speed: 1
     - _Strength: 0.1
-    m_Colors: []
+    - _SwirlAmount: 0.5
+    - _SwirlSpeed: 2
+    m_Colors:
+    - _Color: {r: 0.21960786, g: 0.21960786, b: 0.21960786, a: 1}
+    - _GlowColor: {r: 1, g: 1, b: 1, a: 1}
+    - _ScrollSpeed: {r: 1, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
