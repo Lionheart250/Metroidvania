@@ -25,7 +25,7 @@ Material:
     m_TexEnvs:
     - _GalaxyTex:
         m_Texture: {fileID: 2800000, guid: 7de649ee2f1ae46749880dea2f7ba682, type: 3}
-        m_Scale: {x: 1, y: 1}
+        m_Scale: {x: 100, y: 100}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
@@ -41,30 +41,36 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _BlendMode: 0.305
-    - _Contrast: 1.97
+    - _BlendMode: 0.1
+    - _Contrast: 10
     - _EmissionStrength: 1
-    - _GalaxyIntensity: 0.3
+    - _EnableEffects: 1
+    - _GalaxyIntensity: 2
     - _GlowIntensity: 10
     - _HeadRadius: 0.282
     - _HeadSize: 0
     - _HeadSize1: 0.008
     - _HeadSize2: 0.5
     - _HeadSize3: 0.122
-    - _IntensityMultiplier: 4.02
+    - _IntensityMultiplier: 10
     - _NoiseStrength: 0.5
     - _NumHeads: 3
     - _OutlineWidth: 0.247
-    - _PulsateSpeed: 0
+    - _PatternPulsateAmount: 0.1
+    - _PatternPulsateSpeed: 5
+    - _PulsateSpeed: 10
     - _ScrollSpeed: 1
-    - _SwirlAmount: 1
-    - _SwirlSpeed: 0.49
+    - _SwirlAmount: 0
+    - _SwirlSpeed: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _ExcludedColor2: {r: 0.8018868, g: 0.8018868, b: 0.8018868, a: 0}
     - _ExcludedColor3: {r: 1, g: 1, b: 1, a: 1}
-    - _ExcludedColor4: {r: 0.015686275, g: 0.027450982, b: 0.03137255, a: 0}
+    - _ExcludedColor4: {r: 0.33333334, g: 0.32941177, b: 0.32941177, a: 0}
+    - _ExcludedColor5: {r: 0.5529412, g: 0.5529412, b: 0.5529412, a: 0}
+    - _ExcludedColor6: {r: 0.72156864, g: 0.72156864, b: 0.72156864, a: 0}
+    - _ExcludedColor7: {r: 0.70980394, g: 0.7058824, b: 0.7058824, a: 0}
     - _ExcludedColors: {r: 0.62352943, g: 0.627451, b: 0.62352943, a: 1}
     - _GlowColor: {r: 0, g: 1, b: 0.9668927, a: 1}
     - _HeadCenter: {r: 0.65, g: 0.66, b: 0, a: 0}

@@ -582,7 +582,7 @@ private void OnTriggerExit2D(Collider2D _other)
                 walkTimer = Mathf.Clamp(walkTimer, 0f, maxWalkTimer);
                 anim.SetBool("Running", false);
                 anim.SetBool("Walking", false);
-                Debug.Log("walkTimer: " + walkTimer);
+                //Debug.Log("walkTimer: " + walkTimer);
             }
         }
     }

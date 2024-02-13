@@ -1,22 +1,25 @@
-Shader "Unlit/NewUnlitShader"
+Shader "Custom/GrassShader"
 {
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+        _WaveFrequency ("Wave Frequency", Float) = 2.0
+        _WaveAmplitude ("Wave Amplitude", Float) = 0.05
+        _WaveSpeed ("Wave Speed", Float) = 1.0
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        Tags { "Queue" = "Transparent" "IgnoreProjector" = "True" "RenderType" = "Transparent" }
         LOD 100
+
+        ZWrite Off
+        Blend One OneMinusSrcAlpha
 
         Pass
         {
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-            // make fog work
-            #pragma multi_compile_fog
-
             #include "UnityCG.cginc"
 
             struct appdata
@@ -34,6 +37,9 @@ Shader "Unlit/NewUnlitShader"
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
+            float _WaveFrequency;
+            float _WaveAmplitude;
+            float _WaveSpeed;
 
             v2f vert (appdata v)
             {
@@ -46,10 +52,17 @@ Shader "Unlit/NewUnlitShader"
 
             fixed4 frag (v2f i) : SV_Target
             {
-                // sample the texture
+                // Calculate wave offset based on time and UV coordinates
+                float waveOffset = _Time.y * _WaveSpeed;
+
+                // Calculate vertex displacement based on sine wave
+                float wave = sin((i.uv.x * _WaveFrequency + waveOffset) * 2.0 * 3.14159265) * _WaveAmplitude;
+
+                // Apply the wave effect to the Y coordinate of the UV
+                i.uv.y += wave;
+
+                // Sample the texture
                 fixed4 col = tex2D(_MainTex, i.uv);
-                // apply fog
-                UNITY_APPLY_FOG(i.fogCoord, col);
                 return col;
             }
             ENDCG
