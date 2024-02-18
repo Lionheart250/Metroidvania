@@ -213,7 +213,7 @@ public struct SaveData
             lastScene = SceneManager.GetActiveScene().name;
             writer.Write(lastScene);
         }
-        Debug.Log("saved player data");
+        //Debug.Log("saved player data");
         
 
     }
@@ -342,12 +342,12 @@ public struct SaveData
 
                 
             }
-            Debug.Log("load player data");
-            Debug.Log(playerHalfMana);
+            //Debug.Log("load player data");
+            //Debug.Log(playerHalfMana);
         }
         else
         {
-            Debug.Log("File doesnt exist");
+            //Debug.Log("File doesnt exist");
             PlayerController.Instance.halfMana = false;
             PlayerController.Instance.Health = PlayerController.Instance.maxHealth;
             PlayerController.Instance.Mana = 0.5f;

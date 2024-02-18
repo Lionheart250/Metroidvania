@@ -23,11 +23,11 @@ public class SceneFader : MonoBehaviour
 
     if (fadeOutUIImage == null)
     {
-        Debug.LogError("Image component not found on SceneFader object.");
+        //Debug.LogError("Image component not found on SceneFader object.");
     }
     else
     {
-        Debug.Log("Image component found and assigned successfully.");
+        //Debug.Log("Image component found and assigned successfully.");
     }
 }
 

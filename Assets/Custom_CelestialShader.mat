@@ -41,11 +41,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _BlendMode: 0.1
+    - _BlendMode: 1
     - _Contrast: 10
     - _EmissionStrength: 1
     - _EnableEffects: 1
-    - _GalaxyIntensity: 2
+    - _GalaxyIntensity: 0.19
     - _GlowIntensity: 10
     - _HeadRadius: 0.282
     - _HeadSize: 0
@@ -65,12 +65,25 @@ Material:
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
+    - _ExcludedColor10: {r: 0.40000004, g: 0.39607847, b: 0.39607847, a: 0}
+    - _ExcludedColor11: {r: 0.5058824, g: 0.5019608, b: 0.5019608, a: 0}
+    - _ExcludedColor12: {r: 0.77647066, g: 0.7725491, b: 0.7725491, a: 0}
+    - _ExcludedColor13: {r: 0.65882355, g: 0.6627451, b: 0.65882355, a: 0}
+    - _ExcludedColor14: {r: 0.68235296, g: 0.68235296, b: 0.68235296, a: 0}
+    - _ExcludedColor15: {r: 0.75294125, g: 0.7490196, b: 0.7490196, a: 0}
+    - _ExcludedColor16: {r: 0.5882353, g: 0.5882353, b: 0.5882353, a: 0}
+    - _ExcludedColor17: {r: 0, g: 0, b: 0, a: 0}
+    - _ExcludedColor18: {r: 0, g: 0, b: 0, a: 0}
+    - _ExcludedColor19: {r: 0, g: 0, b: 0, a: 0}
     - _ExcludedColor2: {r: 0.8018868, g: 0.8018868, b: 0.8018868, a: 0}
+    - _ExcludedColor20: {r: 0, g: 0, b: 0, a: 0}
     - _ExcludedColor3: {r: 1, g: 1, b: 1, a: 1}
     - _ExcludedColor4: {r: 0.33333334, g: 0.32941177, b: 0.32941177, a: 0}
     - _ExcludedColor5: {r: 0.5529412, g: 0.5529412, b: 0.5529412, a: 0}
     - _ExcludedColor6: {r: 0.72156864, g: 0.72156864, b: 0.72156864, a: 0}
     - _ExcludedColor7: {r: 0.70980394, g: 0.7058824, b: 0.7058824, a: 0}
+    - _ExcludedColor8: {r: 0.21960786, g: 0.21568629, b: 0.21960786, a: 0}
+    - _ExcludedColor9: {r: 0.45098042, g: 0.45098042, b: 0.45098042, a: 0}
     - _ExcludedColors: {r: 0.62352943, g: 0.627451, b: 0.62352943, a: 1}
     - _GlowColor: {r: 0, g: 1, b: 0.9668927, a: 1}
     - _HeadCenter: {r: 0.65, g: 0.66, b: 0, a: 0}
@@ -80,5 +93,6 @@ Material:
     - _HeadPosition3: {r: 0.5, g: 0.48, b: 0, a: 0}
     - _HeadPositions: {r: 0.66, g: 0.5, b: 0, a: 0}
     - _NotVisibleColor: {r: 0, g: 1, b: 0, a: 1}
+    - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _ScrollSpeed: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []

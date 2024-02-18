@@ -12,6 +12,8 @@ TagManager:
   - Navigation Static
   - PlayerAttack
   - Illusion
+  - Obstacle
+  - Player3D
   layers:
   - Default
   - TransparentFX

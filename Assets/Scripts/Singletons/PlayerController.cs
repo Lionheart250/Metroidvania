@@ -244,7 +244,6 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
-        
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -252,9 +251,8 @@ public class PlayerController : MonoBehaviour
         else
         {
             Instance = this;
-        }
-        
-        DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(gameObject);
+    }
     }
 
     // Start is called before the first frame update
@@ -292,7 +290,7 @@ public class PlayerController : MonoBehaviour
         manaStorage.fillAmount = Mana;
 
         //Health = maxHealth;
-        Debug.Log(transform.position);
+        //Debug.Log(transform.position);
     }
 
     // Update is called once per frame
@@ -1362,9 +1360,9 @@ IEnumerator StopTakingDamage()
     void LightDart()
     {  
         if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && !pState.aiming && castOrHealTimer < 0.5f && timeSinceCast >= timeBetweenCast 
-        && Mana >= manaSpellCost / 3.0f && pState.lightForm)
+        && Mana >= manaSpellCost / 3.0f && pState.lightForm && yAxis == 0 && unlockedSideCast)
         {
-            pState.casting = true;
+            
             timeSinceCast = 0;
             StartCoroutine(LightDartCoroutine());
         }
@@ -1377,6 +1375,7 @@ IEnumerator StopTakingDamage()
     {   
     if (yAxis == 0 && unlockedSideCast)
     {
+        pState.casting = true;
         anim.SetBool("Casting", true);
         GameObject _lightDart = Instantiate(lightningDart, SideAttackTransform.position, Quaternion.identity);
         timeSinceCast = 1;
@@ -1405,22 +1404,29 @@ IEnumerator StopTakingDamage()
         yield return new WaitForSeconds(0.15f);
         anim.SetBool("Casting", false);
         castOrHealTimer = 0;
+        pState.casting = false;
     }
 
 
     
     void LightningStrike()
     {
-        if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && !pState.aiming &&  castOrHealTimer <= 0.5f && timeSinceCast >= timeBetweenCast 
-        && Mana >= manaSpellCost && pState.lightForm)
+        if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && !pState.aiming && castOrHealTimer < 0.5f
+        && Mana >= manaSpellCost / 3.0f && pState.lightForm && !pState.casting)
         {
-            if ((yAxis < 0 && Grounded()) && unlockedDownCast && pState.lightForm)
+            if ((yAxis < 0 && Grounded()) && unlockedDownCast)
             {
                 StartCoroutine(LightningStrikeHit());
+                timeSinceCast = 0;
             }
-            if ((yAxis < 0 && !Grounded()) && unlockedDownCast && pState.lightForm)
+            if ((yAxis < 0 && !Grounded()) && unlockedDownCast)
             {
                 StartCoroutine(AirLightningStrikeHit());
+                timeSinceCast = 0;
+            }
+            else
+            {
+            timeSinceCast += Time.deltaTime;
             }
         }
     }
@@ -1442,9 +1448,12 @@ IEnumerator StopTakingDamage()
         yield return new WaitForSeconds(0.5f);
                
         anim.SetBool("Casting", false);
-        pState.casting = false;
+        
         lightningStrike.SetActive(false);
         UnfreezeRigidbodyPosition();
+
+        yield return new WaitForSeconds(1.5f);
+        pState.casting = false;
 
     }
 
@@ -1525,6 +1534,7 @@ IEnumerator StopTakingDamage()
         if( yAxis > 0 && unlockedUpCast)
         {
             anim.SetBool("Casting", true);
+            pState.casting = true;
             yield return new WaitForSeconds(0.15f);
 
             Instantiate(upSpellExplosion, transform);
@@ -1535,10 +1545,12 @@ IEnumerator StopTakingDamage()
             manaOrbsHandler.countDown = 3f;
             audioSource.PlayOneShot(ExplosionSpellCastSound);
             yield return new WaitForSeconds(0.35f);
+            pState.casting = false;
         }
         else if((yAxis < 0 && !Grounded()) && unlockedDownCast)
         {
             anim.SetBool("Casting", true);
+            pState.casting = true;
             
             
 
@@ -1552,12 +1564,13 @@ IEnumerator StopTakingDamage()
             pState.recoilingY = true;
             yield return new WaitForSeconds(0.35f);
             downSpellShadowFireball.SetActive(false);
+            pState.casting = false;
             
         }
         else if((yAxis < 0 && Grounded()) && unlockedDownCast)
         {
             anim.SetBool("Casting", true);
-            
+            pState.casting = true;
             yield return new WaitForSeconds(0.15f);
 
             sideSpellShadowFireball.SetActive(true);
@@ -1568,11 +1581,12 @@ IEnumerator StopTakingDamage()
             manaOrbsHandler.countDown = 3f;
             pState.recoilingX = true;
             yield return new WaitForSeconds(0.35f);
+            pState.casting = false;
             sideSpellShadowFireball.SetActive(false);
             
         }          
         anim.SetBool("Casting", false);
-        pState.casting = false;
+        
         //castOrHealTimer = 0;
     }
 

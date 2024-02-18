@@ -37,8 +37,10 @@ public class SceneTransition : MonoBehaviour
     if (GameManager.Instance.transitionedFromScene == transitionTo)
     {
         PlayerController.Instance.transform.position = startPoint.position;
+        PlayerController3D.Instance.transform.position = startPoint.position;
 
         StartCoroutine(PlayerController.Instance.WalkIntoNewScene(exitDirection, exitTime));
+        StartCoroutine(PlayerController3D.Instance.WalkIntoNewScene(exitDirection, exitTime));
     }
     StartCoroutine(UIManager.Instance.sceneFader.Fade(SceneFader.FadeDirection.Out));
 }
@@ -54,6 +56,19 @@ public class SceneTransition : MonoBehaviour
             GameManager.Instance.transitionedFromScene = SceneManager.GetActiveScene().name;
 
             PlayerController.Instance.pState.cutscene = true;
+
+            StartCoroutine(UIManager.Instance.sceneFader.FadeAndLoadScene(SceneFader.FadeDirection.In, transitionTo));
+        }
+    }
+
+    private void OnTriggerEnter(Collider _other)
+    {
+        if (_other.CompareTag("Player3D"))
+        {
+            CheckShadeData();
+
+            GameManager.Instance.transitionedFromScene = SceneManager.GetActiveScene().name;
+
 
             StartCoroutine(UIManager.Instance.sceneFader.FadeAndLoadScene(SceneFader.FadeDirection.In, transitionTo));
         }

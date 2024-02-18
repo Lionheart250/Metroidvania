@@ -35,4 +35,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Tutorial/Tutorial_Room_9.unity
     guid: a5f6a2697ab1b458f8b782de3c37eb2b
+  - enabled: 1
+    path: Assets/Scenes/Tutorial/Animal_Crossing_World.unity
+    guid: 0cfc543221baa45498a8af3dc4b92d22
   m_configObjects: {}

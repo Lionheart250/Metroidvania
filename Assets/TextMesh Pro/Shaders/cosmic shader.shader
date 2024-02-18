@@ -1,4 +1,4 @@
-Shader "Unlit/UnlitSpriteWithNeonGlow"
+Shader "CosmicShader"
 {
     Properties
     {
@@ -21,6 +21,19 @@ Shader "Unlit/UnlitSpriteWithNeonGlow"
         _ExcludedColor5 ("Excluded Color 5", Color) = (0,0,0,0) // Fifth color to exclude
         _ExcludedColor6 ("Excluded Color 6", Color) = (0,0,0,0) // Sixth color to exclude
         _ExcludedColor7 ("Excluded Color 7", Color) = (0,0,0,0) // Seventh color to exclude
+        _ExcludedColor8 ("Excluded Color 8", Color) = (0,0,0,0) // Eighth color to exclude
+        _ExcludedColor9 ("Excluded Color 9", Color) = (0,0,0,0) // Ninth color to exclude
+        _ExcludedColor10 ("Excluded Color 10", Color) = (0,0,0,0) // Tenth color to exclude
+        _ExcludedColor11 ("Excluded Color 11", Color) = (0,0,0,0) // Eleventh color to exclude
+        _ExcludedColor12 ("Excluded Color 12", Color) = (0,0,0,0) // Twelfth color to exclude
+        _ExcludedColor13 ("Excluded Color 13", Color) = (0,0,0,0) // Thirteenth color to exclude
+        _ExcludedColor14 ("Excluded Color 14", Color) = (0,0,0,0) // Fourteenth color to exclude
+        _ExcludedColor15 ("Excluded Color 15", Color) = (0,0,0,0) // Fifteenth color to exclude
+        _ExcludedColor16 ("Excluded Color 16", Color) = (0,0,0,0) // Sixteenth color to exclude
+        _ExcludedColor17 ("Excluded Color 17", Color) = (0,0,0,0) // Seventeenth color to exclude
+        _ExcludedColor18 ("Excluded Color 18", Color) = (0,0,0,0) // Eighteenth color to exclude
+        _ExcludedColor19 ("Excluded Color 19", Color) = (0,0,0,0) // Nineteenth color to exclude
+        _ExcludedColor20 ("Excluded Color 20", Color) = (0,0,0,0) // Twentieth color to exclude
         _EnableEffects ("Enable Effects", Float) = 1.0 // Toggle to enable/disable effects
         _PatternPulsateSpeed ("Pattern Pulsate Speed", Range(0, 10)) = 2.0 // Adjust the speed of the pulsating pattern
         _PatternPulsateAmount ("Pattern Pulsate Amount", Range(0, 1)) = 0.5 // Adjust the amount of pulsating pattern effect
@@ -66,13 +79,26 @@ Shader "Unlit/UnlitSpriteWithNeonGlow"
             half _PulsateSpeed;
             half _GlowIntensity;
             float4 _GlowColor;
-            float4 _ExcludedColors[7]; // Adjusted to hold 7 elements
+            float4 _ExcludedColors[20]; // Adjusted to hold 20 elements
             float4 _ExcludedColor2;
             float4 _ExcludedColor3;
-            float4 _ExcludedColor4; // New excluded color
-            float4 _ExcludedColor5; // New excluded color
-            float4 _ExcludedColor6; // New excluded color
-            float4 _ExcludedColor7; // New excluded color
+            float4 _ExcludedColor4;
+            float4 _ExcludedColor5;
+            float4 _ExcludedColor6;
+            float4 _ExcludedColor7;
+            float4 _ExcludedColor8;
+            float4 _ExcludedColor9;
+            float4 _ExcludedColor10;
+            float4 _ExcludedColor11;
+            float4 _ExcludedColor12;
+            float4 _ExcludedColor13;
+            float4 _ExcludedColor14;
+            float4 _ExcludedColor15;
+            float4 _ExcludedColor16;
+            float4 _ExcludedColor17;
+            float4 _ExcludedColor18;
+            float4 _ExcludedColor19;
+            float4 _ExcludedColor20;
             float _EnableEffects;
             half _PatternPulsateSpeed;
             half _PatternPulsateAmount;
@@ -118,14 +144,27 @@ Shader "Unlit/UnlitSpriteWithNeonGlow"
 
                 // Check if the pixel color matches any excluded color on the sprite
                 bool excludePixel = false;
-                for (int j = 0; j < 7; j++) {
+                for (int j = 0; j < 20; j++) {
                     if (distance(spriteColor.rgb, _ExcludedColors[j].rgb) < 0.05 ||
                         distance(spriteColor.rgb, _ExcludedColor2.rgb) < 0.05 ||
                         distance(spriteColor.rgb, _ExcludedColor3.rgb) < 0.05 ||
                         distance(spriteColor.rgb, _ExcludedColor4.rgb) < 0.05 ||
                         distance(spriteColor.rgb, _ExcludedColor5.rgb) < 0.05 ||
                         distance(spriteColor.rgb, _ExcludedColor6.rgb) < 0.05 ||
-                        distance(spriteColor.rgb, _ExcludedColor7.rgb) < 0.05) {
+                        distance(spriteColor.rgb, _ExcludedColor7.rgb) < 0.05 ||
+                        distance(spriteColor.rgb, _ExcludedColor8.rgb) < 0.05 ||
+                        distance(spriteColor.rgb, _ExcludedColor9.rgb) < 0.05 ||
+                        distance(spriteColor.rgb, _ExcludedColor10.rgb) < 0.05 ||
+                        distance(spriteColor.rgb, _ExcludedColor11.rgb) < 0.05 ||
+                        distance(spriteColor.rgb, _ExcludedColor12.rgb) < 0.05 ||
+                        distance(spriteColor.rgb, _ExcludedColor13.rgb) < 0.05 ||
+                        distance(spriteColor.rgb, _ExcludedColor14.rgb) < 0.05 ||
+                        distance(spriteColor.rgb, _ExcludedColor15.rgb) < 0.05 ||
+                        distance(spriteColor.rgb, _ExcludedColor16.rgb) < 0.05 ||
+                        distance(spriteColor.rgb, _ExcludedColor17.rgb) < 0.05 ||
+                        distance(spriteColor.rgb, _ExcludedColor18.rgb) < 0.05 ||
+                        distance(spriteColor.rgb, _ExcludedColor19.rgb) < 0.05 ||
+                        distance(spriteColor.rgb, _ExcludedColor20.rgb) < 0.05) {
                         excludePixel = true;
                         break;
                     }

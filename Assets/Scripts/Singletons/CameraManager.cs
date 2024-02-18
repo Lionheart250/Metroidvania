@@ -55,12 +55,43 @@ public class CameraManager : MonoBehaviour
 
 
     private void Start()
+{
+    Transform playerTransform = null;
+
+    if (PlayerController.Instance.gameObject.activeSelf)
+    {
+        playerTransform = PlayerController.Instance.transform;
+    }
+    else if (PlayerController3D.Instance.gameObject.activeSelf)
+    {
+        playerTransform = PlayerController3D.Instance.transform;
+    }
+    else
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            playerTransform = player.transform;
+        }
+        else
+        {
+            GameObject player3D = GameObject.FindGameObjectWithTag("Player3D");
+            if (player3D != null)
+            {
+                playerTransform = player3D.transform;
+            }
+        }
+    }
+
+    if (playerTransform != null)
     {
         for (int i = 0; i < allVirtualCameras.Length; i++)
         {
-            allVirtualCameras[i].Follow = PlayerController.Instance.transform;
+            allVirtualCameras[i].Follow = playerTransform;
         }
     }
+}
+
 
     public void SwapCamera(CinemachineVirtualCamera _newCam)
     {

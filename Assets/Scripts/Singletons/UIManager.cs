@@ -13,47 +13,45 @@ public class UIManager : MonoBehaviour
     public GameObject inventory;
     [SerializeField] GameObject halfMana, fullMana;
 
-
     public enum ManaState
     {
         FullMana,
         HalfMana
     }
     public ManaState manaState;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
         {
+            // If an instance already exists and it's not this one, destroy this instance
             Destroy(gameObject);
+            return;
         }
-        else
-        {
-            Instance = this;
-        }
+
+        Instance = this;
         DontDestroyOnLoad(gameObject);
 
         sceneFader = GetComponentInChildren<SceneFader>();
     }
+
     public void SwitchMana(ManaState _manaState)
     {
-        switch(_manaState)
+        switch (_manaState)
         {
             case ManaState.FullMana:
-
                 halfMana.SetActive(false);
                 fullMana.SetActive(true);
-
                 break;
 
             case ManaState.HalfMana:
-
                 fullMana.SetActive(false);
                 halfMana.SetActive(true);
-
                 break;
         }
         manaState = _manaState;
     }
+
     public IEnumerator ActivateDeathScreen()
     {
         yield return new WaitForSeconds(0.8f);
@@ -62,6 +60,7 @@ public class UIManager : MonoBehaviour
         yield return new WaitForSeconds(0.8f);
         deathScreen.SetActive(true);
     }
+
     public IEnumerator DeactivateDeathScreen()
     {
         yield return new WaitForSeconds(0.5f);
