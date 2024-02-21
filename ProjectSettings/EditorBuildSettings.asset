@@ -13,6 +13,9 @@ EditorBuildSettings:
     guid: 8c9cfa26abfee488c85f1582747f6a02
   - enabled: 1
     path: Assets/Scenes/Tutorial/Tutorial_Room_2.unity
+    guid: 2a3065cb8a9a64e63a6bccc7a53517af
+  - enabled: 1
+    path: Assets/Scenes/Tutorial/Tutorial_Room_2_oldversion.unity
     guid: 0fcf4a5aeb23749b69cb8c6ad09e38a0
   - enabled: 1
     path: Assets/Scenes/Tutorial/Tutorial_Room_3.unity

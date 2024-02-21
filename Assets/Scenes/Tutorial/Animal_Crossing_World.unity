@@ -4571,7 +4571,7 @@ PrefabInstance:
       objectReference: {fileID: 463364094}
     - target: {fileID: 6576171250640668739, guid: b9fa3b738169740e9b92a61ed3d6fa04, type: 3}
       propertyPath: transitionTo
-      value: Tutorial_Room_1
+      value: Tutorial_Room_2
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 1798673094576043321, guid: b9fa3b738169740e9b92a61ed3d6fa04, type: 3}
