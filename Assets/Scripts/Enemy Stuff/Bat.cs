@@ -18,6 +18,8 @@ public class Bat : Enemy
     [SerializeField] private Transform wallCheckTransform;
     [SerializeField] private Transform target;
     [SerializeField] private bool isChasing = false;
+    public GameObject coinPrefab;
+    public int numberOfCoins = 1;
     Path path;
     int currentWaypoint = 0;
     bool reachedEndOfPath = false;
@@ -103,7 +105,7 @@ public class Bat : Enemy
             currentWaypoint++;
         }
     }
-
+    
     
 
     protected override void UpdateEnemyStates()
@@ -113,6 +115,7 @@ public class Bat : Enemy
     switch (GetCurrentEnemyState)
     {
         case EnemyStates.Bat_Idle:
+        isChasing = false;
             if (_dist < chaseDistance)
             {
                 ChangeState(EnemyStates.Bat_Chase);
@@ -125,6 +128,7 @@ public class Bat : Enemy
 
         case EnemyStates.Bat_Stunned:
             timer += Time.deltaTime;
+            isChasing = false;
 
             if (timer > stunDuration)
             {
@@ -135,6 +139,7 @@ public class Bat : Enemy
 
         case EnemyStates.Bat_Death:
             Death(Random.Range(2, 3));
+            isChasing = false;
             break;
 
         // Add this case to set isChasing to false when not in Bat_Chase state
@@ -271,11 +276,24 @@ private void OnDrawGizmosSelected()
         }
     }
 
-    protected override void Death(float _destroyTime)
+    private bool coinsSpawned = false;
+
+protected override void Death(float _destroyTime)
+{
+    rb.gravityScale = 12;
+    base.Death(_destroyTime);
+
+    // Check if coins have already been spawned
+    if (!coinsSpawned)
     {
-        rb.gravityScale = 12;
-        base.Death(_destroyTime);
+        coinsSpawned = true;
+
+        for (int i = 0; i < numberOfCoins; i++)
+        {
+            Instantiate(coinPrefab, transform.position, Quaternion.identity);
+        }
     }
+}
 
     protected override void ChangeCurrentAnimation()
     {

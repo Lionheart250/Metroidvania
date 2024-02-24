@@ -19,6 +19,7 @@ public struct SaveData
 
     //player stuff
     public int playerHealth;
+    public int currency;
     public int playerHeartShards;
     public float playerMana;
     public int playerManaOrbs;
@@ -107,6 +108,9 @@ public struct SaveData
         {
             playerHealth = PlayerController.Instance.Health;
             writer.Write(playerHealth);
+
+            currency = CurrencyManager.Instance.currencyAmount;
+            writer.Write(currency);
 
             playerHeartShards = PlayerController.Instance.heartShards;
             writer.Write(playerHeartShards);
@@ -224,6 +228,9 @@ public struct SaveData
             using(BinaryReader reader = new BinaryReader(File.OpenRead(Application.persistentDataPath + "/save.player.data")))
             {   
                 playerHealth = reader.ReadInt32();
+                
+                currency = reader.ReadInt32();
+                CurrencyManager.Instance.currencyAmount = currency;
                 playerHeartShards = reader.ReadInt32();
 
                 int maxHealth = reader.ReadInt32();

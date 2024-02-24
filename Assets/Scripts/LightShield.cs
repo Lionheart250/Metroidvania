@@ -14,10 +14,21 @@ public class LightShield : MonoBehaviour
         Destroy(gameObject, lifetime);
     }
 
-    private void FixedUpdate()
+    private void Update()
+{
+    // Rotate the LightShield if the player is not facing right
+    if (!PlayerStateList.Instance.lookingRight)
     {
-        //transform.position += speed * transform.right;
+        transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
     }
+    else
+    {
+        transform.localRotation = Quaternion.identity;
+    }
+
+    // Move the LightShield
+    //transform.position += speed * transform.right;
+}
     //detect hit
     private void OnTriggerEnter2D(Collider2D other)
     {

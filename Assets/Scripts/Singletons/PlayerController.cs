@@ -404,12 +404,17 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
             }
         
 
-    if (isOnPlatform && platformRb != null)
+            if (isOnPlatform && platformRb != null)
+            {
+                // If on platform and not providing any input, match platform velocity
+                rb.velocity = new Vector2(walkSpeed * xAxis + platformRb.velocity.x, rb.velocity.y);
+            }
+        }
+    }
+
+    public void SetPlatformRigidbody(Rigidbody2D platformRb)
     {
-        // If on platform and not providing any input, match platform velocity
-        rb.velocity = new Vector2(walkSpeed * xAxis + platformRb.velocity.x, rb.velocity.y);
-    }
-    }
+        this.platformRb = platformRb;
     }
     private Vector2 lastInputDirection;
 
@@ -569,8 +574,8 @@ private void OnTriggerExit2D(Collider2D _other)
                 // Check if walkTimer is greater than or equal to 0.5
                 if (walkTimer >= 0.24f && rb.velocity.x != 0 && Grounded())
                 {
-                    anim.SetBool("Walking", true);
-                    anim.SetBool("Running", false);
+                    anim.SetBool("Running", true);
+                    anim.SetBool("Walking", false);
                 }
             }
             else
@@ -772,11 +777,12 @@ private void OnTriggerExit2D(Collider2D _other)
         yield return new WaitForSeconds(_delay);
         pState.cutscene = false;
     }
+    
 
     void SwapForm()
-{
-    if ((Gamepad.current?.triangleButton.wasPressedThisFrame == true || Input.GetKeyDown(KeyCode.R)) && Grounded())
     {
+    if ((Gamepad.current?.triangleButton.wasPressedThisFrame == true || Input.GetKeyDown(KeyCode.R)) && Grounded())
+        {
         // Toggle between shadow form and light form
         pState.shadowForm = !pState.shadowForm;
         pState.lightForm = !pState.shadowForm;
@@ -808,8 +814,8 @@ private void OnTriggerExit2D(Collider2D _other)
                 anim.SetBool("ShadowForm", true);
             }
         }
+        }
     }
-}
 
 
 
@@ -1461,7 +1467,7 @@ IEnumerator StopTakingDamage()
     {
         anim.SetBool("Casting", true);
         pState.casting = true;
-            
+
         yield return new WaitForSeconds(0.15f);
 
         downSpellFireball.SetActive(true);
@@ -1470,7 +1476,31 @@ IEnumerator StopTakingDamage()
         Mana -= manaSpellCost;
         manaOrbsHandler.usedMana = true;
         manaOrbsHandler.countDown = 3f;
+
         yield return new WaitForSeconds(0.35f);
+
+        // Add a loop to check if the player is grounded and end the coroutine if grounded
+        while (!Grounded())
+        {
+            yield return null; // Wait for the next frame
+            
+        }
+
+        // Set pState.casting to false when the coroutine ends
+        anim.SetBool("Casting", false);
+        pState.casting = false;
+        FreezeRigidbodyPosition();
+        lightningStrike.SetActive(true);
+        audioSource.PlayOneShot(spellCastSound);
+        yield return new WaitForSeconds(0.5f);
+               
+        anim.SetBool("Casting", false);
+        
+        lightningStrike.SetActive(false);
+        UnfreezeRigidbodyPosition();
+
+        yield return new WaitForSeconds(1.5f);
+        pState.casting = false;
         
     }
     
@@ -1651,7 +1681,7 @@ IEnumerator StopTakingDamage()
 
     if (!Grounded() && airJumpCounter < maxAirJumps && ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && !pState.lightForm))
     {
-        audioSource.PlayOneShot(jumpSound);
+        //audioSource.PlayOneShot(jumpSound);
 
         pState.jumping = true;
 

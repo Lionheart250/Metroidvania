@@ -14,12 +14,14 @@ public class MovingPlatform : MonoBehaviour
     private PlayerController playerController;
     private Rigidbody2D playerRb;
     private Vector3 moveDirection;
+    private float originalGravityScale;
 
     private void Awake()
     {
         playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         rb = GetComponent<Rigidbody2D>();
         playerRb = GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody2D>();
+        originalGravityScale = playerRb.gravityScale;
     }
 
     private void Start()
@@ -72,21 +74,23 @@ public class MovingPlatform : MonoBehaviour
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
+{
+    if (collision.CompareTag("Player") && canTrigger && !isMoving)
     {
-        if (collision.CompareTag("Player") && canTrigger && !isMoving)
-        {
-            isMoving = true;
-            canTrigger = false;
-            targetPos = (targetPos == posA.position) ? posB.position : posA.position;
-            DirectionCalculate();
+        isMoving = true;
+        canTrigger = false;
+        targetPos = (targetPos == posA.position) ? posB.position : posA.position;
+        DirectionCalculate();
 
-            UpdatePlayerState(true);
-        }
-        else
-        {
-            UpdatePlayerState(true);
-        }
+        UpdatePlayerState(true);
+        playerController.SetPlatformRigidbody(rb); // Set the platform's Rigidbody on the player
     }
+    else
+    {
+        UpdatePlayerState(true); // This line seems redundant in the 'else' block and might need reevaluation
+    }
+}
+
 
     private void OnTriggerExit2D(Collider2D collision)
     {
@@ -104,11 +108,11 @@ public class MovingPlatform : MonoBehaviour
     private void UpdatePlayerState(bool isOnPlatform)
     {
         if (playerRb != null)
-        {
-
-            playerController.isOnPlatform = isOnPlatform;
-            playerRb.gravityScale = isOnPlatform ? playerRb.gravityScale * 8 : playerRb.gravityScale / 8;
-        }
+    {
+        playerController.isOnPlatform = isOnPlatform;
+        // Use the originalGravityScale for calculations
+        //playerRb.gravityScale = isOnPlatform ? originalGravityScale * 8 : originalGravityScale;
+    }
     }
 }
 

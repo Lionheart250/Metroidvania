@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    public string transitionedFromScene;
+    public static GameManager Instance { get; private set; }
 
     public Vector2 platformingRespawnPoint;
     public Vector2 respawnPoint;
@@ -18,72 +18,79 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float fadeTime;
     public bool gameIsPaused;
 
-    public static GameManager Instance { get; private set; }
+    // Added field for storing the previously transitioned from scene
+    public string transitionedFromScene;
+
     private void Awake()
     {
-        SaveData.Instance.Initialize();
-        
-        if(Instance != null && Instance != this)
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
-        }
-        else
-        {
-            Instance = this;
+            return;
         }
 
-        if(PlayerController.Instance != null)
-        {
-            if(PlayerController.Instance.halfMana)
-            {
-                SaveData.Instance.LoadShadeData();
-                if(SaveData.Instance.sceneWithShade == SceneManager.GetActiveScene().name || SaveData.Instance.sceneWithShade == "")
-                {
-                    Instantiate(shade, SaveData.Instance.shadePos, SaveData.Instance.shadeRot);
-                }
-            }
-        }
-        
-        SaveScene();
-        
+        Instance = this;
         DontDestroyOnLoad(gameObject);
 
-            
+        SaveData.Instance.Initialize();
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Store the previously transitioned from scene
+        transitionedFromScene = scene.name;
+
+        SaveScene(scene.name);
+
+        if (PlayerController.Instance != null && PlayerController.Instance.halfMana)
+        {
+            SaveData.Instance.LoadShadeData();
+            if (SaveData.Instance.sceneWithShade == scene.name || SaveData.Instance.sceneWithShade == "")
+            {
+                Instantiate(shade, SaveData.Instance.shadePos, SaveData.Instance.shadeRot);
+            }
+        }
+
         bench = FindObjectOfType<Bench>();
     }
+
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.P))
+        if (Input.GetKeyDown(KeyCode.P))
         {
             SaveData.Instance.SavePlayerData();
         }
 
-        if(Input.GetKeyDown(KeyCode.Escape) && !gameIsPaused)
+        if (Input.GetKeyDown(KeyCode.Escape) && !gameIsPaused)
         {
             pauseMenu.FadeUIIn(fadeTime);
-            Time.timeScale = 0;
+            FreezeTime();
             gameIsPaused = true;
         }
     }
+
     public void UnpauseGame()
     {
-        Time.timeScale = 1;
+        UnFreezeTime();
         gameIsPaused = false;
     }
-    public void SaveScene()
+
+    public void SaveScene(string sceneName)
     {
-        string currentSceneName = SceneManager.GetActiveScene().name;
-        SaveData.Instance.sceneNames.Add(currentSceneName);
+        SaveData.Instance.sceneNames.Add(sceneName);
     }
+
     public void RespawnPlayer()
     {
         SaveData.Instance.LoadBench();
-        if(SaveData.Instance.benchSceneName != null) //load the bench's scene if it exists.
+        if (!string.IsNullOrEmpty(SaveData.Instance.benchSceneName))
         {
             SceneManager.LoadScene(SaveData.Instance.benchSceneName);
         }
 
-        if(SaveData.Instance.benchPos != null) //set the respawn point to the bench's position.
+        if (SaveData.Instance.benchPos != null)
         {
             respawnPoint = SaveData.Instance.benchPos;
         }
@@ -94,19 +101,16 @@ public class GameManager : MonoBehaviour
         StartCoroutine(UIManager.Instance.DeactivateDeathScreen());
         PlayerController.Instance.transform.position = respawnPoint;
 
-        
         PlayerController.Instance.Respawned();
     }
 
     public void FreezeTime()
     {
-        Time.timeScale = 0;    
+        Time.timeScale = 0;
     }
 
     public void UnFreezeTime()
     {
-        Time.timeScale = 1;    
+        Time.timeScale = 1;
     }
-
-   
 }
