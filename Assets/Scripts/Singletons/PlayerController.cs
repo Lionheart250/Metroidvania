@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float jumpForce = 45f; //sets how hight the player can jump
     [SerializeField] private float lightJumpForce = 60f; 
     private int jumpBufferCounter = 0; //stores the jump button input
+    private int lightJumpBufferCounter = 0;
     [SerializeField] private int jumpBufferFrames; //sets the max amount of frames the jump buffer input is stored
     [SerializeField] private int lightJumpBufferFrames;
 
@@ -174,6 +175,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Camera Stuff")]
     [SerializeField] private float playerFallSpeedThreshold = -10;
+    
     [Space(5)]
 
     [Header("Audio")]
@@ -215,7 +217,7 @@ public class PlayerController : MonoBehaviour
     private bool landingSoundPlayed;
 
 
-    public static PlayerController Instance;
+    public static PlayerController Instance { get; private set; }
 
     //unlocking 
     public bool unlockedWallJump;
@@ -252,7 +254,7 @@ public class PlayerController : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-    }
+        }
     }
 
     // Start is called before the first frame update
@@ -295,26 +297,26 @@ public class PlayerController : MonoBehaviour
 
     // Update is called once per frame
     private void OnDrawGizmos()
-{
-    DrawGizmo(SideAttackTransform, SideAttackArea, Color.red);
-    DrawGizmo(ChargeAttackTransform, ChargeAttackArea, Color.red);
-    DrawGizmo(UpAttackTransform, UpAttackArea, Color.red);
-    DrawGizmo(DownAttackTransform, DownAttackArea, Color.red);
+    {
+        DrawGizmo(SideAttackTransform, SideAttackArea, Color.red);
+        DrawGizmo(ChargeAttackTransform, ChargeAttackArea, Color.red);
+        DrawGizmo(UpAttackTransform, UpAttackArea, Color.red);
+        DrawGizmo(DownAttackTransform, DownAttackArea, Color.red);
     
-    // Draw shadow gizmos in a different color (e.g., blue)
-    DrawGizmo(ShadowSideAttackTransform, ShadowSideAttackArea, Color.blue);
-    DrawGizmo(ShadowUpAttackTransform, ShadowUpAttackArea, Color.blue);
-    DrawGizmo(ShadowDownAttackTransform, ShadowDownAttackArea, Color.blue);
+        // Draw shadow gizmos in a different color (e.g., blue)
+        DrawGizmo(ShadowSideAttackTransform, ShadowSideAttackArea, Color.blue);
+        DrawGizmo(ShadowUpAttackTransform, ShadowUpAttackArea, Color.blue);
+        DrawGizmo(ShadowDownAttackTransform, ShadowDownAttackArea, Color.blue);
     
-    Gizmos.color = Color.red; // Reset color for the remaining gizmos
-    Gizmos.DrawWireSphere(LightJumpTransform.position, Mathf.Max(LightJumpArea.x, LightJumpArea.y) * 0.5f);
-}
+        Gizmos.color = Color.red; // Reset color for the remaining gizmos
+        Gizmos.DrawWireSphere(LightJumpTransform.position, Mathf.Max(LightJumpArea.x, LightJumpArea.y) * 0.5f);
+    }
 
-private void DrawGizmo(Transform transform, Vector3 area, Color color)
-{
-    Gizmos.color = color;
-    Gizmos.DrawWireCube(transform.position, area);
-}
+    private void DrawGizmo(Transform transform, Vector3 area, Color color)
+    {   
+        Gizmos.color = color;
+        Gizmos.DrawWireCube(transform.position, area);
+    }
 
     void Update()
     {
@@ -430,7 +432,7 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
         {
             _other.GetComponent<Enemy>().EnemyGetsHit(spellDamage, (_other.transform.position - transform.position).normalized, recoilYSpeed);
         }
-        if (_other.GetComponent<Enemy>() != null && pState.lightJumping)
+        if ((_other.GetComponent<Enemy>() != null || _other.GetComponent<IllusionaryWall>() != null) && pState.lightJumping)
         {
             int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
             Vector2 hitDirection = new Vector2(_recoilLeftOrRight, -1);
@@ -444,7 +446,7 @@ private void DrawGizmo(Transform transform, Vector3 area, Color color)
     
             rb.velocity = oppositeDirection * (lightJumpForce * 0.5f);
         }
-}
+    }
 
 private void OnTriggerExit2D(Collider2D _other)
 {
@@ -455,32 +457,32 @@ private void OnTriggerExit2D(Collider2D _other)
         // Coroutine should only run when puddleForm toggles from true to false
         StartCoroutine(ShadowDashSequenceExitLongPuddle());
     }
-}
+    }
 
     void ToggleMainColliderOn()
     {
-    mainCollider.enabled = true;
+        mainCollider.enabled = true;
 
-    Debug.Log("Main collider is now enabled.");
+        Debug.Log("Main collider is now enabled.");
     }
 
     void ToggleMainColliderOff()
     {
-    mainCollider.enabled = false;
+        mainCollider.enabled = false;
 
-    Debug.Log("Main collider is now disabled.");
+        Debug.Log("Main collider is now disabled.");
     }
 
 
 
     void GetInputs()
     {
-       xAxis = Input.GetAxisRaw("Horizontal");
-       yAxis = Input.GetAxisRaw("Vertical");
-       attack = Input.GetButtonDown("Attack");
-       blackShield = Input.GetButtonDown("Shield");
-       openMap = Input.GetButton("Map");
-       openInventory = Input.GetButton("Inventory");
+        xAxis = Input.GetAxisRaw("Horizontal");
+        yAxis = Input.GetAxisRaw("Vertical");
+        attack = Input.GetButtonDown("Attack");
+        blackShield = Input.GetButtonDown("Shield");
+        openMap = Input.GetButton("Map");
+        openInventory = Input.GetButton("Inventory");
         if (Input.GetButton("Cast/Heal"))
         {
             castOrHealTimer += Time.deltaTime;
@@ -494,16 +496,18 @@ private void OnTriggerExit2D(Collider2D _other)
         }
         
     }
+
+    private RigidbodyConstraints2D savedPositionConstraints;
     void FreezeRigidbodyPosition()
     {
         savedPositionConstraints = rb.constraints;
-        rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY;
+        rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
     }
 
     void UnfreezeRigidbodyPosition()
     {
-        rb.constraints = RigidbodyConstraints2D.FreezeRotation;;
-    }    
+        rb.constraints = savedPositionConstraints | RigidbodyConstraints2D.FreezeRotation;
+    }
 
     void ToggleMap()
     {
@@ -530,15 +534,27 @@ private void OnTriggerExit2D(Collider2D _other)
     }
     
 
+    public delegate void PlayerFlippedEvent(Vector3 targetOffset);
+    public static event PlayerFlippedEvent OnPlayerFlipped;
+    public Vector3 TargetOffset { get; private set; }
+
     void Flip()
 {
+    float targetOffset = CameraManager.Instance.xOffset;
+
     if (xAxis < 0)
     {
         if (pState.lookingRight || !pState.lookingRight)
         {
             transform.eulerAngles = new Vector2(0, 180);
-            //transform.localScale = new Vector3(1, 1, 1);
             pState.lookingRight = false;
+            
+            // Check if the camera is not panning before starting the camera offset lerp
+            if (!CameraManager.Instance.IsPanning)
+            {
+                StartCoroutine(CameraManager.Instance.LerpCameraOffset(new Vector3(targetOffset, 0, 0)));
+                OnPlayerFlipped?.Invoke(new Vector3(targetOffset, 0, 0));
+            }
         }
     }
     else if (xAxis > 0)
@@ -546,13 +562,21 @@ private void OnTriggerExit2D(Collider2D _other)
         if (!pState.lookingRight)
         {
             transform.eulerAngles = new Vector2(0, 0);
-           // transform.localScale = new Vector3(-1, 1, 1);
             pState.lookingRight = true;
+            // Check if the camera is not panning before starting the camera offset lerp
+            if (!CameraManager.Instance.IsPanning)
+            {
+                StartCoroutine(CameraManager.Instance.LerpCameraOffset(new Vector3(targetOffset, 0, 0)));
+                OnPlayerFlipped?.Invoke(new Vector3(targetOffset, 0, 0));
+            }
         }
     }
 }
 
-   private float walkTimer = 0f;
+
+
+
+    private float walkTimer = 0f;
     private float maxWalkTimer = 1f;
 
     private void Move()
@@ -596,16 +620,15 @@ private void OnTriggerExit2D(Collider2D _other)
         //if falling past a certain speed threshold
         if (rb.velocity.y < playerFallSpeedThreshold && !CameraManager.Instance.isLerpingYDamping && !CameraManager.Instance.hasLerpedYDamping)
         {
-            StartCoroutine(CameraManager.Instance.LerpYDamping(true));
+            StartCoroutine(CameraManager.Instance.LerpYDamping(true)); // Correct
         }
         //if standing stil or moving up
         if(rb.velocity.y >= 0 && !CameraManager.Instance.isLerpingYDamping && CameraManager.Instance.hasLerpedYDamping)
         {
             //reset camera function
             CameraManager.Instance.hasLerpedYDamping = false;
-            StartCoroutine(CameraManager.Instance.LerpYDamping(false));
+            StartCoroutine(CameraManager.Instance.LerpYDamping(false)); // Correct
         }
-
     }
 
     void StartDash()
@@ -697,24 +720,24 @@ private void OnTriggerExit2D(Collider2D _other)
         walkSpeed = 40f;
         ToggleMainColliderOff();
     
-    // Wait for a set amount of time (adjust the time according to your needs)
+        // Wait for a set amount of time (adjust the time according to your needs)
         yield return new WaitForSeconds(1f);
         if (!pState.puddleForm)
         {
-    // Call EndShadowDash after the delay
-        isShadowDashing = false;
+            // Call EndShadowDash after the delay
+            isShadowDashing = false;
     
-        ToggleMainColliderOn();
-        walkSpeed = 50f;
-        puddleFormCollider.SetActive(false);
-        sr.enabled = true;
-        spriteColor.a = originalColor.a;  // Use the original alpha value
-        sr.color = spriteColor;
+            ToggleMainColliderOn();
+            walkSpeed = 50f;
+            puddleFormCollider.SetActive(false);
+            sr.enabled = true;
+            spriteColor.a = originalColor.a;  // Use the original alpha value
+            sr.color = spriteColor;
 
-        Debug.Log("EndShadowDash called.");
+            Debug.Log("EndShadowDash called.");
 
-        yield return new WaitForSeconds(1f);
-        canStartShadowDash = true;
+            yield return new WaitForSeconds(1f);
+            canStartShadowDash = true;
         }
     }  
  
@@ -722,15 +745,15 @@ private void OnTriggerExit2D(Collider2D _other)
     {   
         if ((Input.GetButtonUp("Dash") || (Gamepad.current?.rightTrigger.wasReleasedThisFrame == true)) && pState.shadowForm && isShadowDashing && !pState.puddleForm)
         {
-        isShadowDashing = false;
-        ToggleMainColliderOn();
-        walkSpeed = 50f;
-        puddleFormCollider.SetActive(false);
-        sr.enabled = true;
-        Color spriteColor = sr.color;
-        spriteColor.a = originalColor.a;  // Use the original alpha value
+            isShadowDashing = false;
+            ToggleMainColliderOn();
+            walkSpeed = 50f;
+            puddleFormCollider.SetActive(false);
+            sr.enabled = true;
+            Color spriteColor = sr.color;
+            spriteColor.a = originalColor.a;  // Use the original alpha value
 
-        StartCoroutine(ShadowDashSequenceExitLongPuddle());
+            StartCoroutine(ShadowDashSequenceExitLongPuddle());
         
 
         }
@@ -781,39 +804,39 @@ private void OnTriggerExit2D(Collider2D _other)
 
     void SwapForm()
     {
-    if ((Gamepad.current?.triangleButton.wasPressedThisFrame == true || Input.GetKeyDown(KeyCode.R)) && Grounded())
+        if ((Gamepad.current?.triangleButton.wasPressedThisFrame == true || Input.GetKeyDown(KeyCode.R)) && Grounded())
         {
-        // Toggle between shadow form and light form
-        pState.shadowForm = !pState.shadowForm;
-        pState.lightForm = !pState.shadowForm;
+            // Toggle between shadow form and light form
+            pState.shadowForm = !pState.shadowForm;
+            pState.lightForm = !pState.shadowForm;
 
-        // Ensure sr is not null
-        if (sr != null)
-        {
-            // Set the color based on the current form
-            //sr.color = pState.shadowForm ? Color.black : Color.white;
+            // Ensure sr is not null
+            if (sr != null)
+            {
+                // Set the color based on the current form
+                //sr.color = pState.shadowForm ? Color.black : Color.white;
 
-            // Modify walkSpeed and gravity based on the current form
-            if (pState.lightForm)
-            {   
-                anim.SetBool("ShadowForm", false);
-                // Adjust parameters for light form
-                walkSpeed = 60f; // Increase walkSpeed by 35%
-                fallGravityMultiplier = originalFallGravityMultiplier * 1.5f;
-                maxFallingSpeed = 150;
-                anim.SetBool("LightForm", true);
+                // Modify walkSpeed and gravity based on the current form
+                if (pState.lightForm)
+                {   
+                    anim.SetBool("ShadowForm", false);
+                    // Adjust parameters for light form
+                    walkSpeed = 60f; // Increase walkSpeed by 35%
+                    fallGravityMultiplier = originalFallGravityMultiplier * 1.5f;
+                    maxFallingSpeed = 150;
+                    anim.SetBool("LightForm", true);
+                }
+                else if (pState.shadowForm)
+                {   
+                    anim.SetBool("LightForm", false);
+                    // Adjust parameters for shadow form
+                    // Reset to original walkSpeed if not in light form
+                    walkSpeed = 50f;
+                    fallGravityMultiplier = originalFallGravityMultiplier * 1.5f;
+                    maxFallingSpeed = 100;
+                    anim.SetBool("ShadowForm", true);
+                }
             }
-            else if (pState.shadowForm)
-            {   
-                anim.SetBool("LightForm", false);
-                // Adjust parameters for shadow form
-                // Reset to original walkSpeed if not in light form
-                walkSpeed = 50f;
-                fallGravityMultiplier = originalFallGravityMultiplier * 1.5f;
-                maxFallingSpeed = 100;
-                anim.SetBool("ShadowForm", true);
-            }
-        }
         }
     }
 
@@ -822,128 +845,128 @@ private void OnTriggerExit2D(Collider2D _other)
 
 
     void Attack()
-{
-    timeSinceAttck += Time.deltaTime;
-
-    if ((attack || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && timeSinceAttck >= timeBetweenAttack && !pState.shadowForm)
     {
-        timeSinceAttck = 0;
-        anim.SetTrigger("Attacking");
-        audioSource.PlayOneShot(dashAndAttackSound);
+        timeSinceAttck += Time.deltaTime;
 
-        // Handle different attack types based on input and conditions
-        if (yAxis == 0 || (yAxis < 0 && Grounded()) && !pState.shadowForm)
+        if ((attack || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && timeSinceAttck >= timeBetweenAttack && !pState.shadowForm)
         {
-            int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
+            timeSinceAttck = 0;
+            anim.SetTrigger("Attacking");
+            audioSource.PlayOneShot(dashAndAttackSound);
 
-            // Handle regular attack
-            Hit(SideAttackTransform, SideAttackArea, ref pState.recoilingX, Vector2.right * _recoilLeftOrRight, recoilXSpeed);
-            Instantiate(slashEffect, SideAttackTransform);
-        }
-        else if (yAxis > 0 && !pState.shadowForm)
-        {
-            // Handle up attack
-            Hit(UpAttackTransform, UpAttackArea, ref pState.recoilingY, Vector2.up, recoilYSpeed);
-            SlashEffectAtAngle(slashEffect, 80, UpAttackTransform);
-        }
-        else if (yAxis < 0 && !Grounded() && !pState.shadowForm)
-        {
+            // Handle different attack types based on input and conditions
+            if (yAxis == 0 || (yAxis < 0 && Grounded()) && !pState.shadowForm)
+            {
+                int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
+
+                // Handle regular attack
+                Hit(SideAttackTransform, SideAttackArea, ref pState.recoilingX, Vector2.right * _recoilLeftOrRight, recoilXSpeed);
+                Instantiate(slashEffect, SideAttackTransform);
+            }
+            else if (yAxis > 0 && !pState.shadowForm)
+            {
+                // Handle up attack
+                Hit(UpAttackTransform, UpAttackArea, ref pState.recoilingY, Vector2.up, recoilYSpeed);
+                SlashEffectAtAngle(slashEffect, 80, UpAttackTransform);
+            }
+            else if (yAxis < 0 && !Grounded() && !pState.shadowForm)
+            {
             
-            // Handle down attack
-            Hit(DownAttackTransform, DownAttackArea, ref pState.recoilingY, Vector2.down, recoilYSpeed);
-            SlashEffectAtAngle(slashEffect, -90, DownAttackTransform);
+                // Handle down attack
+                Hit(DownAttackTransform, DownAttackArea, ref pState.recoilingY, Vector2.down, recoilYSpeed);
+                SlashEffectAtAngle(slashEffect, -90, DownAttackTransform);
+            }
         }
-    }
 
-    if ((Input.GetButton("Attack") || (Gamepad.current?.squareButton.isPressed == true)) && chargeTime <= 2 && !pState.shadowForm)
-    {
-        chargeTime += Time.deltaTime * chargeSpeed;
-        chargeTime = Mathf.Clamp(chargeTime, 0f, 2f);
-
-        GameObject _chargeParticles = Instantiate(chargeParticles, transform.position, Quaternion.identity);
-
-        if (chargeTime >= 2f)
+        if ((Input.GetButton("Attack") || (Gamepad.current?.squareButton.isPressed == true)) && chargeTime <= 2 && !pState.shadowForm)
         {
-            // Double the size
-            Vector3 newScale = _chargeParticles.transform.localScale * 2f;
-            _chargeParticles.transform.localScale = newScale;
+            chargeTime += Time.deltaTime * chargeSpeed;
+            chargeTime = Mathf.Clamp(chargeTime, 0f, 2f);
+
+            GameObject _chargeParticles = Instantiate(chargeParticles, transform.position, Quaternion.identity);
+
+            if (chargeTime >= 2f)
+            {
+                // Double the size
+                Vector3 newScale = _chargeParticles.transform.localScale * 2f;
+                _chargeParticles.transform.localScale = newScale;
+            }
+
+            Destroy(_chargeParticles, 0.05f);
         }
-
-        Destroy(_chargeParticles, 0.05f);
-    }
-    else if ((Input.GetButtonDown("Attack") || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && !pState.shadowForm)
-    {
-        // If the attack button is pressed, but not held, reset chargeTime
-        chargeTime = 0;
-    }
-
-    if ((Input.GetButtonUp("Attack") || (Gamepad.current?.squareButton.wasReleasedThisFrame == true)) && chargeTime < 2 && !pState.shadowForm)
-    {
-        chargeTime = 0;
-    }
-    else if ((Input.GetButtonUp("Attack") || (Gamepad.current?.squareButton.wasReleasedThisFrame == true)) && chargeTime >= 2 && !pState.shadowForm)
-    {
-        audioSource.PlayOneShot(dashAndAttackSound);
-        // Release charge if the button is released and charging duration is sufficient
-        ReleaseCharge();
-    }
-}
-
-
-void ShadowAttack()
-{
-    if ((attack || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && timeSinceAttck >= timeBetweenAttack && pState.shadowForm)
-    {
-        timeSinceAttck = 0;
-        anim.SetTrigger("Attacking");
-        audioSource.PlayOneShot(dashAndAttackSound);
-
-        // Handle different attack types based on input and conditions
-        if (yAxis == 0 || (yAxis < 0 && Grounded()) && !pState.lightForm)
+        else if ((Input.GetButtonDown("Attack") || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && !pState.shadowForm)
         {
-            int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
+            // If the attack button is pressed, but not held, reset chargeTime
+            chargeTime = 0;
+        }
 
-            ShadowHit(ShadowSideAttackTransform, ShadowSideAttackArea, ref pState.recoilingX, Vector2.right * _recoilLeftOrRight, recoilXSpeed);
-            Instantiate(chargeSlashEffect, ShadowSideAttackTransform);
-        }
-        else if (yAxis > 0 && pState.shadowForm)
+        if ((Input.GetButtonUp("Attack") || (Gamepad.current?.squareButton.wasReleasedThisFrame == true)) && chargeTime < 2 && !pState.shadowForm)
         {
-            // Handle up attack
-            ShadowHit(ShadowUpAttackTransform, ShadowUpAttackArea, ref pState.recoilingY, Vector2.up, recoilYSpeed);
-            SlashEffectAtAngle(chargeSlashEffect, 80, ShadowUpAttackTransform);
+            chargeTime = 0;
         }
-        else if (yAxis < 0 && !Grounded() && pState.shadowForm)
+        else if ((Input.GetButtonUp("Attack") || (Gamepad.current?.squareButton.wasReleasedThisFrame == true)) && chargeTime >= 2 && !pState.shadowForm)
         {
-            // Handle down attack
-            ShadowHit(ShadowDownAttackTransform, ShadowDownAttackArea, ref pState.recoilingY, Vector2.down, recoilYSpeed);
-            SlashEffectAtAngle(chargeSlashEffect, -90, ShadowDownAttackTransform);
+            audioSource.PlayOneShot(dashAndAttackSound);
+            // Release charge if the button is released and charging duration is sufficient
+            ReleaseCharge();
+        }
+    }       
+
+
+    void ShadowAttack()
+    {
+        if ((attack || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && timeSinceAttck >= timeBetweenAttack && pState.shadowForm)
+        {
+            timeSinceAttck = 0;
+            anim.SetTrigger("Attacking");
+            audioSource.PlayOneShot(dashAndAttackSound);
+
+            // Handle different attack types based on input and conditions
+            if (yAxis == 0 || (yAxis < 0 && Grounded()) && !pState.lightForm)
+            {
+                int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
+
+                ShadowHit(ShadowSideAttackTransform, ShadowSideAttackArea, ref pState.recoilingX, Vector2.right * _recoilLeftOrRight, recoilXSpeed);
+                Instantiate(chargeSlashEffect, ShadowSideAttackTransform);
+            }
+            else if (yAxis > 0 && pState.shadowForm)
+            {
+                // Handle up attack
+                ShadowHit(ShadowUpAttackTransform, ShadowUpAttackArea, ref pState.recoilingY, Vector2.up, recoilYSpeed);
+                SlashEffectAtAngle(chargeSlashEffect, 80, ShadowUpAttackTransform);
+            }
+            else if (yAxis < 0 && !Grounded() && pState.shadowForm)
+            {
+                // Handle down attack
+                ShadowHit(ShadowDownAttackTransform, ShadowDownAttackArea, ref pState.recoilingY, Vector2.down, recoilYSpeed);
+                SlashEffectAtAngle(chargeSlashEffect, -90, ShadowDownAttackTransform);
+            }
         }
     }
-}
 
     void ReleaseCharge()
-{
-    int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
-
-    // Manually set the damage value
-    int customDamage = 5; // Replace 20 with your desired damage value
-
-    Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(ChargeAttackTransform.position, ChargeAttackArea, 0, attackableLayer);
-
-    if (objectsToHit.Length > 0)
     {
-        pState.recoilingX = true;
-        dashed = false;
-    }
+        int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
 
-    for (int i = 0; i < objectsToHit.Length; i++)
-    {
-        if (objectsToHit[i].GetComponent<Enemy>() != null)
+        // Manually set the damage value
+        int customDamage = 5; // Replace 20 with your desired damage value
+
+        Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(ChargeAttackTransform.position, ChargeAttackArea, 0, attackableLayer);
+
+        if (objectsToHit.Length > 0)
         {
-            // Pass the custom damage to the EnemyGetsHit method
-            objectsToHit[i].GetComponent<Enemy>().EnemyGetsHit(customDamage, Vector2.right * _recoilLeftOrRight, recoilXSpeed);
+            pState.recoilingX = true;
+            dashed = false;
+        }
 
-            if (objectsToHit[i].CompareTag("Enemy"))
+        for (int i = 0; i < objectsToHit.Length; i++)
+        {
+            if (objectsToHit[i].GetComponent<Enemy>() != null)
+            {
+                // Pass the custom damage to the EnemyGetsHit method
+                objectsToHit[i].GetComponent<Enemy>().EnemyGetsHit(customDamage, Vector2.right * _recoilLeftOrRight, recoilXSpeed);
+
+                if (objectsToHit[i].CompareTag("Enemy"))
                 {
                     if(Mana < 1)
                     {
@@ -956,53 +979,53 @@ void ShadowAttack()
                     }
                                         
                 }
+            }
         }
-    }
     
-    Instantiate(chargeSlashEffect, ChargeAttackTransform);
-    chargeTime = 0;
-    // Add code for the actual attack logic here
-    Debug.Log("Charge Released");
-}
+        Instantiate(chargeSlashEffect, ChargeAttackTransform);
+        chargeTime = 0;
+        // Add code for the actual attack logic here
+        Debug.Log("Charge Released");
+    }
 
 
     void Hit(Transform _attackTransform, Vector2 _attackArea, ref bool _recoilBool, Vector2 _recoilDir, float _recoilStrength)
-{
-    Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
-
-    if (objectsToHit.Length > 0)
     {
-        _recoilBool = true;
-        dashed = false;
-    }
+        Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
 
-    for (int i = 0; i < objectsToHit.Length; i++)
-    {
-        if (objectsToHit[i].CompareTag("Enemy"))
+        if (objectsToHit.Length > 0)
         {
-            if (objectsToHit[i].GetComponent<Enemy>() != null)
-            {
-                objectsToHit[i].GetComponent<Enemy>().EnemyGetsHit(damage, _recoilDir, _recoilStrength);
-            }
-            if (Mana < 1)
-            {
-                Mana += manaGain;
-            }
-
-            if (Mana >= 1 || (halfMana && Mana >= 0.5))
-            {
-                manaOrbsHandler.UpdateMana(manaGain * 3);
-            }
+            _recoilBool = true;
+            dashed = false;
         }
-         if (objectsToHit[i].CompareTag("Illusion"))
+
+        for (int i = 0; i < objectsToHit.Length; i++)
+        {
+            if (objectsToHit[i].CompareTag("Enemy"))
+            {
+                if (objectsToHit[i].GetComponent<Enemy>() != null)
+                {
+                    objectsToHit[i].GetComponent<Enemy>().EnemyGetsHit(damage, _recoilDir, _recoilStrength);
+                }
+                if (Mana < 1)
+                {
+                    Mana += manaGain;
+                }
+
+                if (Mana >= 1 || (halfMana && Mana >= 0.5))
+                {
+                    manaOrbsHandler.UpdateMana(manaGain * 3);
+                }
+            }
+            if (objectsToHit[i].CompareTag("Illusion"))
             {
                 // Destroy the illusionary wall when hit
                 Destroy(objectsToHit[i].gameObject);
             }
-    }
+        }
 
-    transform.position += new Vector3(_recoilDir.x * _recoilStrength * Time.deltaTime, _recoilDir.y * _recoilStrength * Time.deltaTime, 0f);
-}
+        transform.position += new Vector3(_recoilDir.x * _recoilStrength * Time.deltaTime, _recoilDir.y * _recoilStrength * Time.deltaTime, 0f);
+    }
 
     
 
@@ -1028,15 +1051,15 @@ void ShadowAttack()
     }
 
     void SlashEffectAtAngle(GameObject _slashEffect, int _effectAngle, Transform _attackTransform)
-{
-    _slashEffect = Instantiate(_slashEffect, _attackTransform);
+    {
+        _slashEffect = Instantiate(_slashEffect, _attackTransform);
 
-    // Flip the instantiated slash effect based on player direction
-    _slashEffect.transform.localScale = new Vector3(1, pState.lookingRight ? 1 : -1, 1);
+        // Flip the instantiated slash effect based on player direction
+        _slashEffect.transform.localScale = new Vector3(1, pState.lookingRight ? 1 : -1, 1);
 
-    // Set the angle of the slash effect
-    _slashEffect.transform.eulerAngles = new Vector3(0, 0, _effectAngle);
-}
+        // Set the angle of the slash effect
+        _slashEffect.transform.eulerAngles = new Vector3(0, 0, _effectAngle);
+    }
 
     void ShadowSlashEffectAtAngle(GameObject _slashEffect, int _effectAngle, Transform _attackTransform)
     {
@@ -1113,37 +1136,37 @@ void ShadowAttack()
     }
 
     public void TakeDamage(float _damage) 
-{   
-    if(pState.alive && !pState.dodging && !pState.lightJumping)
+    {   
+        if(pState.alive && !pState.dodging && !pState.lightJumping)
+        {
+            audioSource.PlayOneShot(hurtSound);
+
+            Health -= Mathf.RoundToInt(_damage);
+            Debug.Log("Player Health: " + Health); // Add this debug log
+            if (Health <= 0)
+            {
+                Health = 0;
+                StartCoroutine(Death());
+            }
+            else if(!pState.dodging)
+            {
+                StartCoroutine(StopTakingDamage());
+            }
+            }
+}
+
+    IEnumerator StopTakingDamage()
     {
-        audioSource.PlayOneShot(hurtSound);
-
-        Health -= Mathf.RoundToInt(_damage);
-        Debug.Log("Player Health: " + Health); // Add this debug log
-        if (Health <= 0)
-        {
-            Health = 0;
-            StartCoroutine(Death());
-        }
-        else if(!pState.dodging)
-        {
-            StartCoroutine(StopTakingDamage());
-        }
+        pState.invincible = true;
+        Debug.Log("Player is invincible"); // Add this debug log
+        GameObject _bloodSpurtParticles = Instantiate(bloodSpurt, transform.position, Quaternion.identity);
+        Destroy(_bloodSpurtParticles, 1.5f);
+        anim.SetTrigger("TakeDamage");
+        Debug.Log("Triggered TakeDamage animation"); // Add this debug log
+        yield return new WaitForSeconds(1f);
+        pState.invincible = false;
+        Debug.Log("Player is no longer invincible"); // Add this debug log
     }
-}
-
-IEnumerator StopTakingDamage()
-{
-    pState.invincible = true;
-    Debug.Log("Player is invincible"); // Add this debug log
-    GameObject _bloodSpurtParticles = Instantiate(bloodSpurt, transform.position, Quaternion.identity);
-    Destroy(_bloodSpurtParticles, 1.5f);
-    anim.SetTrigger("TakeDamage");
-    Debug.Log("Triggered TakeDamage animation"); // Add this debug log
-    yield return new WaitForSeconds(1f);
-    pState.invincible = false;
-    Debug.Log("Player is no longer invincible"); // Add this debug log
-}
 
 
     IEnumerator Flash()
@@ -1258,23 +1281,23 @@ IEnumerator StopTakingDamage()
         UIManager.Instance.SwitchMana(UIManager.ManaState.FullMana);
     }
 
-   void Heal()
+    void Heal()
     {
-     if (Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == true))
-    {
-        //Debug.Log("castOrHealTimer: " + castOrHealTimer);
-        castOrHealTimer = Mathf.Clamp(castOrHealTimer, 0f, 1.0f);
+        if (Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == true))
+        {
+             //Debug.Log("castOrHealTimer: " + castOrHealTimer);
+            castOrHealTimer = Mathf.Clamp(castOrHealTimer, 0f, 1.0f);
        
-    }
-    else
-    {
-        //Debug.Log("castOrHealTimer: " + castOrHealTimer);
-        // Decrease the timer when the button is not held down
-        castOrHealTimer -= Time.deltaTime;
-        castOrHealTimer = Mathf.Clamp(castOrHealTimer, 0f, 1.0f);
-    }
-    if ((Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == true)) && castOrHealTimer > 0.5f && Health < maxHealth && Mana > 0 && !pState.jumping && !pState.dashing)
-    {
+        }
+        else
+        {
+            //Debug.Log("castOrHealTimer: " + castOrHealTimer);
+            // Decrease the timer when the button is not held down
+            castOrHealTimer -= Time.deltaTime;
+            castOrHealTimer = Mathf.Clamp(castOrHealTimer, 0f, 1.0f);
+        }
+        if ((Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == true)) && castOrHealTimer > 0.5f && Health < maxHealth && Mana > 0 && !pState.jumping && !pState.dashing)
+        {
             pState.healing = true;
             anim.SetBool("Healing", true);
 
@@ -1379,28 +1402,28 @@ IEnumerator StopTakingDamage()
     }
     IEnumerator LightDartCoroutine()
     {   
-    if (yAxis == 0 && unlockedSideCast)
-    {
-        pState.casting = true;
-        anim.SetBool("Casting", true);
-        GameObject _lightDart = Instantiate(lightningDart, SideAttackTransform.position, Quaternion.identity);
-        timeSinceCast = 1;
-        audioSource.PlayOneShot(spellCastSound);
+        if (yAxis == 0 && unlockedSideCast)
+        {
+            pState.casting = true;
+            anim.SetBool("Casting", true);
+            GameObject _lightDart = Instantiate(lightningDart, SideAttackTransform.position, Quaternion.identity);
+            timeSinceCast = 1;
+            audioSource.PlayOneShot(spellCastSound);
 
     
-        // Flip fireball based on the player's facing direction
-        if (pState.lookingRight)
-        {
-            _lightDart.transform.eulerAngles = Vector3.zero;
-        }
-        else
-        {
-            _lightDart.transform.eulerAngles = new Vector2(_lightDart.transform.eulerAngles.x, 180); 
-        }
+            // Flip fireball based on the player's facing direction
+            if (pState.lookingRight)
+            {
+                _lightDart.transform.eulerAngles = Vector3.zero;
+            }
+            else
+            {
+                _lightDart.transform.eulerAngles = new Vector2(_lightDart.transform.eulerAngles.x, 180); 
+            }
         
-            Mana -= manaSpellCost / 3f;
-            manaOrbsHandler.usedMana = true;
-            manaOrbsHandler.countDown = 3f;
+                Mana -= manaSpellCost / 3f;
+                manaOrbsHandler.usedMana = true;
+                manaOrbsHandler.countDown = 3f;
             
         }
         else
@@ -1467,9 +1490,10 @@ IEnumerator StopTakingDamage()
     {
         anim.SetBool("Casting", true);
         pState.casting = true;
+        FreezeRigidbodyPosition();
 
         yield return new WaitForSeconds(0.15f);
-
+        UnfreezeRigidbodyPosition();
         downSpellFireball.SetActive(true);
         audioSource.PlayOneShot(spellCastSound);
 
@@ -1477,7 +1501,7 @@ IEnumerator StopTakingDamage()
         manaOrbsHandler.usedMana = true;
         manaOrbsHandler.countDown = 3f;
 
-        yield return new WaitForSeconds(0.35f);
+        
 
         // Add a loop to check if the player is grounded and end the coroutine if grounded
         while (!Grounded())
@@ -1485,10 +1509,6 @@ IEnumerator StopTakingDamage()
             yield return null; // Wait for the next frame
             
         }
-
-        // Set pState.casting to false when the coroutine ends
-        anim.SetBool("Casting", false);
-        pState.casting = false;
         FreezeRigidbodyPosition();
         lightningStrike.SetActive(true);
         audioSource.PlayOneShot(spellCastSound);
@@ -1561,7 +1581,7 @@ IEnumerator StopTakingDamage()
             manaOrbsHandler.countDown = 3f;
             pState.casting = false;
         }     
-        if( yAxis > 0 && unlockedUpCast)
+        if (yAxis > 0 && unlockedUpCast)
         {
             anim.SetBool("Casting", true);
             pState.casting = true;
@@ -1643,8 +1663,8 @@ IEnumerator StopTakingDamage()
     }
     
     public bool Grounded()
-{
-    bool grounded = Physics2D.Raycast(groundCheckPoint.position, Vector2.down, groundCheckY, whatIsGround)
+    {
+        bool grounded = Physics2D.Raycast(groundCheckPoint.position, Vector2.down, groundCheckY, whatIsGround)
         || Physics2D.Raycast(groundCheckPoint.position + new Vector3(groundCheckX, 0, 0), Vector2.down, groundCheckY, whatIsGround)
         || Physics2D.Raycast(groundCheckPoint.position + new Vector3(-groundCheckX, 0, 0), Vector2.down, groundCheckY, whatIsGround);
 
@@ -1662,119 +1682,138 @@ IEnumerator StopTakingDamage()
     }
 
     return grounded;
-}
+    }
 
     
-
-    private RigidbodyConstraints2D savedPositionConstraints;
     void Jump()
     {    
 
-    if (jumpBufferCounter > 0 && coyoteTimeCounter > 0 && !pState.jumping)
-    {
-        pState.jumping = true;
+        if (jumpBufferCounter > 0 && coyoteTimeCounter > 0 && !pState.jumping)
+        {
+            pState.jumping = true;
         
-        //audioSource.PlayOneShot(jumpSound);
+            //audioSource.PlayOneShot(jumpSound);
 
-        rb.velocity = new Vector3(rb.velocity.x, jumpForce);        
+            rb.velocity = new Vector3(rb.velocity.x, jumpForce);        
+        }
+
+        if (!Grounded() && airJumpCounter < maxAirJumps && ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && !pState.lightForm))
+        {
+            //audioSource.PlayOneShot(jumpSound);
+
+            pState.jumping = true;
+
+            airJumpCounter++;
+
+            rb.velocity = new Vector3(rb.velocity.x, jumpForce);
+        }
+
+        if ((Input.GetButtonUp("Jump") || (Gamepad.current?.crossButton.wasReleasedThisFrame == true)) && rb.velocity.y > 3 && !pState.lightJumping)
+        {
+            pState.jumping = false;
+
+            rb.velocity = new Vector2(rb.velocity.x, 0);
+        }
+
+        // Increase gravity while falling
+        if (rb.velocity.y < 0 && !pState.lightJumping)
+        {
+            rb.velocity += Vector2.up * Physics2D.gravity.y * (fallGravityMultiplier - 1) * Time.deltaTime;
+        }
+
+        // Clamp the vertical velocity to control falling speed
+        rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -maxFallingSpeed, rb.velocity.y));
+
+        anim.SetBool("Jumping", !Grounded());
     }
-
-    if (!Grounded() && airJumpCounter < maxAirJumps && ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && !pState.lightForm))
-    {
-        //audioSource.PlayOneShot(jumpSound);
-
-        pState.jumping = true;
-
-        airJumpCounter++;
-
-        rb.velocity = new Vector3(rb.velocity.x, jumpForce);
-    }
-
-    if ((Input.GetButtonUp("Jump") || (Gamepad.current?.crossButton.wasReleasedThisFrame == true)) && rb.velocity.y > 3 && !pState.lightJumping)
-    {
-        pState.jumping = false;
-
-        rb.velocity = new Vector2(rb.velocity.x, 0);
-    }
-
-    // Increase gravity while falling
-    if (rb.velocity.y < 0 && !pState.lightJumping)
-    {
-        rb.velocity += Vector2.up * Physics2D.gravity.y * (fallGravityMultiplier - 1) * Time.deltaTime;
-    }
-
-    // Clamp the vertical velocity to control falling speed
-    rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -maxFallingSpeed, rb.velocity.y));
-
-    anim.SetBool("Jumping", !Grounded());
-}
 
     // Add a variable to track the last light jump direction
-private Vector2 lastLightJumpDirection = Vector2.zero;
+    private Vector2 lastLightJumpDirection = Vector2.zero;
 
-void LightJump()
-{
-    if (!Grounded() && lightJumpCounter < maxLightJumps && (Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && pState.lightForm && !pState.lightJumping && !isWallJumping && !Walled())
-    {   
+    void LightJump()
+    {
+        if (!Grounded() && lightJumpCounter < maxLightJumps && lightJumpBufferCounter > 0 && unlockedVarJump && pState.lightForm && !pState.lightJumping && !isWallJumping && !Walled())
+        {   
         
-        StartCoroutine(LightJumpCoroutine());
-        lightJumpCounter++;
+            StartCoroutine(LightJumpCoroutine());
+            lightJumpCounter++;
+        }
+
+        if (Grounded())
+        {
+            lastLightJumpDirection = Vector2.zero;
+        }
     }
 
-     if (Grounded())
+    IEnumerator LightJumpCoroutine()
     {
-        lastLightJumpDirection = Vector2.zero;
-    }
-}
+        pState.lightJumping = true;
+        UnfreezeRigidbodyPosition();
+        Vector2 launchDirection;
+        if (Mathf.Approximately(xAxis, 0) && Mathf.Approximately(yAxis, 0))
+        {
+            // No input, use the current facing direction or another default direction.
+            launchDirection = lastLightJumpDirection;
+        }
+        else
+        {
+            float angle = Mathf.Atan2(yAxis, xAxis) * Mathf.Rad2Deg;
+            angle = Mathf.Round(angle / 45) * 45;
+            float roundedX = Mathf.Cos(angle * Mathf.Deg2Rad);
+            float roundedY = Mathf.Sin(angle * Mathf.Deg2Rad);
 
-IEnumerator LightJumpCoroutine()
-{   
-    pState.lightJumping = true;
-    UnfreezeRigidbodyPosition();
-    Vector2 launchDirection;
-    if (Mathf.Approximately(xAxis, 0) && Mathf.Approximately(yAxis, 0))
-    {
-    // No input, use the current facing direction or another default direction.
-    launchDirection = lastLightJumpDirection;
-    }
-    else
-    {
-    float angle = Mathf.Atan2(yAxis, xAxis) * Mathf.Rad2Deg;
-    angle = Mathf.Round(angle / 45) * 45;
-    float roundedX = Mathf.Cos(angle * Mathf.Deg2Rad);
-    float roundedY = Mathf.Sin(angle * Mathf.Deg2Rad);
-    
-    launchDirection = new Vector2(roundedX, roundedY).normalized;
-    }
-    if (launchDirection != lastLightJumpDirection)
-    {
-    rb.velocity = new Vector2(rb.velocity.x, 0);
-    FreezeRigidbodyPosition();
-    yield return new WaitForSeconds(0.15f);
-    UnfreezeRigidbodyPosition();
-    
-    
-    lightBall.SetActive(true);
-    anim.SetTrigger("Dashing");
-    audioSource.PlayOneShot(dashAndAttackSound);
-    
-    rb.gravityScale = 0;
+            launchDirection = new Vector2(roundedX, roundedY).normalized;
+        }
 
-    rb.velocity = launchDirection * lightJumpForce;
-    lastLightJumpDirection = launchDirection;
-    
-    yield return new WaitForSeconds(dashTime);
-    pState.lightJumping = false;
-    FreezeRigidbodyPosition();
-    yield return new WaitForSeconds(0.1f);
-    UnfreezeRigidbodyPosition();
-    rb.velocity = Vector2.zero;
-    lightBall.SetActive(false);        
-    rb.gravityScale = gravity;
-    
+        if (launchDirection != lastLightJumpDirection)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, 0);
+            FreezeRigidbodyPosition();
+            yield return new WaitForSeconds(0.15f);
+            audioSource.PlayOneShot(dashAndAttackSound);
+            UnfreezeRigidbodyPosition();
 
+
+            lightBall.SetActive(true);
+            // Assuming the light ball's collider is on the "LightBallCollider" layer
+            Physics2D.IgnoreLayerCollision(gameObject.layer, LayerMask.NameToLayer("Attackable"), true);
+            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("LightBallCollider"), LayerMask.NameToLayer("Attackable"), false);
+
+            anim.SetTrigger("Dashing");
+            
+
+            rb.gravityScale = 0;
+
+            float distanceToTravel = 40f; // Adjust this value as needed
+            float timeToTravel = 0.15f; // Adjust this value as needed
+            Vector2 targetPosition = (Vector2)transform.position + (launchDirection * distanceToTravel);
+            float startTime = Time.time;
+            float elapsedTime = 0f;
+
+            while (elapsedTime < timeToTravel)
+            {
+                elapsedTime = Time.time - startTime;
+                float t = Mathf.Clamp01(elapsedTime / timeToTravel);
+                rb.MovePosition(Vector2.Lerp(transform.position, targetPosition, t));
+                yield return null;
+            }
+
+            FreezeRigidbodyPosition();
+            yield return new WaitForSeconds(0.15f);
+            UnfreezeRigidbodyPosition();
+            rb.velocity = Vector2.zero;
+            lightBall.SetActive(false);
+            Physics2D.IgnoreLayerCollision(gameObject.layer, LayerMask.NameToLayer("Attackable"), false);
+            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("LightBallCollider"), LayerMask.NameToLayer("Attackable"), false);
+            pState.lightJumping = false;
+            rb.gravityScale = gravity;
+            lastLightJumpDirection = launchDirection;
+        }
     }
-}
+
+
+
+
 
     void UpdateJumpVariables()
     {
@@ -1790,6 +1829,8 @@ IEnumerator LightJumpCoroutine()
             coyoteTimeCounter = coyoteTime;
             airJumpCounter = 0;
             lightJumpCounter = 0;
+            lightJumpBufferCounter = 0;
+            
         }
         else
         {
@@ -1797,18 +1838,19 @@ IEnumerator LightJumpCoroutine()
             landingSoundPlayed = false;
         }
 
-if ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)))
+        if ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)))
         {
             jumpBufferCounter = jumpBufferFrames;
         }
-        if ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && pState.lightJumping)
+        if ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && pState.lightForm && unlockedVarJump && !Grounded())
         {
-            jumpBufferCounter = lightJumpBufferFrames;
-
+            lightJumpBufferCounter = lightJumpBufferFrames;
         }
         else
         {
             jumpBufferCounter--;
+            lightJumpBufferCounter--;
+            
         }
     }
 
@@ -1834,38 +1876,37 @@ if ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThis
         }
     }
     void WallJump()
-{
-    if (isWallSliding)
     {
-        isWallJumping = false;
-        wallJumpingDirection = !pState.lookingRight ? 1 : -1;
-
-        CancelInvoke(nameof(StopWallJumping));
-    }
-
-    if ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && isWallSliding)
-    {
-        isWallJumping = true;
-        rb.velocity = new Vector2(wallJumpingDirection * wallJumpingPower.x, wallJumpingPower.y);
-
-        dashed = false;
-        airJumpCounter = 0;
-        lightJumpCounter = 0;
-
-        if ((pState.lookingRight && transform.eulerAngles.y == 0) || (!pState.lookingRight && transform.eulerAngles.y != 0))
+        if (isWallSliding)
         {
-            pState.lookingRight = !pState.lookingRight;
-            int _yRotation = pState.lookingRight ? 0 : 180;
+            isWallJumping = false;
+            wallJumpingDirection = !pState.lookingRight ? 1 : -1;
 
-            transform.eulerAngles = new Vector2(transform.eulerAngles.x, _yRotation);
+            CancelInvoke(nameof(StopWallJumping));
         }
+        if ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && isWallSliding)
+        {
+            isWallJumping = true;
+            rb.velocity = new Vector2(wallJumpingDirection * wallJumpingPower.x, wallJumpingPower.y);
 
-        // Debug statement for wall jump
-        Debug.Log("Wall jump!");
-        
-        Invoke(nameof(StopWallJumping), wallJumpingDuration);
+            dashed = false;
+            airJumpCounter = 0;
+            lightJumpCounter = 0;
+
+            if ((pState.lookingRight && transform.eulerAngles.y == 0) || (!pState.lookingRight && transform.eulerAngles.y != 0))
+            {
+                pState.lookingRight = !pState.lookingRight;
+                int _yRotation = pState.lookingRight ? 0 : 180;
+
+                transform.eulerAngles = new Vector2(transform.eulerAngles.x, _yRotation);
+            }
+
+            // Debug statement for wall jump
+            Debug.Log("Wall jump!");
+            
+            Invoke(nameof(StopWallJumping), wallJumpingDuration);
+        }
     }
-}
 
     void StopWallJumping()
     {

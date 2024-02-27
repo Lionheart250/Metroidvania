@@ -2,129 +2,250 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
+using static LeanTween;
+using UnityEditor;
 
 public class CameraManager : MonoBehaviour
 {
     [SerializeField] CinemachineVirtualCamera[] allVirtualCameras;
 
-    private CinemachineVirtualCamera currentCamera;
+    public CinemachineVirtualCamera currentCamera { get; private set; }
     private CinemachineFramingTransposer framingTransposer;
 
     [Header("Y Damping Settings for Player Jump/Fall:")]
     [SerializeField] private float panAmount = 0.1f;
     [SerializeField] private float panTime = 0.2f;
+    [SerializeField] private float cameraLerpTime = 0.2f;
+    [SerializeField] public float xOffset = 1.0f;
     public float playerFallSpeedTheshold = -30
 ;
     public bool isLerpingYDamping;
     public bool hasLerpedYDamping;
 
     private float normalYDamp;
+    public Coroutine _panCameraCoroutine;
+    private Vector2 _startingTrackedObjectOffset;
 
     public static CameraManager Instance { get; private set; }
 
     private void Awake()
-{
-    if (Instance == null)
     {
-        Instance = this;
-    }
-
-    bool openRoomCameraFound = false;
-
-    // Search for the 'Open Room Camera' specifically
-    foreach (var camera in allVirtualCameras)
-    {
-        if (camera.name == "Open Room Camera") {
-            currentCamera = camera;
-            framingTransposer = currentCamera.GetCinemachineComponent<CinemachineFramingTransposer>();
-            openRoomCameraFound = true;
-            break; // Exit the loop once the camera is found
+        if (Instance == null)
+        {
+            Instance = this;
         }
-    }
 
-    if (!openRoomCameraFound && allVirtualCameras.Length > 0) {
-        // If 'Open Room Camera' is not found, default to the first camera in the array
+        foreach (var camera in allVirtualCameras)
+        {
+            if (camera.Follow == null)
+            {
+                Debug.LogWarning("Virtual camera '" + camera.name + "' does not have a follow target.");
+            }
+        }
+
+        // Set the initial camera to the first camera in the list
         currentCamera = allVirtualCameras[0];
         framingTransposer = currentCamera.GetCinemachineComponent<CinemachineFramingTransposer>();
+        normalYDamp = framingTransposer.m_YDamping;
+        _startingTrackedObjectOffset = framingTransposer.m_TrackedObjectOffset;
     }
-
-    normalYDamp = framingTransposer.m_YDamping;
-}
-
-
-
 
     private void Start()
-{
-    Transform playerTransform = null;
+    {
+        PlayerController.OnPlayerFlipped += HandlePlayerFlipped;
 
-    if (PlayerController.Instance.gameObject.activeSelf)
-    {
-        playerTransform = PlayerController.Instance.transform;
-    }
-    else if (PlayerController3D.Instance.gameObject.activeSelf)
-    {
-        playerTransform = PlayerController3D.Instance.transform;
-    }
-    else
-    {
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
+        Transform playerTransform = null;
+
+        if (PlayerController.Instance.gameObject.activeSelf)
         {
-            playerTransform = player.transform;
+            playerTransform = PlayerController.Instance.transform;
+        }
+        else if (PlayerController3D.Instance.gameObject.activeSelf)
+        {
+            playerTransform = PlayerController3D.Instance.transform;
         }
         else
         {
-            GameObject player3D = GameObject.FindGameObjectWithTag("Player3D");
-            if (player3D != null)
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
             {
-                playerTransform = player3D.transform;
+                playerTransform = player.transform;
+            }
+            else
+            {
+                GameObject player3D = GameObject.FindGameObjectWithTag("Player3D");
+                if (player3D != null)
+                {
+                    playerTransform = player3D.transform;
+                }
+            }
+        }
+
+        if (playerTransform != null)
+        {
+            for (int i = 0; i < allVirtualCameras.Length; i++)
+            {
+                allVirtualCameras[i].Follow = playerTransform;
             }
         }
     }
 
-    if (playerTransform != null)
+    void OnDestroy()
     {
-        for (int i = 0; i < allVirtualCameras.Length; i++)
+        // Unsubscribe from the event to avoid memory leaks
+        PlayerController.OnPlayerFlipped -= HandlePlayerFlipped;
+    }
+
+    public void SwapCamera(CinemachineVirtualCamera newCam)
+    {
+        if (newCam != null)
         {
-            allVirtualCameras[i].Follow = playerTransform;
+            currentCamera.enabled = false;
+            currentCamera = newCam;
+            framingTransposer = currentCamera.GetCinemachineComponent<CinemachineFramingTransposer>();
+            normalYDamp = framingTransposer.m_YDamping;
+            currentCamera.enabled = true;
         }
     }
-}
 
 
-    public void SwapCamera(CinemachineVirtualCamera _newCam)
-    {
-        currentCamera.enabled = false;
-        currentCamera = _newCam;
-        currentCamera.enabled = true;
-    }
 
     public IEnumerator LerpYDamping(bool _isPlayerFalling)
     {
+        if (isLerpingYDamping)
+        {
+            yield break; // Don't start another tween if one is already running
+        }
+
         isLerpingYDamping = true;
-        //take start y damp amount
-        float _startYDamp = framingTransposer.m_YDamping;
-        float _endYDamp = 0;
-        //determine end damp amount
-        if (_isPlayerFalling)
+        float startYDamp = framingTransposer.m_YDamping;
+        float endYDamp = _isPlayerFalling ? panAmount + startYDamp : normalYDamp;
+
+        LeanTween.value(gameObject, startYDamp, endYDamp, panTime)
+            .setOnUpdate((float val) =>
+            {
+                framingTransposer.m_YDamping = val;
+            })
+            .setOnComplete(() =>
+            {
+                isLerpingYDamping = false;
+                hasLerpedYDamping = _isPlayerFalling;
+            });
+
+        // Wait for the LeanTween to complete
+        while (isLerpingYDamping)
         {
-            _endYDamp = panAmount;
-            hasLerpedYDamping = true;
-        }
-        else
-        {
-            _endYDamp = normalYDamp;
-        }
-        //lerp panAmount
-        float _timer = 0;
-        while (_timer < panTime)
-        {
-            _timer += Time.deltaTime;
-            float _lerpedPanAmount = Mathf.Lerp(_startYDamp, _endYDamp, (_timer / panTime));
-            framingTransposer.m_YDamping = _lerpedPanAmount;
             yield return null;
         }
-        isLerpingYDamping = false;
+    }
+
+
+    void HandlePlayerFlipped(Vector3 targetOffset)
+    {
+        StartCoroutine(LerpCameraOffset(targetOffset));
+    }
+
+    private int lerpTween; // Store the integer identifier for the LeanTween animation
+
+    public IEnumerator LerpCameraOffset(Vector3 targetOffset)
+    {
+        if (lerpTween != 0)
+        {
+            LeanTween.cancel(lerpTween); // Cancel the previous tween if it's still running
+        }
+
+        // Use LeanTween to lerp the camera offset from 0 to the target offset
+        lerpTween = LeanTween.value(gameObject, Vector3.zero, targetOffset, cameraLerpTime)
+            .setEase(LeanTweenType.easeOutSine) // Use easeOutSine for a smooth deceleration
+            .setOnUpdate((Vector3 val) =>
+            {
+                framingTransposer.m_TrackedObjectOffset = val;
+            })
+            .id;
+
+        // Wait for the lerp to complete
+        yield return new WaitForSeconds(cameraLerpTime);
+
+        // Ensure the final offset is set after the lerp completes
+        framingTransposer.m_TrackedObjectOffset = targetOffset;
+    }
+
+    public void PanCameraOnContact(float panDistance, float panTime, PanDirection panDirection, bool panToStartingPos)
+    {
+            _panCameraCoroutine = StartCoroutine(PanCamera(panDistance, panTime, panDirection, panToStartingPos));
+    }
+
+    [SerializeField] private bool isPanning = false;
+
+    public bool IsPanning
+    {
+        get { return isPanning; }
+    }
+
+    private IEnumerator PanCamera(float panDistance, float panTime, PanDirection panDirection, bool panToStartingPos)
+{
+    isPanning = true;
+    Vector2 endPos = Vector2.zero;
+    Vector2 startingPos = Vector2.zero;
+    Vector2 currentPos = framingTransposer.m_TrackedObjectOffset; // Added to track current position
+
+    if (!panToStartingPos)
+    {
+        switch (panDirection)
+        {
+            case PanDirection.Up:
+                endPos = Vector2.up * panDistance;
+                break;
+            case PanDirection.Down:
+                endPos = Vector2.down * panDistance;
+                break;
+            case PanDirection.Left:
+                endPos = Vector2.left * panDistance;
+                break;
+            case PanDirection.Right:
+                endPos = Vector2.right * panDistance;
+                break;
+            default:
+                break;
+        }
+
+        startingPos = currentPos; // Changed to start from the current position
+        endPos += startingPos;
+    }
+    else
+    {
+        startingPos = currentPos; // Changed to start from the current position
+        endPos = new Vector2(8, 0); // Corrected end position calculation
+    }
+
+    float elapsedTime = 0f;
+    while (elapsedTime < panTime)
+    {
+        elapsedTime += Time.deltaTime;
+        float t = Mathf.Clamp01(elapsedTime / panTime);
+        Vector3 panLerp = Vector3.Lerp(startingPos, endPos, t);
+        framingTransposer.m_TrackedObjectOffset = panLerp;
+
+        yield return null;
+    }
+
+    // Ensure the final offset is set after the lerp completes
+    framingTransposer.m_TrackedObjectOffset = endPos;
+
+    if (panToStartingPos)
+    {
+        isPanning = true;
+        // Wait until the camera pans back to its starting position
+        while (Vector3.Distance(framingTransposer.m_TrackedObjectOffset, currentPos) > 8.56f)
+        {
+            yield return null;
+        }
+        isPanning = false;
     }
 }
+
+
+
+}
+
+
