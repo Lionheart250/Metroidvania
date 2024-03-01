@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour
 
     [Header("Horizontal Movement Settings:")]
     [SerializeField] private float walkSpeed = 1; //sets the players movement speed on the ground
+    [SerializeField] private float airWalkSpeed = 1; //sets the players movement speed in the air 
+
     private float originalWalkSpeed;
     [Space(5)]
 
@@ -29,13 +31,10 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private int airJumpCounter = 0; //keeps track of how many times the player has jumped in the air
     private int lightJumpCounter = 0;
-    [SerializeField] private float lightJumpChargeSpeed;
-    [SerializeField] public float lightJumpChargeTime;
     [SerializeField] private int maxAirJumps; //the max no. of air jumps
     [SerializeField] private int maxLightJumps;
-    [SerializeField] private int maxFallingSpeed; //the max no. of air jumps
+    [SerializeField] private float maxFallingSpeed; //the max fallspeed
     public float fallGravityMultiplier; // You can adjust this value
-    private float originalFallGravityMultiplier;
     private float gravity; //stores the gravity scale at start
     [Space(5)]
 
@@ -270,7 +269,6 @@ public class PlayerController : MonoBehaviour
         anim = GetComponent<Animator>();
         manaOrbsHandler = FindObjectOfType<ManaOrbsHandler>();
         originalWalkSpeed = walkSpeed;
-        originalFallGravityMultiplier = fallGravityMultiplier;
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         mainCollider = GetComponent<CapsuleCollider2D>();
         originalColor = sr.color;
@@ -539,16 +537,14 @@ private void OnTriggerExit2D(Collider2D _other)
     public Vector3 TargetOffset { get; private set; }
 
     void Flip()
-{
-    float targetOffset = CameraManager.Instance.xOffset;
-
-    if (xAxis < 0)
     {
-        if (pState.lookingRight || !pState.lookingRight)
+        float targetOffset = CameraManager.Instance.xOffset;
+
+        if (xAxis < 0 && pState.lookingRight)
         {
             transform.eulerAngles = new Vector2(0, 180);
             pState.lookingRight = false;
-            
+
             // Check if the camera is not panning before starting the camera offset lerp
             if (!CameraManager.Instance.IsPanning)
             {
@@ -556,13 +552,11 @@ private void OnTriggerExit2D(Collider2D _other)
                 OnPlayerFlipped?.Invoke(new Vector3(targetOffset, 0, 0));
             }
         }
-    }
-    else if (xAxis > 0)
-    {
-        if (!pState.lookingRight)
+        else if (xAxis > 0 && !pState.lookingRight)
         {
             transform.eulerAngles = new Vector2(0, 0);
             pState.lookingRight = true;
+
             // Check if the camera is not panning before starting the camera offset lerp
             if (!CameraManager.Instance.IsPanning)
             {
@@ -571,7 +565,7 @@ private void OnTriggerExit2D(Collider2D _other)
             }
         }
     }
-}
+
 
 
 
@@ -580,23 +574,25 @@ private void OnTriggerExit2D(Collider2D _other)
     private float maxWalkTimer = 1f;
 
     private void Move()
+{
+    if (!pState.lightJumping)
     {
-        if (!pState.lightJumping)
+        if (Grounded())
         {
+            // Grounded movement
             rb.velocity = new Vector2(walkSpeed * xAxis, rb.velocity.y);
 
-            if (rb.velocity.x != 0 && Grounded())
+            if (rb.velocity.x != 0)
             {
                 walkTimer += Time.deltaTime;
-
-                // Clamp walkTimer to ensure it never goes above 2 or below 0
                 walkTimer = Mathf.Clamp(walkTimer, 0f, maxWalkTimer);
 
-                anim.SetBool("Running", true);
-                anim.SetBool("Walking", false);
-
-                // Check if walkTimer is greater than or equal to 0.5
-                if (walkTimer >= 0.24f && rb.velocity.x != 0 && Grounded())
+                if (walkTimer >= 0.24f)
+                {
+                    anim.SetBool("Running", false);
+                    anim.SetBool("Walking", true);
+                }
+                else
                 {
                     anim.SetBool("Running", true);
                     anim.SetBool("Walking", false);
@@ -604,15 +600,24 @@ private void OnTriggerExit2D(Collider2D _other)
             }
             else
             {
-                // If not moving, reset walkTimer and set both Walking and Running to false
                 walkTimer = 0;
-                walkTimer = Mathf.Clamp(walkTimer, 0f, maxWalkTimer);
                 anim.SetBool("Running", false);
                 anim.SetBool("Walking", false);
-                //Debug.Log("walkTimer: " + walkTimer);
             }
         }
+        else
+        {
+            // Airborne movement
+            
+            rb.velocity = new Vector2(airWalkSpeed * xAxis, rb.velocity.y);
+
+            // Set animation states for airborne movement
+            anim.SetBool("Running", false);
+            anim.SetBool("Walking", false);
+        }
     }
+}
+
 
 
     void UpdateCameraYDampForPlayerFall()
@@ -820,20 +825,19 @@ private void OnTriggerExit2D(Collider2D _other)
                 if (pState.lightForm)
                 {   
                     anim.SetBool("ShadowForm", false);
-                    // Adjust parameters for light form
-                    walkSpeed = 60f; // Increase walkSpeed by 35%
-                    fallGravityMultiplier = originalFallGravityMultiplier * 1.5f;
-                    maxFallingSpeed = 150;
+                    walkSpeed = 60f; 
+                    airWalkSpeed = 40f;
+                    jumpForce = 120f;
+                    maxFallingSpeed = 70f;
                     anim.SetBool("LightForm", true);
                 }
                 else if (pState.shadowForm)
                 {   
                     anim.SetBool("LightForm", false);
-                    // Adjust parameters for shadow form
-                    // Reset to original walkSpeed if not in light form
                     walkSpeed = 50f;
-                    fallGravityMultiplier = originalFallGravityMultiplier * 1.5f;
-                    maxFallingSpeed = 100;
+                    airWalkSpeed = 70f;
+                    jumpForce = 120f;
+                    maxFallingSpeed = 120f;
                     anim.SetBool("ShadowForm", true);
                 }
             }
@@ -1153,7 +1157,7 @@ private void OnTriggerExit2D(Collider2D _other)
                 StartCoroutine(StopTakingDamage());
             }
             }
-}
+    }
 
     IEnumerator StopTakingDamage()
     {
@@ -1694,7 +1698,8 @@ private void OnTriggerExit2D(Collider2D _other)
         
             //audioSource.PlayOneShot(jumpSound);
 
-            rb.velocity = new Vector3(rb.velocity.x, jumpForce);        
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce);  
+            StartCoroutine(LerpAirWalkSpeed(25, 50, 0.4f));      
         }
 
         if (!Grounded() && airJumpCounter < maxAirJumps && ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && !pState.lightForm))
@@ -1705,7 +1710,7 @@ private void OnTriggerExit2D(Collider2D _other)
 
             airJumpCounter++;
 
-            rb.velocity = new Vector3(rb.velocity.x, jumpForce);
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
 
         if ((Input.GetButtonUp("Jump") || (Gamepad.current?.crossButton.wasReleasedThisFrame == true)) && rb.velocity.y > 3 && !pState.lightJumping)
@@ -1726,6 +1731,19 @@ private void OnTriggerExit2D(Collider2D _other)
 
         anim.SetBool("Jumping", !Grounded());
     }
+    
+    private IEnumerator LerpAirWalkSpeed(float startValue, float endValue, float duration)
+{
+    float timer = 0f;
+    while (timer < duration)
+    {
+        float t = timer / duration;
+        airWalkSpeed = Mathf.Lerp(startValue, endValue, t);
+        timer += Time.deltaTime;
+        yield return null;
+    }
+    airWalkSpeed = endValue;
+}
 
     // Add a variable to track the last light jump direction
     private Vector2 lastLightJumpDirection = Vector2.zero;

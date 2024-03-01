@@ -15,7 +15,7 @@ public class PlayerStateList : MonoBehaviour
     public bool dashing = false;
     public bool dodging = false;
     public bool recoilingX, recoilingY;
-    public bool lookingRight = false;
+    public bool lookingRight = true;
     public bool invincible;
     public bool healing;
     public bool casting;

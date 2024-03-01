@@ -1,23 +1,30 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MovingPillar : MonoBehaviour
 {
     public Transform posA, posB;
     public float speed;
-    public float decelerationDistance = 1.0f;  
+    public float decelerationDistance = 1.0f;
+    public float startDelay = 1.0f; // Delay before starting movement
+    public float tweenDuration = 1.0f; // Duration of the up and down tween
     private Vector3 targetPos;
     private bool isMoving = true; // Start moving by default
-    Rigidbody2D rb;
+    private Rigidbody2D rb;
 
-    Vector3 moveDirection;
+    private Vector3 moveDirection;
 
     private void Start()
     {
-        targetPos = posB.position; // Start moving towards posB
         rb = GetComponent<Rigidbody2D>();
-        DirectionCalculate(); // Calculate direction once
+        LeanTween.delayedCall(startDelay, () =>
+        {
+            if (posB != null) // Check if posB is not null
+            {
+                targetPos = posB.position; // Start moving towards posB
+                DirectionCalculate(); // Calculate direction once
+                SmashUpDown();
+            }
+        });
     }
 
     private void Update()
@@ -54,8 +61,15 @@ public class MovingPillar : MonoBehaviour
         }
     }
 
-    void DirectionCalculate()
+    private void DirectionCalculate()
     {
         moveDirection = (targetPos - transform.position).normalized;
+    }
+
+    private void SmashUpDown()
+    {
+        LeanTween.moveY(gameObject, posA.position.y, tweenDuration)
+            .setEase(LeanTweenType.easeInOutSine)
+            .setLoopPingPong();
     }
 }

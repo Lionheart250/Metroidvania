@@ -96,15 +96,28 @@ public class CameraManager : MonoBehaviour
         PlayerController.OnPlayerFlipped -= HandlePlayerFlipped;
     }
 
-    public void SwapCamera(CinemachineVirtualCamera newCam)
+    public void SwapCamera(CinemachineVirtualCamera cameraFromLeft, CinemachineVirtualCamera cameraFromRight, Vector2 triggerExitDirection)
     {
-        if (newCam != null)
+        if (currentCamera == cameraFromLeft && triggerExitDirection.x > 0f)
         {
-            currentCamera.enabled = false;
-            currentCamera = newCam;
+            cameraFromRight.enabled = true;
+
+            cameraFromLeft.enabled = false;
+
+            currentCamera = cameraFromRight;
+
             framingTransposer = currentCamera.GetCinemachineComponent<CinemachineFramingTransposer>();
-            normalYDamp = framingTransposer.m_YDamping;
-            currentCamera.enabled = true;
+        }
+
+        else if (currentCamera == cameraFromRight && triggerExitDirection.x < 0f)
+        {
+            cameraFromLeft.enabled = true;
+
+            cameraFromRight.enabled = false;
+
+            currentCamera = cameraFromLeft;
+
+            framingTransposer = currentCamera.GetCinemachineComponent<CinemachineFramingTransposer>();  
         }
     }
 
@@ -147,15 +160,18 @@ public class CameraManager : MonoBehaviour
 
     private int lerpTween; // Store the integer identifier for the LeanTween animation
 
-    public IEnumerator LerpCameraOffset(Vector3 targetOffset)
+   public IEnumerator LerpCameraOffset(Vector3 targetOffset)
     {
         if (lerpTween != 0)
         {
             LeanTween.cancel(lerpTween); // Cancel the previous tween if it's still running
         }
 
-        // Use LeanTween to lerp the camera offset from 0 to the target offset
-        lerpTween = LeanTween.value(gameObject, Vector3.zero, targetOffset, cameraLerpTime)
+        Vector3 currentOffset = framingTransposer.m_TrackedObjectOffset; // Get the current offset
+        Vector3 startOffset = new Vector3(-currentOffset.x, currentOffset.y, currentOffset.z); // Start from the negative of the current x-axis offset
+
+        // Use LeanTween to lerp the camera offset from the start offset to the target offset
+        lerpTween = LeanTween.value(gameObject, startOffset, targetOffset, cameraLerpTime)
             .setEase(LeanTweenType.easeOutSine) // Use easeOutSine for a smooth deceleration
             .setOnUpdate((Vector3 val) =>
             {
@@ -169,6 +185,8 @@ public class CameraManager : MonoBehaviour
         // Ensure the final offset is set after the lerp completes
         framingTransposer.m_TrackedObjectOffset = targetOffset;
     }
+
+
 
     public void PanCameraOnContact(float panDistance, float panTime, PanDirection panDirection, bool panToStartingPos)
     {

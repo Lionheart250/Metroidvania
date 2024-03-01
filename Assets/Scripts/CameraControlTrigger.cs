@@ -42,11 +42,20 @@ public class CameraControlTrigger : MonoBehaviour
         }
     }
 
+    private bool isSwappingCamera = false;
+
     private void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.CompareTag("Player"))
         {
-            if (customInspectorObjects.panCameraOnContact)
+            Vector2 exitDirection = (collision.transform.position - _coll.bounds.center).normalized;
+
+            if (customInspectorObjects.swapCameras && customInspectorObjects.cameraOnLeft != null && customInspectorObjects.cameraOnRight != null)
+            {
+                isSwappingCamera = true; // Set the flag to true when swapping cameras
+                CameraManager.Instance.SwapCamera(customInspectorObjects.cameraOnLeft, customInspectorObjects.cameraOnRight, exitDirection);
+            }
+            if (!isSwappingCamera && customInspectorObjects.panCameraOnContact)
             {
                 // Stop the enter coroutine if it's currently running
                 if (isEntering)
@@ -68,6 +77,7 @@ public class CameraControlTrigger : MonoBehaviour
             }
         }
     }
+
 
 }
 
