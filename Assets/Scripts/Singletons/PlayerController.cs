@@ -8,10 +8,11 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-
+    [SerializeField] private int comboCounter = 0;
     [Header("Horizontal Movement Settings:")]
     [SerializeField] private float walkSpeed = 1; //sets the players movement speed on the ground
     [SerializeField] private float airWalkSpeed = 1; //sets the players movement speed in the air 
+    [SerializeField] private float aimWalkSpeed = 1;
 
     private float originalWalkSpeed;
     [Space(5)]
@@ -35,7 +36,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private int maxLightJumps;
     [SerializeField] private float maxFallingSpeed; //the max fallspeed
     public float fallGravityMultiplier; // You can adjust this value
-    private float gravity; //stores the gravity scale at start
+    public float gravity; //stores the gravity scale at start
     [Space(5)]
 
     [Header("Wall Jump Settings")]
@@ -91,6 +92,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask attackableLayer; //the layer the player can attack and recoil off of
 
     private float timeBetweenAttack = 0.4f, timeSinceAttck;
+    private float timeBetweenShadowAttack = 0.6f, timeSinceShadowAttck;
 
     [SerializeField] private float damage; //the damage the player does to an enemy
 
@@ -159,6 +161,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] GameObject downSpellFireball;
     [SerializeField] GameObject downSpellShadowFireball;
     [SerializeField] GameObject shadowBloodSpray;
+    [SerializeField] GameObject shadowHook;
     [SerializeField] GameObject lightBall;
     [SerializeField] GameObject lightningBow;
     [SerializeField] GameObject lightningArrow;
@@ -167,8 +170,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float lightJumpDamage;
     [SerializeField] private Transform LightJumpTransform; //the middle of the up attack area
     [SerializeField] private Vector2 LightJumpArea; //how large the area of side attack is
-    float timeSinceCast;
-    float castOrHealTimer;
+    public float timeSinceCast;
+    public float castOrHealTimer;
     [Space(5)]
 
 
@@ -188,8 +191,6 @@ public class PlayerController : MonoBehaviour
 
 
     [Header("BlackShield Settings")]
-    public UnityEngine.Rendering.Universal.Light2D playerLight;
-    public bool Shielded = false;
     [SerializeField] GameObject Shield;
     [Space(5)]
     
@@ -366,12 +367,13 @@ public class PlayerController : MonoBehaviour
             Attack();
             ShadowAttack();
             CastSpell();
-            BlackShield();
+            //BlackShield();
             LightningBow();
             LightDart();
             LightningStrike();
             StartShadowDash();
             EndShadowDash();
+            ShadowHook();
         }        
         FlashWhileInvincible();     
         
@@ -496,13 +498,13 @@ private void OnTriggerExit2D(Collider2D _other)
     }
 
     private RigidbodyConstraints2D savedPositionConstraints;
-    void FreezeRigidbodyPosition()
+    public void FreezeRigidbodyPosition()
     {
         savedPositionConstraints = rb.constraints;
         rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
     }
 
-    void UnfreezeRigidbodyPosition()
+    public void UnfreezeRigidbodyPosition()
     {
         rb.constraints = savedPositionConstraints | RigidbodyConstraints2D.FreezeRotation;
     }
@@ -574,49 +576,52 @@ private void OnTriggerExit2D(Collider2D _other)
     private float maxWalkTimer = 1f;
 
     private void Move()
-{
-    if (!pState.lightJumping)
     {
-        if (Grounded())
+        float currentWalkSpeed = pState.aiming ? aimWalkSpeed : walkSpeed;
+
+        if (!pState.lightJumping)
         {
-            // Grounded movement
-            rb.velocity = new Vector2(walkSpeed * xAxis, rb.velocity.y);
-
-            if (rb.velocity.x != 0)
+            if (Grounded())
             {
-                walkTimer += Time.deltaTime;
-                walkTimer = Mathf.Clamp(walkTimer, 0f, maxWalkTimer);
+                // Grounded movement
+                rb.velocity = new Vector2(currentWalkSpeed * xAxis, rb.velocity.y);
 
-                if (walkTimer >= 0.24f)
+                if (rb.velocity.x != 0)
                 {
-                    anim.SetBool("Running", false);
-                    anim.SetBool("Walking", true);
+                    walkTimer += Time.deltaTime;
+                    walkTimer = Mathf.Clamp(walkTimer, 0f, maxWalkTimer);
+
+                    if (walkTimer >= 0.24f)
+                    {
+                        anim.SetBool("Running", false);
+                        anim.SetBool("Walking", true);
+                    }
+                    else
+                    {
+                        anim.SetBool("Running", true);
+                        anim.SetBool("Walking", false);
+                    }
                 }
                 else
                 {
-                    anim.SetBool("Running", true);
+                    walkTimer = 0;
+                    anim.SetBool("Running", false);
                     anim.SetBool("Walking", false);
                 }
             }
             else
             {
-                walkTimer = 0;
+                // Airborne movement
+                
+                rb.velocity = new Vector2(airWalkSpeed * xAxis, rb.velocity.y);
+
+                // Set animation states for airborne movement
                 anim.SetBool("Running", false);
                 anim.SetBool("Walking", false);
             }
         }
-        else
-        {
-            // Airborne movement
-            
-            rb.velocity = new Vector2(airWalkSpeed * xAxis, rb.velocity.y);
-
-            // Set animation states for airborne movement
-            anim.SetBool("Running", false);
-            anim.SetBool("Walking", false);
-        }
     }
-}
+
 
 
 
@@ -626,6 +631,7 @@ private void OnTriggerExit2D(Collider2D _other)
         if (rb.velocity.y < playerFallSpeedThreshold && !CameraManager.Instance.isLerpingYDamping && !CameraManager.Instance.hasLerpedYDamping)
         {
             StartCoroutine(CameraManager.Instance.LerpYDamping(true)); // Correct
+            
         }
         //if standing stil or moving up
         if(rb.velocity.y >= 0 && !CameraManager.Instance.isLerpingYDamping && CameraManager.Instance.hasLerpedYDamping)
@@ -705,7 +711,7 @@ private void OnTriggerExit2D(Collider2D _other)
     private bool canStartShadowDash = true;
     void StartShadowDash()
     {
-        if (canStartShadowDash && (Input.GetButtonDown("Dash") || (Gamepad.current?.rightTrigger.wasPressedThisFrame == true)) && pState.shadowForm)
+        if (canStartShadowDash && (Input.GetButtonDown("Dash") || (Gamepad.current?.rightTrigger.wasPressedThisFrame == true)) && pState.shadowForm && !pState.aiming)
         {
             StartCoroutine(ShadowDashSequence());
         }
@@ -914,39 +920,79 @@ private void OnTriggerExit2D(Collider2D _other)
             // Release charge if the button is released and charging duration is sufficient
             ReleaseCharge();
         }
-    }       
-
+    }      
+    private float quickAttackWindow = 1f; // Time window to consider attacks as quick
 
     void ShadowAttack()
     {
-        if ((attack || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && timeSinceAttck >= timeBetweenAttack && pState.shadowForm)
+    timeSinceShadowAttck += Time.deltaTime;
+    if (timeSinceShadowAttck >= quickAttackWindow)
+    {
+        comboCounter = 0;
+    }
+    if ((attack || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && timeSinceShadowAttck >= timeBetweenShadowAttack && pState.shadowForm)
+    {
+        if (timeSinceShadowAttck <= quickAttackWindow)
         {
-            timeSinceAttck = 0;
-            anim.SetTrigger("Attacking");
-            audioSource.PlayOneShot(dashAndAttackSound);
+            comboCounter++;
+        }
+        else
+        {
+            comboCounter++;
+        }
+        timeSinceShadowAttck = 0;
+        audioSource.PlayOneShot(dashAndAttackSound);
 
-            // Handle different attack types based on input and conditions
-            if (yAxis == 0 || (yAxis < 0 && Grounded()) && !pState.lightForm)
-            {
-                int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
+        // Handle different attack types based on input and conditions
+        if (yAxis == 0 || (yAxis < 0 && Grounded()) && !pState.lightForm)
+        {
+            int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
 
-                ShadowHit(ShadowSideAttackTransform, ShadowSideAttackArea, ref pState.recoilingX, Vector2.right * _recoilLeftOrRight, recoilXSpeed);
-                Instantiate(chargeSlashEffect, ShadowSideAttackTransform);
-            }
-            else if (yAxis > 0 && pState.shadowForm)
+            ShadowHit(ShadowSideAttackTransform, ShadowSideAttackArea, ref pState.recoilingX, Vector2.right * _recoilLeftOrRight, recoilXSpeed);
+            Instantiate(chargeSlashEffect, ShadowSideAttackTransform);
+
+            // Set animation based on comboCounter
+            if (comboCounter == 1)
             {
-                // Handle up attack
-                ShadowHit(ShadowUpAttackTransform, ShadowUpAttackArea, ref pState.recoilingY, Vector2.up, recoilYSpeed);
-                SlashEffectAtAngle(chargeSlashEffect, 80, ShadowUpAttackTransform);
+                
+                //anim.SetTrigger("Attack1");
             }
-            else if (yAxis < 0 && !Grounded() && pState.shadowForm)
+            else if (comboCounter == 2)
             {
-                // Handle down attack
-                ShadowHit(ShadowDownAttackTransform, ShadowDownAttackArea, ref pState.recoilingY, Vector2.down, recoilYSpeed);
-                SlashEffectAtAngle(chargeSlashEffect, -90, ShadowDownAttackTransform);
+                //anim.SetTrigger("Attack2");
+            }
+            else if (comboCounter == 3)
+            {
+                //anim.SetTrigger("Attack3");
+                comboCounter = 0; // Reset comboCounter after the 3rd attack
             }
         }
+
+        // Adjust time between attacks if in a quick combo
+        if (comboCounter == 2)
+        {
+            timeBetweenShadowAttack = 0.3f;
+        }
+        else
+        {
+            timeBetweenShadowAttack = 0.6f;
+        }
     }
+    else if (yAxis > 0 && !pState.shadowForm)
+    {
+        // Handle up attack
+        ShadowHit(ShadowUpAttackTransform, ShadowUpAttackArea, ref pState.recoilingY, Vector2.up, recoilYSpeed);
+        SlashEffectAtAngle(slashEffect, 80, ShadowUpAttackTransform);
+    }
+    else if (yAxis < 0 && !Grounded() && !pState.shadowForm)
+    {           
+        // Handle down attack
+        ShadowHit(ShadowDownAttackTransform, ShadowDownAttackArea, ref pState.recoilingY, Vector2.down, recoilYSpeed);
+        SlashEffectAtAngle(slashEffect, -90, ShadowDownAttackTransform);
+        comboCounter = 0;
+        }
+    }
+
 
     void ReleaseCharge()
     {
@@ -1100,10 +1146,10 @@ private void OnTriggerExit2D(Collider2D _other)
             airJumpCounter = 0;
             lightJumpCounter = 0;
         }
-        else if (pState.lightJumping == false)
-        {
-            rb.gravityScale = gravity;
-        }
+       // else if (pState.lightJumping == false)
+        //{
+        //    rb.gravityScale = gravity;
+        //}
 
         //stop recoil
         if (pState.recoilingX && stepsXRecoiled < recoilXSteps)
@@ -1390,6 +1436,30 @@ private void OnTriggerExit2D(Collider2D _other)
         anim.SetBool("Casting", false);
     }
 
+    void ShadowHook()
+    {
+        if ((Input.GetButtonDown("Shield") || (Gamepad.current?.leftTrigger.wasPressedThisFrame == true)) && pState.shadowForm)
+        {
+            pState.aiming = true;
+            shadowHook.SetActive(true);
+            
+            anim.SetBool("Casting", true);
+        }
+        if ((Input.GetButtonUp("Shield") || (Gamepad.current?.leftTrigger.wasReleasedThisFrame == true)) && pState.shadowForm && pState.aiming)
+        {
+            
+            shadowHook.SetActive(false);
+            anim.SetBool("Casting", false);
+            rb.gravityScale = gravity;
+             pState.aiming = false;
+            
+            
+        }
+    }
+
+
+
+
     void LightDart()
     {  
         if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && !pState.aiming && castOrHealTimer < 0.5f && timeSinceCast >= timeBetweenCast 
@@ -1647,24 +1717,24 @@ private void OnTriggerExit2D(Collider2D _other)
 
     
 
-    void BlackShield()
-    {   
-        if ((Input.GetButtonDown("Shield") || (Gamepad.current?.leftTrigger.wasPressedThisFrame == true)) && !Shielded && unlockedBlackShield && pState.shadowForm && Grounded())
-        {              
+    //void BlackShield()
+    //{   
+        //if ((Input.GetButtonDown("Shield") || (Gamepad.current?.leftTrigger.wasPressedThisFrame == true)) && !Shielded && unlockedBlackShield && pState.shadowForm && Grounded())
+        //{              
             //audioSource.PlayOneShot(jumpSound);
-            anim.SetBool("Casting", true);
-            Shield.SetActive(true);
-            Shielded = true; 
-            FreezeRigidbodyPosition();          
-        }
-        else if ((Input.GetButtonUp("Shield") || (Gamepad.current?.leftTrigger.wasReleasedThisFrame == true)) && Shielded && unlockedBlackShield && pState.shadowForm) 
-        {   
-            anim.SetBool("Casting", false);
-            Shield.SetActive(false);
-            Shielded = false;  
-            UnfreezeRigidbodyPosition();  
-        }
-    }
+            //anim.SetBool("Casting", true);
+            //Shield.SetActive(true);
+            //Shielded = true; 
+            //FreezeRigidbodyPosition();          
+        //}
+        //else if ((Input.GetButtonUp("Shield") || (Gamepad.current?.leftTrigger.wasReleasedThisFrame == true)) && Shielded && unlockedBlackShield && pState.shadowForm) 
+        //{   
+            //anim.SetBool("Casting", false);
+            //Shield.SetActive(false);
+            //Shielded = false;  
+            //UnfreezeRigidbodyPosition();  
+        //}
+    //}
     
     public bool Grounded()
     {
@@ -1860,7 +1930,7 @@ private void OnTriggerExit2D(Collider2D _other)
         {
             jumpBufferCounter = jumpBufferFrames;
         }
-        if ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && pState.lightForm && unlockedVarJump && !Grounded())
+        if ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && pState.lightForm && unlockedVarJump && !Grounded() && coyoteTimeCounter <= 0)
         {
             lightJumpBufferCounter = lightJumpBufferFrames;
         }
@@ -1909,6 +1979,7 @@ private void OnTriggerExit2D(Collider2D _other)
 
             dashed = false;
             airJumpCounter = 0;
+            lightJumpBufferCounter = 0;
             lightJumpCounter = 0;
 
             if ((pState.lookingRight && transform.eulerAngles.y == 0) || (!pState.lookingRight && transform.eulerAngles.y != 0))

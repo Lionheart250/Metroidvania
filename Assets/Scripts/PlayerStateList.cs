@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerStateList : MonoBehaviour
 {
-    public static PlayerStateList Instance; // Singleton reference
+    public static PlayerStateList Instance { get; private set; }
 
     public bool lightForm = false;
     public bool shadowForm = false;
