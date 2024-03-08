@@ -12,7 +12,6 @@ public class ShadowHook : MonoBehaviour
     [Header("Scripts:")]
     public GrappleRope grappleRope;
     [Header("Layer Settings:")]
-    [SerializeField] private bool grappleToAll = false;
     [SerializeField] private LayerMask grappableLayerMask;
 
     [Header("Transform Refrences:")]
@@ -31,7 +30,7 @@ public class ShadowHook : MonoBehaviour
     [Header("Launching")]
     [SerializeField] private bool launchToPoint = true;
     [SerializeField] private LaunchType Launch_Type = LaunchType.Transform_Launch;
-    [Range(0, 5)] [SerializeField] private float launchSpeed = 5;
+    [Range(0, 500)] [SerializeField] private float launchSpeed = 500;
 
     [Header("No Launch To Point")]
     [SerializeField] private bool autoCongifureDistance = false;
@@ -73,11 +72,12 @@ public class ShadowHook : MonoBehaviour
     }
     public float lerpSpeed = 5f;
     private float currentDistance;
+    private bool isLerpingGunHolder = false;
     void Update()
     {
-        if(!shadowHooking)
+        if (!shadowHooking)
         {
-        SetGrapplePoint();
+            SetGrapplePoint();
         }
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
@@ -100,27 +100,27 @@ public class ShadowHook : MonoBehaviour
         if (Input.GetButtonDown("Shield") || (Gamepad.current?.rightTrigger.wasPressedThisFrame == true))
         {
             shadowHooking = true;
-            aimingLine.enabled = false; 
-            
+            aimingLine.enabled = false;
+
         }
-        else if (Input.GetButton("Shield") || (Gamepad.current?.rightTrigger.isPressed == true))
+        else if (Input.GetButton("Shield") || (Gamepad.current?.rightTrigger.isPressed == true) && shadowHooking)
         {
             if (grappleRope.enabled)
             {
                 RotateGun(grapplePoint, false);
-                aimingLine.enabled = false; 
+                aimingLine.enabled = false;
             }
             else
             {
                 RotateGun(aimingDirection, false);
-                aimingLine.enabled = false; 
+                aimingLine.enabled = false;
             }
 
             if (launchToPoint && grappleRope.isGrappling)
             {
                 if (Launch_Type == LaunchType.Transform_Launch)
                 {
-                    gunHolder.position = Vector3.Lerp(gunHolder.position, grapplePoint, Time.deltaTime * launchSpeed);
+                    StartCoroutine(LerpGunHolder(grapplePoint, launchSpeed));
                 }
             }
 
@@ -131,7 +131,7 @@ public class ShadowHook : MonoBehaviour
             m_springJoint2D.enabled = false;
             ballRigidbody.gravityScale = 20;
             grapplePoint = Vector2.zero;
-            aimingLine.enabled = false; 
+            aimingLine.enabled = false;
             shadowHooking = false;
         }
         else
@@ -141,10 +141,14 @@ public class ShadowHook : MonoBehaviour
             m_springJoint2D.enabled = false;
             ballRigidbody.gravityScale = 20;
             //grapplePoint = Vector2.zero;
-            aimingLine.enabled = true;
             shadowHooking = false;
+            if(playerController.Grounded())
+            {
+                aimingLine.enabled = true;
+            }
         }
     }
+
 
     void RotateGun(Vector3 lookPoint, bool allowRotationOverTime)
     {
@@ -235,6 +239,39 @@ public class ShadowHook : MonoBehaviour
                 ballRigidbody.gravityScale = 0;
             }
         }
+    }
+
+    private IEnumerator LerpGunHolder(Vector3 targetPosition, float speed)
+    {
+        isLerpingGunHolder = true;
+
+        float startTime = Time.time;
+        Vector3 startPosition = gunHolder.position;
+        float journeyLength = Vector3.Distance(startPosition, targetPosition);
+
+        while (Vector3.Distance(gunHolder.position, targetPosition) > 0.01f)
+        {
+            float distCovered = (Time.time - startTime) * speed;
+            float fractionOfJourney = distCovered / journeyLength;
+            gunHolder.position = Vector3.Lerp(startPosition, targetPosition, fractionOfJourney);
+            
+            // Calculate the direction towards the target position
+            Vector3 direction = (targetPosition - gunHolder.position).normalized;
+
+            yield return null;
+        }
+
+        // Lerp finished, do something here
+        isLerpingGunHolder = false;
+        Debug.Log("Lerp Finished");
+
+        // Perform the action here
+        grappleRope.enabled = false;
+        m_springJoint2D.enabled = false;
+        ballRigidbody.gravityScale = 20;
+        grapplePoint = Vector2.zero;
+        aimingLine.enabled = false;
+        shadowHooking = false;
     }
 
     private void OnDrawGizmos()

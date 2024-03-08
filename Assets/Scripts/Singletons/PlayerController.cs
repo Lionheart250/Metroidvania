@@ -9,6 +9,8 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private int comboCounter = 0;
+    [SerializeField] private float attackRadius = 2f; // Adjust the radius as needed
+    [Space(5)]
     [Header("Horizontal Movement Settings:")]
     [SerializeField] private float walkSpeed = 1; //sets the players movement speed on the ground
     [SerializeField] private float airWalkSpeed = 1; //sets the players movement speed in the air 
@@ -365,6 +367,7 @@ public class PlayerController : MonoBehaviour
                 StartDodge();
             }         
             Attack();
+            RangedAttack();
             ShadowAttack();
             CastSpell();
             //BlackShield();
@@ -374,6 +377,7 @@ public class PlayerController : MonoBehaviour
             StartShadowDash();
             EndShadowDash();
             ShadowHook();
+            CheckIfNearEnemy();
         }        
         FlashWhileInvincible();     
         
@@ -850,7 +854,80 @@ private void OnTriggerExit2D(Collider2D _other)
         }
     }
 
+    void RangedAttack()
+    {
+        timeSinceAttck += Time.deltaTime;
 
+        // Check if there is an enemy nearby
+        bool isNearEnemy = CheckIfNearEnemy();
+
+        if ((attack || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && timeSinceAttck >= timeBetweenAttack && !pState.shadowForm && !isNearEnemy)
+        {
+            // Attack logic
+            timeSinceAttck = 0;
+            //anim.SetTrigger("RangedAttacking");
+            audioSource.PlayOneShot(dashAndAttackSound);
+
+            if (yAxis == 0 || (yAxis < 0 && Grounded()) && !pState.shadowForm)
+            {
+                // Handle regular attack
+                int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
+                GameObject _lightDart = Instantiate(lightningDart, SideAttackTransform.position, Quaternion.identity);
+
+                if (pState.lookingRight)
+                {
+                    _lightDart.transform.eulerAngles = Vector3.zero;
+                }
+                else
+                {
+                    _lightDart.transform.eulerAngles = new Vector2(_lightDart.transform.eulerAngles.x, 180); 
+                }
+            }
+            else if (yAxis > 0 && !pState.shadowForm)
+            {
+                GameObject _lightDart = Instantiate(lightningDart, UpAttackTransform.position, Quaternion.identity);
+                 _lightDart.transform.eulerAngles = new Vector3(_lightDart.transform.eulerAngles.x, 0, 90);
+            }
+            else if (yAxis < 0 && !Grounded() && !pState.shadowForm)
+            {
+                GameObject _lightDart = Instantiate(lightningDart, UpAttackTransform.position, Quaternion.identity);
+                 _lightDart.transform.eulerAngles = new Vector3(_lightDart.transform.eulerAngles.x, 0, -90);
+            }
+        }
+
+        if ((Input.GetButton("Attack") || (Gamepad.current?.squareButton.isPressed == true)) && chargeTime <= 2 && !pState.shadowForm)
+        {
+            chargeTime += Time.deltaTime * chargeSpeed;
+            chargeTime = Mathf.Clamp(chargeTime, 0f, 2f);
+
+            GameObject _chargeParticles = Instantiate(chargeParticles, transform.position, Quaternion.identity);
+
+            if (chargeTime >= 2f)
+            {
+                // Double the size
+                Vector3 newScale = _chargeParticles.transform.localScale * 2f;
+                _chargeParticles.transform.localScale = newScale;
+            }
+
+            Destroy(_chargeParticles, 0.05f);
+        }
+        else if ((Input.GetButtonDown("Attack") || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && !pState.shadowForm)
+        {
+            // If the attack button is pressed, but not held, reset chargeTime
+            chargeTime = 0;
+        }
+
+        if ((Input.GetButtonUp("Attack") || (Gamepad.current?.squareButton.wasReleasedThisFrame == true)) && chargeTime < 2 && !pState.shadowForm)
+        {
+            chargeTime = 0;
+        }
+        else if ((Input.GetButtonUp("Attack") || (Gamepad.current?.squareButton.wasReleasedThisFrame == true)) && chargeTime >= 2 && !pState.shadowForm)
+        {
+            audioSource.PlayOneShot(dashAndAttackSound);
+            // Release charge if the button is released and charging duration is sufficient
+            ReleaseCharge();
+        }
+    }   
 
 
 
@@ -858,18 +935,20 @@ private void OnTriggerExit2D(Collider2D _other)
     {
         timeSinceAttck += Time.deltaTime;
 
-        if ((attack || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && timeSinceAttck >= timeBetweenAttack && !pState.shadowForm)
+        // Check if there is an enemy nearby
+        bool isNearEnemy = CheckIfNearEnemy();
+
+        if ((attack || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && timeSinceAttck >= timeBetweenAttack && !pState.shadowForm && isNearEnemy)
         {
+            // Attack logic
             timeSinceAttck = 0;
             anim.SetTrigger("Attacking");
             audioSource.PlayOneShot(dashAndAttackSound);
 
-            // Handle different attack types based on input and conditions
             if (yAxis == 0 || (yAxis < 0 && Grounded()) && !pState.shadowForm)
             {
-                int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
-
                 // Handle regular attack
+                int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
                 Hit(SideAttackTransform, SideAttackArea, ref pState.recoilingX, Vector2.right * _recoilLeftOrRight, recoilXSpeed);
                 Instantiate(slashEffect, SideAttackTransform);
             }
@@ -881,7 +960,6 @@ private void OnTriggerExit2D(Collider2D _other)
             }
             else if (yAxis < 0 && !Grounded() && !pState.shadowForm)
             {
-            
                 // Handle down attack
                 Hit(DownAttackTransform, DownAttackArea, ref pState.recoilingY, Vector2.down, recoilYSpeed);
                 SlashEffectAtAngle(slashEffect, -90, DownAttackTransform);
@@ -921,78 +999,136 @@ private void OnTriggerExit2D(Collider2D _other)
             ReleaseCharge();
         }
     }      
+
+    bool CheckIfNearEnemy()
+    {
+        // Define the radius and draw a circle in the Scene view
+        float radius = attackRadius;
+        DrawDebugCircle(transform.position, radius, Color.red);
+
+        // Use Physics2D.OverlapCircleAll to check for enemies within a certain radius
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, radius, attackableLayer);
+
+        // If there are colliders found, return true
+        if (colliders.Length > 0)
+        {
+            Debug.Log("Enemy is near!");
+            return true;
+        }
+        else
+        {
+            Debug.Log("No enemy nearby.");
+            return false;
+        }
+    }
+
+    void DrawDebugCircle(Vector2 center, float radius, Color color)
+    {
+        int segments = 36;
+        float angleStep = 360f / segments;
+
+        Vector2 prevPoint = center + Vector2.right * radius;
+
+        for (int i = 0; i < segments + 1; i++)
+        {
+            float angle = i * angleStep;
+            Vector2 nextPoint = center + (Vector2)(Quaternion.Euler(0, 0, angle) * Vector2.right) * radius;
+            Debug.DrawLine(prevPoint, nextPoint, color);
+
+            prevPoint = nextPoint;
+        }
+    }
+
+
+
     private float quickAttackWindow = 1f; // Time window to consider attacks as quick
 
     void ShadowAttack()
     {
-    timeSinceShadowAttck += Time.deltaTime;
-    if (timeSinceShadowAttck >= quickAttackWindow)
-    {
-        comboCounter = 0;
-    }
-    if ((attack || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && timeSinceShadowAttck >= timeBetweenShadowAttack && pState.shadowForm)
-    {
-        if (timeSinceShadowAttck <= quickAttackWindow)
+        timeSinceShadowAttck += Time.deltaTime;
+        if (timeSinceShadowAttck >= quickAttackWindow)
         {
-            comboCounter++;
+            comboCounter = 0;
         }
-        else
+        if ((attack || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && timeSinceShadowAttck >= timeBetweenShadowAttack && pState.shadowForm)
         {
-            comboCounter++;
-        }
-        timeSinceShadowAttck = 0;
-        audioSource.PlayOneShot(dashAndAttackSound);
-
-        // Handle different attack types based on input and conditions
-        if (yAxis == 0 || (yAxis < 0 && Grounded()) && !pState.lightForm)
-        {
-            int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
-
-            ShadowHit(ShadowSideAttackTransform, ShadowSideAttackArea, ref pState.recoilingX, Vector2.right * _recoilLeftOrRight, recoilXSpeed);
-            Instantiate(chargeSlashEffect, ShadowSideAttackTransform);
-
-            // Set animation based on comboCounter
-            if (comboCounter == 1)
+            if (timeSinceShadowAttck <= quickAttackWindow)
             {
-                
-                //anim.SetTrigger("Attack1");
+                comboCounter++;
             }
-            else if (comboCounter == 2)
+            else
             {
-                //anim.SetTrigger("Attack2");
+                comboCounter++;
             }
-            else if (comboCounter == 3)
+            timeSinceShadowAttck = 0;
+            audioSource.PlayOneShot(dashAndAttackSound);
+
+            // Handle different attack types based on input and conditions
+            if (yAxis == 0 || (yAxis < 0 && Grounded()) && !pState.lightForm)
             {
-                //anim.SetTrigger("Attack3");
-                comboCounter = 0; // Reset comboCounter after the 3rd attack
+                int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
+
+                ShadowHit(ShadowSideAttackTransform, ShadowSideAttackArea, ref pState.recoilingX, Vector2.right * _recoilLeftOrRight, recoilXSpeed);
+                Instantiate(slashEffect, ShadowSideAttackTransform);
+
+                // Set animation based on comboCounter
+                if (comboCounter == 1)
+                {
+                    //anim.SetTrigger("Attack1");
+                }
+                else if (comboCounter == 2)
+                {
+                    //anim.SetTrigger("Attack2");
+                }
+                else if (comboCounter == 3)
+                {
+                    //anim.SetTrigger("Attack3");
+                    comboCounter = 0; // Reset comboCounter after the 3rd attack
+                }
+            }
+
+            // Handle up and down attacks
+            if (yAxis > 0 && pState.shadowForm)
+            {
+                // Handle up attack
+                ShadowHit(ShadowUpAttackTransform, ShadowUpAttackArea, ref pState.recoilingY, Vector2.up, recoilYSpeed);
+                ShadowSlashEffectAtAngle(slashEffect, 80, ShadowUpAttackTransform);
+
+                // Set animation based on comboCounter
+                if (comboCounter == 1)
+                {
+                    //anim.SetTrigger("upAttack1");
+                }
+                else if (comboCounter == 2)
+                {
+                    //anim.SetTrigger("upAttack2");
+                }
+                else if (comboCounter == 3)
+                {
+                    //anim.SetTrigger("upAttack3");
+                    comboCounter = 0; // Reset comboCounter after the 3rd attack
+                }
+            }
+            else if (yAxis < 0 && !Grounded() && pState.shadowForm)
+            {           
+                // Handle down attack
+                //anim.SetTrigger("downAttack1");
+                ShadowHit(ShadowDownAttackTransform, ShadowDownAttackArea, ref pState.recoilingY, Vector2.down, recoilYSpeed);
+                ShadowSlashEffectAtAngle(slashEffect, -90, ShadowDownAttackTransform);
+                comboCounter = 0;
+            }
+
+            // Adjust time between attacks if in a quick combo
+            if (comboCounter == 2)
+            {
+                timeBetweenShadowAttack = 0.3f;
+            }
+            else
+            {
+                timeBetweenShadowAttack = 0.6f;
             }
         }
-
-        // Adjust time between attacks if in a quick combo
-        if (comboCounter == 2)
-        {
-            timeBetweenShadowAttack = 0.3f;
-        }
-        else
-        {
-            timeBetweenShadowAttack = 0.6f;
-        }
     }
-    else if (yAxis > 0 && !pState.shadowForm)
-    {
-        // Handle up attack
-        ShadowHit(ShadowUpAttackTransform, ShadowUpAttackArea, ref pState.recoilingY, Vector2.up, recoilYSpeed);
-        SlashEffectAtAngle(slashEffect, 80, ShadowUpAttackTransform);
-    }
-    else if (yAxis < 0 && !Grounded() && !pState.shadowForm)
-    {           
-        // Handle down attack
-        ShadowHit(ShadowDownAttackTransform, ShadowDownAttackArea, ref pState.recoilingY, Vector2.down, recoilYSpeed);
-        SlashEffectAtAngle(slashEffect, -90, ShadowDownAttackTransform);
-        comboCounter = 0;
-        }
-    }
-
 
     void ReleaseCharge()
     {
