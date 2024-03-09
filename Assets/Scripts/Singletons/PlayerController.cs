@@ -57,6 +57,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform groundCheckPoint; //point at which ground check happens
     [SerializeField] private float groundCheckY = 0.2f; //how far down from ground chekc point is Grounded() checked
     [SerializeField] private float groundCheckX = 0.5f; //how far horizontally from ground chekc point to the edge of the player is
+    [SerializeField] private Transform ceilingCheckPoint;
+    [SerializeField] private float ceilingCheckY = 0.2f; //how far up from ceiling check point is Ceilinged() checked
+    [SerializeField] private float ceilingCheckX = 0.5f; //how far horizontally from ceiling check point is Ceilinged() checked
     [SerializeField] private LayerMask whatIsGround; //sets the ground layer
     [Space(5)]
 
@@ -93,7 +96,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private LayerMask attackableLayer; //the layer the player can attack and recoil off of
 
-    private float timeBetweenAttack = 0.4f, timeSinceAttck;
+    private float timeBetweenAttack = 0.5f, timeSinceAttck;
     private float timeBetweenShadowAttack = 0.6f, timeSinceShadowAttck;
 
     [SerializeField] private float damage; //the damage the player does to an enemy
@@ -1004,7 +1007,7 @@ private void OnTriggerExit2D(Collider2D _other)
     {
         // Define the radius and draw a circle in the Scene view
         float radius = attackRadius;
-        DrawDebugCircle(transform.position, radius, Color.red);
+        //DrawDebugCircle(transform.position, radius, Color.red);
 
         // Use Physics2D.OverlapCircleAll to check for enemies within a certain radius
         Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, radius, attackableLayer);
@@ -1012,12 +1015,12 @@ private void OnTriggerExit2D(Collider2D _other)
         // If there are colliders found, return true
         if (colliders.Length > 0)
         {
-            Debug.Log("Enemy is near!");
+            //Debug.Log("Enemy is near!");
             return true;
         }
         else
         {
-            Debug.Log("No enemy nearby.");
+            //Debug.Log("No enemy nearby.");
             return false;
         }
     }
@@ -1576,18 +1579,18 @@ private void OnTriggerExit2D(Collider2D _other)
     {
         if ((Input.GetButtonDown("Shield") || (Gamepad.current?.leftTrigger.wasPressedThisFrame == true)) && pState.shadowForm)
         {
-            pState.aiming = true;
+           
             shadowHook.SetActive(true);
             
             anim.SetBool("Casting", true);
         }
-        if ((Input.GetButtonUp("Shield") || (Gamepad.current?.leftTrigger.wasReleasedThisFrame == true)) && pState.shadowForm && pState.aiming)
+        if ((Input.GetButtonUp("Shield") || (Gamepad.current?.leftTrigger.wasReleasedThisFrame == true)) && pState.shadowForm)
         {
             
             shadowHook.SetActive(false);
             anim.SetBool("Casting", false);
             rb.gravityScale = gravity;
-             pState.aiming = false;
+
             
             
         }
@@ -1757,7 +1760,6 @@ private void OnTriggerExit2D(Collider2D _other)
         {
             //disable downspell if on the ground
             downSpellFireball.SetActive(false);
-            lightBall.SetActive(false);
         }
         //if down spell is active, force player down until grounded
         if(downSpellFireball.activeInHierarchy)
@@ -1893,6 +1895,29 @@ private void OnTriggerExit2D(Collider2D _other)
 
     return grounded;
     }
+
+    public bool Ceilinged()
+    {
+        bool ceilinged = Physics2D.Raycast(ceilingCheckPoint.position, Vector2.up, ceilingCheckY, whatIsGround)
+                    || Physics2D.Raycast(ceilingCheckPoint.position + new Vector3(ceilingCheckX, 0, 0), Vector2.up, ceilingCheckY, whatIsGround)
+                    || Physics2D.Raycast(ceilingCheckPoint.position + new Vector3(-ceilingCheckX, 0, 0), Vector2.up, ceilingCheckY, whatIsGround);
+
+        if (ceilinged)
+        {
+            Debug.DrawRay(ceilingCheckPoint.position, Vector2.up * ceilingCheckY, Color.green); // Visualize the first raycast
+            Debug.DrawRay(ceilingCheckPoint.position + new Vector3(ceilingCheckX, 0, 0), Vector2.up * ceilingCheckY, Color.green); // Visualize the second raycast
+            Debug.DrawRay(ceilingCheckPoint.position + new Vector3(-ceilingCheckX, 0, 0), Vector2.up * ceilingCheckY, Color.green); // Visualize the third raycast
+        }
+        else
+        {
+            Debug.DrawRay(ceilingCheckPoint.position, Vector2.up * ceilingCheckY, Color.yellow); // Visualize the first raycast
+            Debug.DrawRay(ceilingCheckPoint.position + new Vector3(ceilingCheckX, 0, 0), Vector2.up * ceilingCheckY, Color.red); // Visualize the second raycast
+            Debug.DrawRay(ceilingCheckPoint.position + new Vector3(-ceilingCheckX, 0, 0), Vector2.up * ceilingCheckY, Color.red); // Visualize the third raycast
+        }
+
+        return ceilinged;
+    }
+
 
     
     void Jump()
@@ -2043,7 +2068,7 @@ private void OnTriggerExit2D(Collider2D _other)
     {
         if (Grounded())
         { 
-            if (!landingSoundPlayed || (!landingSoundPlayed && !isOnPlatform))
+            if (!landingSoundPlayed)
             {
                 audioSource.PlayOneShot(landingSound);
                 landingSoundPlayed = true;
@@ -2054,12 +2079,21 @@ private void OnTriggerExit2D(Collider2D _other)
             airJumpCounter = 0;
             lightJumpCounter = 0;
             lightJumpBufferCounter = 0;
+            lightBall.SetActive(false);
             
+        }
+        if (!Grounded())
+        {
+            landingSoundPlayed = false;
+        }
+        if (Ceilinged())
+        {
+            lightBall.SetActive(false);
         }
         else
         {
             coyoteTimeCounter -= Time.deltaTime;
-            landingSoundPlayed = false;
+            //landingSoundPlayed = false;
         }
 
         if ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)))

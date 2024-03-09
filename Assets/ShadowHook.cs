@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System;
 
 public class ShadowHook : MonoBehaviour
 {
@@ -75,10 +76,9 @@ public class ShadowHook : MonoBehaviour
     private bool isLerpingGunHolder = false;
     void Update()
     {
-        if (!shadowHooking)
-        {
-            SetGrapplePoint();
-        }
+        
+        
+        
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
 
@@ -99,6 +99,7 @@ public class ShadowHook : MonoBehaviour
 
         if (Input.GetButtonDown("Shield") || (Gamepad.current?.rightTrigger.wasPressedThisFrame == true))
         {
+            SetGrapplePoint();
             shadowHooking = true;
             aimingLine.enabled = false;
 
@@ -108,12 +109,12 @@ public class ShadowHook : MonoBehaviour
             if (grappleRope.enabled)
             {
                 RotateGun(grapplePoint, false);
-                aimingLine.enabled = false;
+                aimingLine.enabled = true;
             }
             else
             {
                 RotateGun(aimingDirection, false);
-                aimingLine.enabled = false;
+                aimingLine.enabled = true;
             }
 
             if (launchToPoint && grappleRope.isGrappling)
@@ -125,27 +126,16 @@ public class ShadowHook : MonoBehaviour
             }
 
         }
-        else if (Input.GetButtonUp("Shield") || (Gamepad.current?.rightTrigger.wasReleasedThisFrame == true))
-        {
-            grappleRope.enabled = false;
-            m_springJoint2D.enabled = false;
-            ballRigidbody.gravityScale = 20;
-            grapplePoint = Vector2.zero;
-            aimingLine.enabled = false;
-            shadowHooking = false;
-        }
         else
         {
-            RotateGun(aimingDirection, true);
+            //RotateGun(aimingDirection, true);
             grappleRope.enabled = false;
             m_springJoint2D.enabled = false;
             ballRigidbody.gravityScale = 20;
             //grapplePoint = Vector2.zero;
             shadowHooking = false;
-            if(playerController.Grounded())
-            {
+
                 aimingLine.enabled = true;
-            }
         }
     }
 
@@ -164,42 +154,102 @@ public class ShadowHook : MonoBehaviour
             gunPivot.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 
     }
+
+    private GameObject grappledObject;
+    private GameObject lastGrappledObject;
+
     void SetGrapplePoint()
-{
-    // Define layers to ignore
-    int defaultLayer = LayerMask.NameToLayer("Default");
-    int backgroundLayer = LayerMask.NameToLayer("Background");
-    int foregroundLayer = LayerMask.NameToLayer("Foreground");
-    int grappableLayer = LayerMask.NameToLayer("Grappable");
-
-    // Create a layer mask that excludes the specified layers
-    int layerMask = ~(1 << defaultLayer | 1 << backgroundLayer | 1 << foregroundLayer);
-
-    RaycastHit2D hit = Physics2D.Raycast(firePoint.position, aimingDirection, maxDistance, layerMask);
-
-    // Draw a line from firePoint to a point far away in the aiming direction
-    aimingLine.positionCount = 2;
-    aimingLine.SetPosition(0, firePoint.position);
-    aimingLine.SetPosition(1, firePoint.position + aimingDirection.normalized * maxDistance);
-
-    if (hit.collider != null && hit.collider.gameObject.layer == grappableLayer && ((Vector2.Distance(hit.point, firePoint.position) <= maxDistance) || !hasMaxDistance))
     {
-        grapplePoint = hit.point;
-        DistanceVector = grapplePoint - (Vector2)gunPivot.position;
-        grappleRope.enabled = true;
+        // Define layers to ignore
+        int defaultLayer = LayerMask.NameToLayer("Default");
+        int backgroundLayer = LayerMask.NameToLayer("Background");
+        int midgroundLayer = LayerMask.NameToLayer("Midground");
+        int foregroundLayer = LayerMask.NameToLayer("Foreground");
+        int grappableLayer = LayerMask.NameToLayer("Grappable");
 
-        // Update the line to point to the grapple point
-        aimingLine.SetPosition(1, grapplePoint);
+        // Create a layer mask that excludes the specified layers
+        int layerMask = ~(1 << defaultLayer | 1 << backgroundLayer | 1 << foregroundLayer);
+        int obstacleLayerMask = ~(1 << defaultLayer | 1 << backgroundLayer | 1 << foregroundLayer | 1 << grappableLayer | 1 << midgroundLayer);
 
-        // Print the layer of the hit object
-        Debug.Log("Hit object on layer: " + LayerMask.LayerToName(hit.collider.gameObject.layer));
+        // Adjust the size of the sphere based on your needs
+        float sphereRadius = 100f;
+
+        RaycastHit2D[] allHits = Physics2D.CircleCastAll(firePoint.position, sphereRadius, Vector2.zero, 0, layerMask);
+
+        // Sort hits by distance from the player
+        Array.Sort(allHits, (a, b) => Vector2.Distance(a.point, firePoint.position).CompareTo(Vector2.Distance(b.point, firePoint.position)));
+
+        foreach (var hit in allHits)
+        {
+            if (hit.collider != null && hit.collider.gameObject.layer == grappableLayer && ((Vector2.Distance(hit.point, firePoint.position) <= maxDistance) || !hasMaxDistance))
+            {
+                // Check if there is anything blocking between player and grapple point
+                RaycastHit2D obstruction = Physics2D.Linecast(firePoint.position, hit.collider.gameObject.transform.position, obstacleLayerMask);
+                Debug.DrawLine(firePoint.position, hit.collider.gameObject.transform.position, Color.red, 1f); // Draw a red line from firePoint to hit.point
+                if (obstruction.collider == null)
+                {
+                    // Check if the hit object is different from the last grappled object
+                    if (lastGrappledObject == null || hit.collider.gameObject != lastGrappledObject)
+                    {
+                        grappledObject = hit.collider.gameObject;
+                        grapplePoint = hit.collider.gameObject.transform.position;
+                        DistanceVector = grapplePoint - (Vector2)gunPivot.position;
+                        grappleRope.enabled = true;
+
+                        // Print the layer of the hit object
+                        Debug.Log("Hit object on layer: " + LayerMask.LayerToName(hit.collider.gameObject.layer));
+
+                        // Update the last grappled object
+                        lastGrappledObject = grappledObject;
+
+                        // Exit the loop after finding a valid grapple point
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (grapplePoint == Vector2.zero)
+        {
+            Debug.Log("No collider hit on Grappable layer or distance too far or obstruction present. Setting grapplePoint to Vector2.zero.");
+        }
     }
-    else
+
+
+
+
+    private IEnumerator LerpGunHolder(Vector3 targetPosition, float speed)
     {
+        isLerpingGunHolder = true;
+
+        float startTime = Time.time;
+        Vector3 startPosition = gunHolder.position;
+        float journeyLength = Vector3.Distance(startPosition, targetPosition);
+
+        while (Vector3.Distance(gunHolder.position, targetPosition) > 0.01f)
+        {
+            float distCovered = (Time.time - startTime) * speed;
+            float fractionOfJourney = distCovered / journeyLength;
+            gunHolder.position = Vector3.Lerp(startPosition, targetPosition, fractionOfJourney);
+
+            // Calculate the direction towards the target position
+            Vector3 direction = (targetPosition - gunHolder.position).normalized;
+
+            yield return null;
+        }
+
+        // Lerp finished, do something here
+        isLerpingGunHolder = false;
+        Debug.Log("Lerp Finished");
+
+        // Perform the action here
+        grappleRope.enabled = false;
+        m_springJoint2D.enabled = false;
+        ballRigidbody.gravityScale = 20;
         //grapplePoint = Vector2.zero;
-        Debug.Log("No collider hit on Grappable layer or distance too far. Setting grapplePoint to Vector2.zero.");
+        aimingLine.enabled = false;
+        shadowHooking = false;
     }
-}
 
 
 
@@ -239,39 +289,6 @@ public class ShadowHook : MonoBehaviour
                 ballRigidbody.gravityScale = 0;
             }
         }
-    }
-
-    private IEnumerator LerpGunHolder(Vector3 targetPosition, float speed)
-    {
-        isLerpingGunHolder = true;
-
-        float startTime = Time.time;
-        Vector3 startPosition = gunHolder.position;
-        float journeyLength = Vector3.Distance(startPosition, targetPosition);
-
-        while (Vector3.Distance(gunHolder.position, targetPosition) > 0.01f)
-        {
-            float distCovered = (Time.time - startTime) * speed;
-            float fractionOfJourney = distCovered / journeyLength;
-            gunHolder.position = Vector3.Lerp(startPosition, targetPosition, fractionOfJourney);
-            
-            // Calculate the direction towards the target position
-            Vector3 direction = (targetPosition - gunHolder.position).normalized;
-
-            yield return null;
-        }
-
-        // Lerp finished, do something here
-        isLerpingGunHolder = false;
-        Debug.Log("Lerp Finished");
-
-        // Perform the action here
-        grappleRope.enabled = false;
-        m_springJoint2D.enabled = false;
-        ballRigidbody.gravityScale = 20;
-        grapplePoint = Vector2.zero;
-        aimingLine.enabled = false;
-        shadowHooking = false;
     }
 
     private void OnDrawGizmos()
