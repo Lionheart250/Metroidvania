@@ -208,10 +208,10 @@ public class ShadowHook : MonoBehaviour
                         // Change the color of the current grapple point
                         if (currentGrapplePoint != null)
                         {
-                            //currentGrapplePoint.GetComponent<SpriteRenderer>().color = Color.white;
+                            StartCoroutine(LerpColor(currentGrapplePoint.GetComponent<SpriteRenderer>(), Color.white, colorChangeSpeed));
                         }
                         currentGrapplePoint = grappledObject;
-                        //currentGrapplePoint.GetComponent<SpriteRenderer>().color = Color.green;
+                        StartCoroutine(LerpColor(currentGrapplePoint.GetComponent<SpriteRenderer>(), Color.green, colorChangeSpeed));
 
                         foundGrapplePoint = true;
                         break;
@@ -238,10 +238,10 @@ public class ShadowHook : MonoBehaviour
         // Change the color of the current grapple point
         if (currentGrapplePoint != null)
         {
-            //currentGrapplePoint.GetComponent<SpriteRenderer>().color = Color.white;
+            StartCoroutine(LerpColor(currentGrapplePoint.GetComponent<SpriteRenderer>(), Color.white, colorChangeSpeed));
         }
         currentGrapplePoint = grappledObject;
-        //currentGrapplePoint.GetComponent<SpriteRenderer>().color = Color.green;
+        StartCoroutine(LerpColor(currentGrapplePoint.GetComponent<SpriteRenderer>(), Color.green, colorChangeSpeed));
     }
 
     if (grapplePoint == Vector2.zero)
@@ -377,8 +377,8 @@ public class ShadowHook : MonoBehaviour
                 Vector2 directionToGrapplePoint = (hit.collider.gameObject.transform.position - transform.position).normalized;
                 if ((directionToGrapplePoint.x > 0 && pState.lookingRight) || (directionToGrapplePoint.x < 0 && !pState.lookingRight))
                 {
-                    grappableCount++;
                     grappleableObj = hit.collider.gameObject;
+                    grappableCount++;
                     break; // Exit the loop after finding the first valid grapple point
                 }
             }
@@ -387,8 +387,8 @@ public class ShadowHook : MonoBehaviour
 
     if (grappableCount == 1)
     {
-        // Reset color of the previous grapple point
-        if (currentGrapplePoint != null)
+        // Reset color of the previous grapple point if it's not the same as the new grapple point
+        if (currentGrapplePoint != null && currentGrapplePoint != grappleableObj)
         {
             StartCoroutine(LerpColor(currentGrapplePoint.GetComponent<SpriteRenderer>(), Color.white, colorChangeSpeed));
         }
@@ -417,8 +417,8 @@ public class ShadowHook : MonoBehaviour
                     // Check if the hit object is different from the last grappled object
                     if (lastGrappledObject == null || hit.collider.gameObject != lastGrappledObject)
                     {
-                        // Reset color of the previous grapple point
-                        if (currentGrapplePoint != null)
+                        // Reset color of the previous grapple point if it's not the same as the new grapple point
+                        if (currentGrapplePoint != null && currentGrapplePoint != hit.collider.gameObject)
                         {
                             StartCoroutine(LerpColor(currentGrapplePoint.GetComponent<SpriteRenderer>(), Color.white, colorChangeSpeed));
                         }
