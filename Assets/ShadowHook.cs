@@ -165,7 +165,7 @@ public class ShadowHook : MonoBehaviour
     int obstacleLayerMask = ~(1 << defaultLayer | 1 << backgroundLayer | 1 << foregroundLayer | 1 << grappableLayer | 1 << midgroundLayer);
 
     // Adjust the size of the sphere based on your needs
-    float sphereRadius = 100f;
+    float sphereRadius = maxDistance;
 
     RaycastHit2D[] allHits = Physics2D.CircleCastAll(firePoint.position, sphereRadius, Vector2.zero, 0, layerMask);
 
@@ -185,32 +185,37 @@ public class ShadowHook : MonoBehaviour
             Debug.DrawLine(firePoint.position, hit.collider.gameObject.transform.position, Color.red, 1f); // Draw a red line from firePoint to hit.point
             if (obstruction.collider == null)
             {
-                grappleableCount++;
-                closestGrappleableHit = hit;
-                // Check if the hit object is different from the last grappled object
-                if (lastGrappledObject == null || hit.collider.gameObject != lastGrappledObject)
+                // Check if the grapple point is in the direction the player is facing
+                Vector2 directionToGrapplePoint = (hit.collider.gameObject.transform.position - transform.position).normalized;
+                if ((directionToGrapplePoint.x > 0 && pState.lookingRight) || (directionToGrapplePoint.x < 0 && !pState.lookingRight))
                 {
-                    grappledObject = hit.collider.gameObject;
-                    grapplePoint = hit.collider.gameObject.transform.position;
-                    DistanceVector = grapplePoint - (Vector2)gunPivot.position;
-                    grappleRope.enabled = true;
-
-                    // Print the layer of the hit object
-                    Debug.Log("Hit object on layer: " + LayerMask.LayerToName(hit.collider.gameObject.layer));
-
-                    // Update the last grappled object
-                    lastGrappledObject = grappledObject;
-
-                    // Change the color of the current grapple point
-                    if (currentGrapplePoint != null)
+                    grappleableCount++;
+                    closestGrappleableHit = hit;
+                    // Check if the hit object is different from the last grappled object
+                    if (lastGrappledObject == null || hit.collider.gameObject != lastGrappledObject)
                     {
-                        //currentGrapplePoint.GetComponent<SpriteRenderer>().color = Color.white;
-                    }
-                    currentGrapplePoint = grappledObject;
-                    //currentGrapplePoint.GetComponent<SpriteRenderer>().color = Color.green;
+                        grappledObject = hit.collider.gameObject;
+                        grapplePoint = hit.collider.gameObject.transform.position;
+                        DistanceVector = grapplePoint - (Vector2)gunPivot.position;
+                        grappleRope.enabled = true;
 
-                    foundGrapplePoint = true;
-                    break;
+                        // Print the layer of the hit object
+                        Debug.Log("Hit object on layer: " + LayerMask.LayerToName(hit.collider.gameObject.layer));
+
+                        // Update the last grappled object
+                        lastGrappledObject = grappledObject;
+
+                        // Change the color of the current grapple point
+                        if (currentGrapplePoint != null)
+                        {
+                            //currentGrapplePoint.GetComponent<SpriteRenderer>().color = Color.white;
+                        }
+                        currentGrapplePoint = grappledObject;
+                        //currentGrapplePoint.GetComponent<SpriteRenderer>().color = Color.green;
+
+                        foundGrapplePoint = true;
+                        break;
+                    }
                 }
             }
         }
@@ -244,6 +249,7 @@ public class ShadowHook : MonoBehaviour
         Debug.Log("No collider hit on Grappable layer or distance too far or obstruction present. Setting grapplePoint to Vector2.zero.");
     }
 }
+
 
 
 
@@ -349,9 +355,9 @@ public class ShadowHook : MonoBehaviour
     int obstacleLayerMask = ~(1 << defaultLayer | 1 << backgroundLayer | 1 << foregroundLayer | 1 << grappableLayer | 1 << midgroundLayer);
 
     // Adjust the size of the sphere based on your needs
-    float sphereRadius = 100f;
+    float colorSphereRadius = maxDistance;
 
-    RaycastHit2D[] allHits = Physics2D.CircleCastAll(firePoint.position, sphereRadius, Vector2.zero, 0, layerMask);
+    RaycastHit2D[] allHits = Physics2D.CircleCastAll(firePoint.position, colorSphereRadius, Vector2.zero, 0, layerMask);
 
     // Sort hits by distance from the player
     Array.Sort(allHits, (a, b) => Vector2.Distance(a.point, firePoint.position).CompareTo(Vector2.Distance(b.point, firePoint.position)));
@@ -363,8 +369,19 @@ public class ShadowHook : MonoBehaviour
     {
         if (hit.collider != null && hit.collider.gameObject.layer == grappableLayer && ((Vector2.Distance(hit.point, firePoint.position) <= maxDistance) || !hasMaxDistance))
         {
-            grappableCount++;
-            grappleableObj = hit.collider.gameObject;
+            // Check if there is anything blocking between player and grapple point
+            RaycastHit2D obstruction = Physics2D.Linecast(firePoint.position, hit.collider.gameObject.transform.position, obstacleLayerMask);
+            if (obstruction.collider == null)
+            {
+                // Check if the grapple point is in the direction the player is facing
+                Vector2 directionToGrapplePoint = (hit.collider.gameObject.transform.position - transform.position).normalized;
+                if ((directionToGrapplePoint.x > 0 && pState.lookingRight) || (directionToGrapplePoint.x < 0 && !pState.lookingRight))
+                {
+                    grappableCount++;
+                    grappleableObj = hit.collider.gameObject;
+                    break; // Exit the loop after finding the first valid grapple point
+                }
+            }
         }
     }
 
@@ -388,7 +405,7 @@ public class ShadowHook : MonoBehaviour
     }
     else
     {
-        // Continue with the existing logic
+        // Continue with the existing logic for multiple grapple points
         foreach (var hit in allHits)
         {
             if (hit.collider != null && hit.collider.gameObject.layer == grappableLayer && ((Vector2.Distance(hit.point, firePoint.position) <= maxDistance) || !hasMaxDistance))
@@ -436,12 +453,14 @@ public class ShadowHook : MonoBehaviour
         while (t < 1f)
         {
             t += Time.deltaTime * speed;
-            spriteRenderer.color = Color.Lerp(startColor, targetColor, t);
+            spriteRenderer.color = Color.Lerp(startColor, targetColor, Mathf.Clamp01(t));
             yield return null;
         }
 
         spriteRenderer.color = targetColor;
     }
+    
+
 
 
 }
