@@ -204,7 +204,7 @@ public class PlayerController : MonoBehaviour
 
     [HideInInspector] public PlayerStateList pState;
     [HideInInspector] public Rigidbody2D rb;
-    private Animator anim;
+    [HideInInspector] public Animator anim;
     private SpriteRenderer sr;
     private Color originalColor;
     private CapsuleCollider2D mainCollider;
@@ -379,7 +379,6 @@ public class PlayerController : MonoBehaviour
             LightningStrike();
             StartShadowDash();
             EndShadowDash();
-            ShadowHook();
             CheckIfNearEnemy();
         }        
         FlashWhileInvincible();     
@@ -843,6 +842,7 @@ private void OnTriggerExit2D(Collider2D _other)
                     jumpForce = 120f;
                     maxFallingSpeed = 70f;
                     anim.SetBool("LightForm", true);
+                    shadowHook.SetActive(false);
                 }
                 else if (pState.shadowForm)
                 {   
@@ -852,6 +852,7 @@ private void OnTriggerExit2D(Collider2D _other)
                     jumpForce = 120f;
                     maxFallingSpeed = 120f;
                     anim.SetBool("ShadowForm", true);
+                    shadowHook.SetActive(true);
                 }
             }
         }
@@ -1574,30 +1575,6 @@ private void OnTriggerExit2D(Collider2D _other)
         lightningBow.SetActive(false);
         anim.SetBool("Casting", false);
     }
-
-    void ShadowHook()
-    {
-        if ((Input.GetButtonDown("Shield") || (Gamepad.current?.leftTrigger.wasPressedThisFrame == true)) && pState.shadowForm)
-        {
-           
-            shadowHook.SetActive(true);
-            
-            anim.SetBool("Casting", true);
-        }
-        if ((Input.GetButtonUp("Shield") || (Gamepad.current?.leftTrigger.wasReleasedThisFrame == true)) && pState.shadowForm)
-        {
-            
-            shadowHook.SetActive(false);
-            anim.SetBool("Casting", false);
-            rb.gravityScale = gravity;
-
-            
-            
-        }
-    }
-
-
-
 
     void LightDart()
     {  
