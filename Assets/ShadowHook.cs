@@ -97,9 +97,10 @@ public class ShadowHook : MonoBehaviour
             SetGrapplePoint();
             shadowHooking = true;
             playerController.anim.SetBool("Casting", true);
+            grappleRope.enabled = true;
 
         }
-        else if (Input.GetButton("Shield") || (Gamepad.current?.leftTrigger.isPressed == true) && shadowHooking)
+        else if (Input.GetButton("Shield") || (Gamepad.current?.leftTrigger.isPressed == true) && shadowHooking && grapplePoint != Vector2.zero)
         {
             if (grappleRope.enabled)
             {
@@ -122,6 +123,7 @@ public class ShadowHook : MonoBehaviour
         }
         else
         {
+            grapplePoint = Vector2.zero;
             //RotateGun(aimingDirection, true);
             grappleRope.enabled = false;
             m_springJoint2D.enabled = false;
@@ -191,31 +193,28 @@ public class ShadowHook : MonoBehaviour
                 {
                     grappleableCount++;
                     closestGrappleableHit = hit;
-                    // Check if the hit object is different from the last grappled object
-                    if (lastGrappledObject == null || hit.collider.gameObject != lastGrappledObject)
+
+                    grappledObject = hit.collider.gameObject;
+                    grapplePoint = hit.collider.gameObject.transform.position;
+                    DistanceVector = grapplePoint - (Vector2)gunPivot.position;
+                    grappleRope.enabled = true;
+
+                    // Print the layer of the hit object
+                    Debug.Log("Hit object on layer: " + LayerMask.LayerToName(hit.collider.gameObject.layer));
+
+                    // Update the last grappled object
+                    lastGrappledObject = grappledObject;
+
+                    // Change the color of the current grapple point
+                    if (currentGrapplePoint != null)
                     {
-                        grappledObject = hit.collider.gameObject;
-                        grapplePoint = hit.collider.gameObject.transform.position;
-                        DistanceVector = grapplePoint - (Vector2)gunPivot.position;
-                        grappleRope.enabled = true;
-
-                        // Print the layer of the hit object
-                        Debug.Log("Hit object on layer: " + LayerMask.LayerToName(hit.collider.gameObject.layer));
-
-                        // Update the last grappled object
-                        lastGrappledObject = grappledObject;
-
-                        // Change the color of the current grapple point
-                        if (currentGrapplePoint != null)
-                        {
-                            StartCoroutine(LerpColor(currentGrapplePoint.GetComponent<SpriteRenderer>(), Color.white, colorChangeSpeed));
-                        }
-                        currentGrapplePoint = grappledObject;
-                        StartCoroutine(LerpColor(currentGrapplePoint.GetComponent<SpriteRenderer>(), Color.green, colorChangeSpeed));
-
-                        foundGrapplePoint = true;
-                        break;
+                        StartCoroutine(LerpColor(currentGrapplePoint.GetComponent<SpriteRenderer>(), Color.white, colorChangeSpeed));
                     }
+                    currentGrapplePoint = grappledObject;
+                    StartCoroutine(LerpColor(currentGrapplePoint.GetComponent<SpriteRenderer>(), Color.green, colorChangeSpeed));
+
+                    foundGrapplePoint = true;
+                    break;
                 }
             }
         }
@@ -247,8 +246,11 @@ public class ShadowHook : MonoBehaviour
     if (grapplePoint == Vector2.zero)
     {
         Debug.Log("No collider hit on Grappable layer or distance too far or obstruction present. Setting grapplePoint to Vector2.zero.");
+        
     }
 }
+
+
 
 
 
