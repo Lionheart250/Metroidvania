@@ -595,7 +595,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 10, z: 0}
-  m_LocalScale: {x: 20, y: 3, z: 1}
+  m_LocalScale: {x: 8, y: 8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8393741681737554738}
@@ -898,7 +898,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3146015249766397942}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9557d669b2bbf4fc39c63f927ebdd180, type: 3}
+  m_Script: {fileID: 11500000, guid: a3691ddb1efb64844a72daead666aa2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 50
@@ -1647,7 +1647,7 @@ GameObject:
   - component: {fileID: 1141633055202301971}
   - component: {fileID: 6327736717140471178}
   - component: {fileID: 654176207366796602}
-  - component: {fileID: 4469386322999295897}
+  - component: {fileID: 117791817639978783}
   m_Layer: 0
   m_Name: ShadowHook
   m_TagString: Untagged
@@ -1683,36 +1683,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd466a75fb1d94ff18978fcf59e0b622, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 25
-  maxRadius: 5
+  moveSpeed: 1
+  maxRadius: 0
   horizontalAxis: Horizontal
   verticalAxis: Vertical
   grappleRope: {fileID: 5678196524230402413}
-  grappleToAll: 0
   grappableLayerMask:
     serializedVersion: 2
-    m_Bits: 64
-  m_camera: {fileID: 0}
+    m_Bits: 2048
   gunHolder: {fileID: 8393741681737554738}
   gunPivot: {fileID: 1141633055202301971}
   firePoint: {fileID: 1141633055202301971}
-  rotateOverTime: 1
-  rotationSpeed: 4
+  rotateOverTime: 0
+  rotationSpeed: 0
   hasMaxDistance: 1
-  maxDistance: 150
+  maxDistance: 100
   launchToPoint: 1
   Launch_Type: 0
-  launchSpeed: 5
+  launchSpeed: 120
   autoCongifureDistance: 0
-  targetDistance: 3
-  targetFrequency: 3
+  targetDistance: 1
+  targetFrequency: 0
   pState: {fileID: 0}
   playerController: {fileID: 0}
-  shadowHook: {fileID: 0}
-  m_springJoint2D: {fileID: 8453907787079911064}
   grapplePoint: {x: 0, y: 0}
   DistanceVector: {x: 0, y: 0}
-  ballRigidbody: {fileID: 1670897694765938384}
+  m_springJoint2D: {fileID: 8453907787079911064}
+  playerRigidbody: {fileID: 1670897694765938384}
+  lerpSpeed: 5
 --- !u!212 &654176207366796602
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1755,7 +1753,7 @@ SpriteRenderer:
   m_SortingLayer: 2
   m_SortingOrder: 10
   m_Sprite: {fileID: 21300000, guid: 2da2d15ce082e12448ac493c55a33f0f, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1765,48 +1763,110 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &4469386322999295897
-MonoBehaviour:
+--- !u!120 &117791817639978783
+LineRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4439624738333053060}
   m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd466a75fb1d94ff18978fcf59e0b622, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSpeed: 25
-  maxRadius: 5
-  horizontalAxis: Horizontal
-  verticalAxis: Vertical
-  grappleRope: {fileID: 5678196524230402413}
-  grappleToAll: 0
-  grappableLayerMask:
-    serializedVersion: 2
-    m_Bits: 64
-  m_camera: {fileID: 0}
-  gunHolder: {fileID: 8393741681737554738}
-  gunPivot: {fileID: 1141633055202301971}
-  firePoint: {fileID: 1141633055202301971}
-  rotateOverTime: 1
-  rotationSpeed: 4
-  hasMaxDistance: 0
-  maxDistance: 150
-  launchToPoint: 1
-  Launch_Type: 0
-  launchSpeed: 5
-  autoCongifureDistance: 1
-  targetDistance: 3
-  targetFrequency: 3
-  pState: {fileID: 0}
-  playerController: {fileID: 0}
-  shadowHook: {fileID: 4439624738333053060}
-  m_springJoint2D: {fileID: 8453907787079911064}
-  grapplePoint: {x: 0, y: 0}
-  DistanceVector: {x: 0, y: 0}
-  ballRigidbody: {fileID: 1670897694765938384}
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 0
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 0
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Positions:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 1}
+  m_Parameters:
+    serializedVersion: 3
+    widthMultiplier: 0.3
+    widthCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    colorGradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 0, b: 0, a: 1}
+      key1: {r: 1, g: 0, b: 0, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: 0
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    numCornerVertices: 1
+    numCapVertices: 10
+    alignment: 0
+    textureMode: 0
+    textureScale: {x: 1, y: 1}
+    shadowBias: 0.5
+    generateLightingData: 0
+  m_MaskInteraction: 0
+  m_UseWorldSpace: 1
+  m_Loop: 0
+  m_ApplyActiveColorSpace: 1
 --- !u!1 &4555006765837358632
 GameObject:
   m_ObjectHideFlags: 0
@@ -1833,7 +1893,38 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -10, z: 0}
-  m_LocalScale: {x: 20, y: 3, z: 1}
+  m_LocalScale: {x: 8, y: 8, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8393741681737554738}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4763588699595616331
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5202393834900939947}
+  m_Layer: 0
+  m_Name: Ceiling Check Point
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5202393834900939947
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4763588699595616331}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.58, y: 3.87, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8393741681737554738}
@@ -2043,7 +2134,7 @@ Transform:
   m_GameObject: {fileID: 5035203146021994808}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.3, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 15, y: 15, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2091,7 +2182,7 @@ SpriteRenderer:
   m_SortingLayer: 2
   m_SortingOrder: 11
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.1764706}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -2339,7 +2430,7 @@ Transform:
   m_GameObject: {fileID: 5206284653687119703}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -3.71, z: 0}
+  m_LocalPosition: {x: 0, y: -4.21, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3101,12 +3192,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7263213754260323155}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -590, y: 503, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6081919134884060294}
+  - {fileID: 5202393834900939947}
   - {fileID: 7864018728045345398}
   - {fileID: 4495849649064230659}
   - {fileID: 4911160870353817340}
@@ -3219,8 +3311,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6412131fb41b34c318aa79c502cfb9a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  comboCounter: 0
+  attackRadius: 12
   walkSpeed: 60
   airWalkSpeed: 50
+  aimWalkSpeed: 1
   jumpForce: 120
   lightJumpForce: 160
   jumpBufferFrames: 5
@@ -3242,6 +3337,9 @@ MonoBehaviour:
   groundCheckPoint: {fileID: 6081919134884060294}
   groundCheckY: 0.2
   groundCheckX: 1
+  ceilingCheckPoint: {fileID: 5202393834900939947}
+  ceilingCheckY: 0.2
+  ceilingCheckX: 1
   whatIsGround:
     serializedVersion: 2
     m_Bits: 64
@@ -3251,25 +3349,25 @@ MonoBehaviour:
   dashEffect: {fileID: 8902779006071723231, guid: 9042fa1c9d75d430788014ec956f31d3, type: 3}
   puddleFormCollider: {fileID: 3440841484494246827}
   SideAttackTransform: {fileID: 1464652292267261723}
-  SideAttackArea: {x: 20, y: 20}
+  SideAttackArea: {x: 20, y: 10}
   UpAttackTransform: {fileID: 5273050065689229505}
-  UpAttackArea: {x: 20, y: 20}
+  UpAttackArea: {x: 10, y: 20}
   DownAttackTransform: {fileID: 4784169075175515984}
-  DownAttackArea: {x: 20, y: 20}
+  DownAttackArea: {x: 10, y: 20}
   ChargeAttackTransform: {fileID: 7864018728045345398}
-  ChargeAttackArea: {x: 40, y: 23}
+  ChargeAttackArea: {x: 40, y: 15}
   ShadowSideAttackTransform: {fileID: 4495849649064230659}
-  ShadowSideAttackArea: {x: 15, y: 35}
+  ShadowSideAttackArea: {x: 40, y: 15}
   ShadowUpAttackTransform: {fileID: 4911160870353817340}
-  ShadowUpAttackArea: {x: 35, y: 15}
+  ShadowUpAttackArea: {x: 15, y: 34}
   ShadowDownAttackTransform: {fileID: 3372852536265797950}
-  ShadowDownAttackArea: {x: 35, y: 15}
+  ShadowDownAttackArea: {x: 15, y: 34}
   attackableLayer:
     serializedVersion: 2
     m_Bits: 8
   damage: 2
   slashEffect: {fileID: 8036702266434397819, guid: ad76ac7460de649b491fe07ded5743c9, type: 3}
-  chargeSlashEffect: {fileID: 8648911973234137180, guid: c97e8aade2b0e4d4c8f98bf6519fd559, type: 3}
+  chargeSlashEffect: {fileID: 8036702266434397819, guid: ad76ac7460de649b491fe07ded5743c9, type: 3}
   chargeSpeed: 2
   chargeTime: 3
   chargeParticles: {fileID: 2500424165092984414, guid: 0992ab8ffc9ed4db5a3ea6af818863ef, type: 3}
@@ -3324,8 +3422,7 @@ MonoBehaviour:
   Shield: {fileID: 7138701095369867511}
   pState: {fileID: 0}
   rb: {fileID: 0}
-  xAxis: 0
-  yAxis: 0
+  anim: {fileID: 0}
   unlockedWallJump: 0
   unlockedDash: 0
   unlockedDodge: 0
@@ -3477,6 +3574,7 @@ MonoBehaviour:
   healing: 0
   casting: 0
   aiming: 0
+  shadowHooking: 0
   cutscene: 0
   alive: 1
 --- !u!95 &8720006190877002372
@@ -3624,11 +3722,11 @@ SpringJoint2D:
   m_BreakAction: 3
   m_AutoConfigureConnectedAnchor: 0
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: -779.3725, y: 659.3174}
+  m_ConnectedAnchor: {x: -713.9273, y: 655.95654}
   m_AutoConfigureDistance: 0
-  m_Distance: 1.3
-  m_DampingRatio: 1
-  m_Frequency: 1
+  m_Distance: 0.005
+  m_DampingRatio: 0
+  m_Frequency: 0
 --- !u!1 &7311268959917152020
 GameObject:
   m_ObjectHideFlags: 0
@@ -3890,7 +3988,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 15.4, y: 0, z: 0}
-  m_LocalScale: {x: 0.3, y: 1.8, z: 1}
+  m_LocalScale: {x: 1.8, y: 1.2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8393741681737554738}
@@ -4067,8 +4165,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8876364348052201954}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 11.349976, y: -6, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -22,8 +22,7 @@ public class PlayerController3D : MonoBehaviour
         else
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
-    }
+        }
     }
 
 

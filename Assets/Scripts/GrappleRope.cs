@@ -116,11 +116,18 @@ public class GrappleRope : MonoBehaviour
         }
     }
 
-    void DrawRopeNoWaves() 
+    void DrawRopeNoWaves()
     {
         m_lineRenderer.positionCount = 2;
         m_lineRenderer.SetPosition(0, grapplingGun.grapplePoint);
         m_lineRenderer.SetPosition(1, grapplingGun.firePoint.position);
+
+        if (!isGrappling)
+        {
+            grapplingGun.Grapple();
+            isGrappling = true;
+        }
     }
+
 
 }

@@ -20,7 +20,6 @@ public class BatCaster : Enemy
     [SerializeField] private bool isChasing = false;
     Path path;
     int currentWaypoint = 0;
-    bool reachedEndOfPath = false;
     Seeker seeker;
     [SerializeField] private float projectileCooldown = 2f;
     private float projectileTimer = 0f;
@@ -83,12 +82,11 @@ public class BatCaster : Enemy
 
         if (currentWaypoint >= path.vectorPath.Count)
         {
-            reachedEndOfPath = true;
             return;
         }
         else
         {
-            reachedEndOfPath = false;
+            
         }
 
 

@@ -22,7 +22,6 @@ public class Bat : Enemy
     public int numberOfCoins = 1;
     Path path;
     int currentWaypoint = 0;
-    bool reachedEndOfPath = false;
     Seeker seeker;
 
     float timer;
@@ -84,12 +83,11 @@ public class Bat : Enemy
 
         if (currentWaypoint >= path.vectorPath.Count)
         {
-            reachedEndOfPath = true;
             return;
         }
         else
         {
-            reachedEndOfPath = false;
+            
         }
 
         Vector2 direction = ((Vector2)path.vectorPath[currentWaypoint]  - rb.position).normalized;

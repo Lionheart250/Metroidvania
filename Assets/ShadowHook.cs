@@ -42,8 +42,6 @@ public class ShadowHook : MonoBehaviour
     [HideInInspector] public PlayerController playerController;
     private bool obstacleInBetween;
 
-    private bool shadowHooking = false;
-
     private enum LaunchType
     {
         Transform_Launch,
@@ -68,7 +66,7 @@ public class ShadowHook : MonoBehaviour
     }
     public float lerpSpeed = 5f;
     private float currentDistance;
-    private bool isLerpingGunHolder = false;
+    private bool coroutining = false;
     void Update()
     {
         
@@ -92,44 +90,31 @@ public class ShadowHook : MonoBehaviour
         Vector3 targetPosition = firePoint.position + aimingDirection * maxDistance;
         Vector3 targetLinePosition = firePoint.position + targetAimingDirection * maxDistance * moveSpeed * Time.deltaTime;
 
-        if (Input.GetButtonDown("Shield") || (Gamepad.current?.leftTrigger.wasPressedThisFrame == true))
+        if (Input.GetButtonDown("Shield") || (Gamepad.current?.leftTrigger.wasPressedThisFrame == true) && !coroutining)
         {
             SetGrapplePoint();
-            shadowHooking = true;
-            playerController.anim.SetBool("Casting", true);
+            
+            
+            if (grapplePoint != Vector2.zero)
+            {
             grappleRope.enabled = true;
-
-        }
-        else if (Input.GetButton("Shield") || (Gamepad.current?.leftTrigger.isPressed == true) && shadowHooking && grapplePoint != Vector2.zero)
-        {
-            if (grappleRope.enabled)
-            {
-                RotateGun(grapplePoint, false);
+            pState.shadowHooking = true;
+            playerController.anim.SetBool("Casting", true);
+            StartCoroutine(LaunchToTarget(grapplePoint, launchSpeed));
             }
-            else
-            {
-                RotateGun(aimingDirection, false);
-            }
-
-            if (launchToPoint && grappleRope.isGrappling)
-            {
-                if (Launch_Type == LaunchType.Transform_Launch)
-                {
-                    StartCoroutine(LerpGunHolder(grapplePoint, launchSpeed));
-                    
-                }
-            }
-
         }
         else
         {
-            grapplePoint = Vector2.zero;
+            //grapplePoint = Vector2.zero;
             //RotateGun(aimingDirection, true);
-            grappleRope.enabled = false;
+            //grappleRope.enabled = false;
             m_springJoint2D.enabled = false;
             playerRigidbody.gravityScale = playerController.gravity;
-            shadowHooking = false;
             playerController.anim.SetBool("Casting", false);
+            if(playerController.Grounded())
+            {
+                pState.shadowHooking = false;
+            }
         }
     }
 
@@ -261,38 +246,35 @@ public class ShadowHook : MonoBehaviour
 
 
 
-    private IEnumerator LerpGunHolder(Vector3 targetPosition, float speed)
+    private IEnumerator LaunchToTarget(Vector3 targetPosition, float launchSpeed)
     {
-        isLerpingGunHolder = true;
-
+        coroutining = true;
+        playerRigidbody.velocity = Vector2.zero;
+        yield return new WaitForSeconds(0.2f);
+        Vector2 launchDirection = (targetPosition - gunHolder.position).normalized;
         float startTime = Time.time;
-        Vector3 startPosition = gunHolder.position;
-        float journeyLength = Vector3.Distance(startPosition, targetPosition);
+        float maxDuration = Vector2.Distance(gunHolder.position, targetPosition) / launchSpeed;
 
-        while (Vector3.Distance(gunHolder.position, targetPosition) > 0.01f)
+        while (Time.time - startTime < maxDuration)
         {
-            float distCovered = (Time.time - startTime) * speed;
-            float fractionOfJourney = distCovered / journeyLength;
-            gunHolder.position = Vector3.Lerp(startPosition, targetPosition, fractionOfJourney);
-
-            // Calculate the direction towards the target position
-            Vector3 direction = (targetPosition - gunHolder.position).normalized;
-
+            playerRigidbody.velocity = launchDirection * launchSpeed;
             yield return null;
         }
 
-        // Lerp finished, do something here
-        isLerpingGunHolder = false;
-        Debug.Log("Lerp Finished");
+        // Ensure the player reaches the exact target position
+        gunHolder.position = targetPosition;
+        playerRigidbody.velocity = new Vector2(launchDirection.x * launchSpeed, launchDirection.y * launchSpeed);
         
 
-        // Perform the action here
-        grappleRope.enabled = false;
-        m_springJoint2D.enabled = false;
         playerRigidbody.gravityScale = playerController.gravity;
+        grappleRope.enabled = false;
+        yield return new WaitForSeconds(0.2f);
+        coroutining = false;
+        m_springJoint2D.enabled = false;
         grapplePoint = Vector2.zero;
-        shadowHooking = false;
+        pState.shadowHooking = false;
     }
+
 
 
 

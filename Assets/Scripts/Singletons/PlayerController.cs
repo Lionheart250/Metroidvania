@@ -15,7 +15,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float walkSpeed = 1; //sets the players movement speed on the ground
     [SerializeField] private float airWalkSpeed = 1; //sets the players movement speed in the air 
     [SerializeField] private float aimWalkSpeed = 1;
-
     private float originalWalkSpeed;
     [Space(5)]
 
@@ -258,7 +257,6 @@ public class PlayerController : MonoBehaviour
         else
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
     }
 
@@ -585,9 +583,9 @@ private void OnTriggerExit2D(Collider2D _other)
     {
         float currentWalkSpeed = pState.aiming ? aimWalkSpeed : walkSpeed;
 
-        if (!pState.lightJumping)
+        if (!pState.lightJumping && !pState.shadowHooking)
         {
-            if (Grounded())
+            if (Grounded() )
             {
                 // Grounded movement
                 rb.velocity = new Vector2(currentWalkSpeed * xAxis, rb.velocity.y);
@@ -617,13 +615,16 @@ private void OnTriggerExit2D(Collider2D _other)
             }
             else
             {
-                // Airborne movement
-                
-                rb.velocity = new Vector2(airWalkSpeed * xAxis, rb.velocity.y);
+                if (xAxis != 0)
+                {
+                    // Airborne movement
+                    
+                    rb.velocity = new Vector2(airWalkSpeed * xAxis, rb.velocity.y);
 
-                // Set animation states for airborne movement
-                anim.SetBool("Running", false);
-                anim.SetBool("Walking", false);
+                    // Set animation states for airborne movement
+                    anim.SetBool("Running", false);
+                    anim.SetBool("Walking", false);
+                }
             }
         }
     }
@@ -840,7 +841,7 @@ private void OnTriggerExit2D(Collider2D _other)
                     walkSpeed = 60f; 
                     airWalkSpeed = 40f;
                     jumpForce = 120f;
-                    maxFallingSpeed = 70f;
+                    maxFallingSpeed = 90f;
                     anim.SetBool("LightForm", true);
                     shadowHook.SetActive(false);
                 }
@@ -848,9 +849,9 @@ private void OnTriggerExit2D(Collider2D _other)
                 {   
                     anim.SetBool("LightForm", false);
                     walkSpeed = 50f;
-                    airWalkSpeed = 70f;
+                    airWalkSpeed = 40f;
                     jumpForce = 120f;
-                    maxFallingSpeed = 120f;
+                    maxFallingSpeed = 90f;
                     anim.SetBool("ShadowForm", true);
                     shadowHook.SetActive(true);
                 }

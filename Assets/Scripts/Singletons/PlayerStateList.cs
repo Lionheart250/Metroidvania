@@ -20,6 +20,7 @@ public class PlayerStateList : MonoBehaviour
     public bool healing;
     public bool casting;
     public bool aiming = false;
+    public bool shadowHooking = false;
     public bool cutscene = false;
     public bool alive = true; // Default to alive
 
@@ -29,7 +30,6 @@ public class PlayerStateList : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // Makes the object persist between scenes
 
             lightForm = true; // Light form is true by default
             shadowForm = false; // Shadow form is false by default
