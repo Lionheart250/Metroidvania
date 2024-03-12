@@ -50,16 +50,16 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    private void OnDestroy()
-    {
-        Debug.Log("PlayerManager is being destroyed.");
-        if (player == null)
-        {
-            Debug.Log("Player GameObject is destroyed.");
-        }
-        if (player3D == null)
-        {
-            Debug.Log("Player3D GameObject is destroyed.");
-        }
-    }
+   // private void OnDestroy()
+    //{
+       // Debug.Log("PlayerManager is being destroyed.");
+       // if (player == null)
+       // {
+        //    Debug.Log("Player GameObject is destroyed.");
+        //}
+        //if (player3D == null)
+        //{
+        //    Debug.Log("Player3D GameObject is destroyed.");
+        //}
+   // }
 }
