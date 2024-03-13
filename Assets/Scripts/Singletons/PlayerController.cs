@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private int maxLightJumps;
     [SerializeField] private float maxFallingSpeed; //the max fallspeed
     public float fallGravityMultiplier; // You can adjust this value
-    public float gravity; //stores the gravity scale at start
+    [HideInInspector] public float gravity; //stores the gravity scale at start
     [Space(5)]
 
     [Header("Wall Jump Settings")]
@@ -431,26 +431,30 @@ public class PlayerController : MonoBehaviour
             pState.puddleForm = true;
             // You may add additional logic or start a coroutine here if needed
         }
-    
+
         if (_other.GetComponent<Enemy>() != null && pState.casting && !pState.lightJumping) 
         {
             _other.GetComponent<Enemy>().EnemyGetsHit(spellDamage, (_other.transform.position - transform.position).normalized, recoilYSpeed);
         }
-        if ((_other.GetComponent<Enemy>() != null || _other.GetComponent<IllusionaryWall>() != null) && pState.lightJumping)
+        if (_other.GetComponent<Enemy>() != null && pState.casting && pState.lightningBody && !pState.lightJumping) 
         {
-            int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
-            Vector2 hitDirection = new Vector2(_recoilLeftOrRight, -1);
+            _other.GetComponent<Enemy>().EnemyGetsHit(spellDamage, (_other.transform.position - transform.position).normalized, recoilXSpeed * 0);
+            
+            // Calculate perpendicular direction based on the player's current velocity
+            Vector2 moveDirection = rb.velocity.normalized;
+            Vector2 perpendicularDirection = new Vector2(moveDirection.y, -moveDirection.x); // Calculate a direction perpendicular to the player's velocity
 
-        
-            Hit(LightJumpTransform, LightJumpArea, ref pState.recoilingY, hitDirection, recoilYSpeed);
+            // Determine the side to move towards (left or right)
+            float dot = Vector2.Dot(perpendicularDirection, rb.velocity.normalized);
+            float sideFactor = dot > 0 ? 1 : -1;
 
-    
-            Vector2 oppositeDirection = -hitDirection;
+            // Move the player slightly to the side
+            Vector2 newPlayerPosition = (Vector2)transform.position + perpendicularDirection * sideFactor * 10f; // Move the player 0.1 units to the side
 
-    
-            rb.velocity = oppositeDirection * (lightJumpForce * 0.5f);
+            transform.position = newPlayerPosition;
         }
     }
+
 
 private void OnTriggerExit2D(Collider2D _other)
 {
@@ -494,7 +498,7 @@ private void OnTriggerExit2D(Collider2D _other)
         
 
         // New Input System
-        if (Gamepad.current != null && Gamepad.current.circleButton.isPressed)
+        if (Gamepad.current != null && Gamepad.current?.dpad.down.isPressed == true)
         {
             castOrHealTimer += Time.deltaTime;
         }
@@ -583,7 +587,7 @@ private void OnTriggerExit2D(Collider2D _other)
     {
         float currentWalkSpeed = pState.aiming ? aimWalkSpeed : walkSpeed;
 
-        if (!pState.lightJumping && !pState.shadowHooking)
+        if (!pState.lightJumping && !pState.shadowHooking && !pState.lightningBody)
         {
             if (Grounded() )
             {
@@ -1474,7 +1478,7 @@ private void OnTriggerExit2D(Collider2D _other)
 
     void Heal()
     {
-        if (Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == true))
+        if (Input.GetButton("Cast/Heal") || (Gamepad.current?.dpad.down.isPressed == true))
         {
              //Debug.Log("castOrHealTimer: " + castOrHealTimer);
             castOrHealTimer = Mathf.Clamp(castOrHealTimer, 0f, 1.0f);
@@ -1487,7 +1491,7 @@ private void OnTriggerExit2D(Collider2D _other)
             castOrHealTimer -= Time.deltaTime;
             castOrHealTimer = Mathf.Clamp(castOrHealTimer, 0f, 1.0f);
         }
-        if ((Input.GetButton("Cast/Heal") || (Gamepad.current?.circleButton.isPressed == true)) && castOrHealTimer > 0.5f && Health < maxHealth && Mana > 0 && !pState.jumping && !pState.dashing)
+        if ((Input.GetButton("Cast/Heal") || (Gamepad.current?.dpad.down.isPressed == true)) && castOrHealTimer > 0.5f && Health < maxHealth && Mana > 0 && !pState.jumping && !pState.dashing)
         {
             pState.healing = true;
             anim.SetBool("Healing", true);
@@ -1536,11 +1540,11 @@ private void OnTriggerExit2D(Collider2D _other)
 
     void LightningBow()
     {
-        if ((Input.GetButtonDown("Cast/Heal") || (Gamepad.current?.circleButton.wasPressedThisFrame == true)) && castOrHealTimer <= 0.5f && timeSinceCast >= timeBetweenCast && Mana >= manaSpellCost && pState.lightForm && yAxis > 0 && unlockedUpCast && Grounded())
+        if ((Input.GetButtonDown("Cast/Heal") || (Gamepad.current?.circleButton.wasPressedThisFrame == true)) && timeSinceCast >= timeBetweenCast && Mana >= manaSpellCost && pState.lightForm && yAxis > 0 && unlockedUpCast && Grounded())
         {
             pState.aiming = true;
             lightningBow.SetActive(true);
-            FreezeRigidbodyPosition(); 
+            //FreezeRigidbodyPosition(); 
             timeSinceCast = 0;
             anim.SetBool("Casting", true);
         }
@@ -1552,7 +1556,7 @@ private void OnTriggerExit2D(Collider2D _other)
         if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && Mana >= manaSpellCost && pState.lightForm && pState.aiming)
         {
             
-            UnfreezeRigidbodyPosition();
+            //UnfreezeRigidbodyPosition();
             StartCoroutine(ShootLightningArrow());
             
             Mana -= manaSpellCost;
@@ -1579,7 +1583,7 @@ private void OnTriggerExit2D(Collider2D _other)
 
     void LightDart()
     {  
-        if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && !pState.aiming && castOrHealTimer < 0.5f && timeSinceCast >= timeBetweenCast 
+        if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && !pState.aiming && timeSinceCast >= timeBetweenCast 
         && Mana >= manaSpellCost / 3.0f && pState.lightForm && yAxis == 0 && unlockedSideCast)
         {
             
@@ -1631,8 +1635,8 @@ private void OnTriggerExit2D(Collider2D _other)
     
     void LightningStrike()
     {
-        if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && !pState.aiming && castOrHealTimer < 0.5f
-        && Mana >= manaSpellCost / 3.0f && pState.lightForm && !pState.casting)
+        if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && !pState.aiming
+        && Mana >= manaSpellCost / 3.0f && pState.lightForm && !pState.casting && !pState.lightningBody)
         {
             if ((yAxis < 0 && Grounded()) && unlockedDownCast)
             {
@@ -1655,7 +1659,8 @@ private void OnTriggerExit2D(Collider2D _other)
     {
         anim.SetBool("Casting", true);
         pState.casting = true;
-        FreezeRigidbodyPosition();
+        pState.lightningBody = true;
+        //FreezeRigidbodyPosition();
 
         yield return new WaitForSeconds(0.15f);
 
@@ -1668,9 +1673,10 @@ private void OnTriggerExit2D(Collider2D _other)
         yield return new WaitForSeconds(0.5f);
                
         anim.SetBool("Casting", false);
+        pState.lightningBody = false;
         
         lightningStrike.SetActive(false);
-        UnfreezeRigidbodyPosition();
+        //UnfreezeRigidbodyPosition();
 
         yield return new WaitForSeconds(1.5f);
         pState.casting = false;
@@ -1681,10 +1687,14 @@ private void OnTriggerExit2D(Collider2D _other)
     {
         anim.SetBool("Casting", true);
         pState.casting = true;
-        FreezeRigidbodyPosition();
+        pState.lightningBody = true;
+        //FreezeRigidbodyPosition();
+        rb.velocity = Vector2.zero;
+        rb.gravityScale = 0;
 
-        yield return new WaitForSeconds(0.15f);
-        UnfreezeRigidbodyPosition();
+        yield return new WaitForSeconds(0.5f);
+        rb.gravityScale = gravity;
+        //UnfreezeRigidbodyPosition();
         downSpellFireball.SetActive(true);
         audioSource.PlayOneShot(spellCastSound);
 
@@ -1697,27 +1707,31 @@ private void OnTriggerExit2D(Collider2D _other)
         // Add a loop to check if the player is grounded and end the coroutine if grounded
         while (!Grounded())
         {
+            rb.velocity += walkSpeed * 5 * Vector2.down;
             yield return null; // Wait for the next frame
             
         }
-        FreezeRigidbodyPosition();
+        //FreezeRigidbodyPosition();
         lightningStrike.SetActive(true);
         audioSource.PlayOneShot(spellCastSound);
+        rb.velocity += walkSpeed * 5 * Vector2.down;
         yield return new WaitForSeconds(0.5f);
                
         anim.SetBool("Casting", false);
         
         lightningStrike.SetActive(false);
-        UnfreezeRigidbodyPosition();
+        pState.lightningBody = false;
+        // UnfreezeRigidbodyPosition();
 
         yield return new WaitForSeconds(1.5f);
         pState.casting = false;
+        
         
     }
     
     void CastSpell()
     {
-        if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && castOrHealTimer <= 0.5f && timeSinceCast >= timeBetweenCast && Mana >= manaSpellCost && pState.shadowForm)
+        if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && timeSinceCast >= timeBetweenCast && Mana >= manaSpellCost && pState.shadowForm)
         {
             pState.casting = true;
             timeSinceCast = 0;
@@ -1742,7 +1756,7 @@ private void OnTriggerExit2D(Collider2D _other)
         //if down spell is active, force player down until grounded
         if(downSpellFireball.activeInHierarchy)
         {
-            rb.velocity += downSpellForce * Vector2.down;
+            //rb.velocity += downSpellForce * Vector2.down;
         }
         if(downSpellShadowFireball.activeInHierarchy)
         {
@@ -1901,7 +1915,7 @@ private void OnTriggerExit2D(Collider2D _other)
     void Jump()
     {    
 
-        if (jumpBufferCounter > 0 && coyoteTimeCounter > 0 && !pState.jumping)
+        if (jumpBufferCounter > 0 && coyoteTimeCounter > 0 && !pState.jumping && !pState.lightningBody)
         {
             pState.jumping = true;
         
@@ -1911,7 +1925,7 @@ private void OnTriggerExit2D(Collider2D _other)
             StartCoroutine(LerpAirWalkSpeed(25, 50, 0.4f));      
         }
 
-        if (!Grounded() && airJumpCounter < maxAirJumps && ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && !pState.lightForm))
+        if (!Grounded() && airJumpCounter < maxAirJumps && ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && !pState.lightForm && !pState.lightningBody))
         {
             //audioSource.PlayOneShot(jumpSound);
 
@@ -1975,7 +1989,7 @@ private void OnTriggerExit2D(Collider2D _other)
     IEnumerator LightJumpCoroutine()
     {
         pState.lightJumping = true;
-        UnfreezeRigidbodyPosition();
+        //UnfreezeRigidbodyPosition();
         Vector2 launchDirection;
         if (Mathf.Approximately(xAxis, 0) && Mathf.Approximately(yAxis, 0))
         {
@@ -1994,11 +2008,12 @@ private void OnTriggerExit2D(Collider2D _other)
 
         if (launchDirection != lastLightJumpDirection)
         {
-            rb.velocity = new Vector2(rb.velocity.x, 0);
-            FreezeRigidbodyPosition();
+            rb.velocity = Vector2.zero;
+            rb.gravityScale = 0;
+            //FreezeRigidbodyPosition();
             yield return new WaitForSeconds(0.15f);
             audioSource.PlayOneShot(dashAndAttackSound);
-            UnfreezeRigidbodyPosition();
+           // UnfreezeRigidbodyPosition();
 
 
             lightBall.SetActive(true);
@@ -2025,9 +2040,11 @@ private void OnTriggerExit2D(Collider2D _other)
                 yield return null;
             }
 
-            FreezeRigidbodyPosition();
+            //FreezeRigidbodyPosition();
+            rb.gravityScale = 0;
+            rb.velocity = Vector2.zero;
             yield return new WaitForSeconds(0.15f);
-            UnfreezeRigidbodyPosition();
+            //UnfreezeRigidbodyPosition();
             rb.velocity = Vector2.zero;
             lightBall.SetActive(false);
             Physics2D.IgnoreLayerCollision(gameObject.layer, LayerMask.NameToLayer("Attackable"), false);
