@@ -605,7 +605,7 @@ private void OnTriggerExit2D(Collider2D _other)
             }
             else
             {
-                if (!Grounded())
+                if (!xAxis == 0 && !pState.shadowHooking)
                 {
                     // Airborne movement
                     
