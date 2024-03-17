@@ -14,6 +14,8 @@ TagManager:
   - Illusion
   - Obstacle
   - Player3D
+  - RingOfLight
+  - LightDart
   layers:
   - Default
   - TransparentFX

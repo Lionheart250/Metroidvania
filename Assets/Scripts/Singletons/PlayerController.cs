@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEditor.Build;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static LeanTween;
 
 
 
@@ -9,7 +10,6 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private int comboCounter = 0;
-    [SerializeField] private float attackRadius = 2f; // Adjust the radius as needed
     [Space(5)]
     [Header("Horizontal Movement Settings:")]
     [SerializeField] private float walkSpeed = 1; //sets the players movement speed on the ground
@@ -22,7 +22,6 @@ public class PlayerController : MonoBehaviour
 
     [Header("Vertical Movement Settings")]
     [SerializeField] private float jumpForce = 45f; //sets how hight the player can jump
-    [SerializeField] private float lightJumpForce = 60f; 
     private int jumpBufferCounter = 0; //stores the jump button input
     private int lightJumpBufferCounter = 0;
     [SerializeField] private int jumpBufferFrames; //sets the max amount of frames the jump buffer input is stored
@@ -95,7 +94,8 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private LayerMask attackableLayer; //the layer the player can attack and recoil off of
 
-    private float timeBetweenAttack = 0.5f, timeSinceAttck;
+    private float timeBetweenRangedAttack  = 0.2f, timeSinceRangedAttck;
+    private float timeBetweenAttack = 0.4f, timeSinceAttck;
     private float timeBetweenShadowAttack = 0.6f, timeSinceShadowAttck;
 
     [SerializeField] private float damage; //the damage the player does to an enemy
@@ -170,7 +170,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] GameObject lightningBow;
     [SerializeField] GameObject lightningArrow;
     [SerializeField] GameObject lightningDart;
+    [SerializeField] GameObject ringOfLight;
     [SerializeField] GameObject lightningStrike;
+    [SerializeField] GameObject lightningStake;
     [SerializeField] float lightJumpDamage;
     [SerializeField] private Transform LightJumpTransform; //the middle of the up attack area
     [SerializeField] private Vector2 LightJumpArea; //how large the area of side attack is
@@ -365,7 +367,7 @@ public class PlayerController : MonoBehaviour
             }   
             if(unlockedDodge)
             {
-                StartDodge();
+                BecomeEmpowered();
             }         
             Attack();
             RangedAttack();
@@ -373,11 +375,11 @@ public class PlayerController : MonoBehaviour
             CastSpell();
             //BlackShield();
             LightningBow();
-            LightDart();
+            LightRing();
             LightningStrike();
             StartShadowDash();
             EndShadowDash();
-            CheckIfNearEnemy();
+            LightningBody();
         }        
         FlashWhileInvincible();     
         
@@ -436,24 +438,8 @@ public class PlayerController : MonoBehaviour
         {
             _other.GetComponent<Enemy>().EnemyGetsHit(spellDamage, (_other.transform.position - transform.position).normalized, recoilYSpeed);
         }
-        if (_other.GetComponent<Enemy>() != null && pState.casting && pState.lightningBody && !pState.lightJumping) 
-        {
-            _other.GetComponent<Enemy>().EnemyGetsHit(spellDamage, (_other.transform.position - transform.position).normalized, recoilXSpeed * 0);
-            
-            // Calculate perpendicular direction based on the player's current velocity
-            Vector2 moveDirection = rb.velocity.normalized;
-            Vector2 perpendicularDirection = new Vector2(moveDirection.y, -moveDirection.x); // Calculate a direction perpendicular to the player's velocity
-
-            // Determine the side to move towards (left or right)
-            float dot = Vector2.Dot(perpendicularDirection, rb.velocity.normalized);
-            float sideFactor = dot > 0 ? 1 : -1;
-
-            // Move the player slightly to the side
-            Vector2 newPlayerPosition = (Vector2)transform.position + perpendicularDirection * sideFactor * 10f; // Move the player 0.1 units to the side
-
-            transform.position = newPlayerPosition;
-        }
     }
+    
 
 
 private void OnTriggerExit2D(Collider2D _other)
@@ -619,7 +605,7 @@ private void OnTriggerExit2D(Collider2D _other)
             }
             else
             {
-                if (xAxis != 0)
+                if (!Grounded())
                 {
                     // Airborne movement
                     
@@ -679,43 +665,88 @@ private void OnTriggerExit2D(Collider2D _other)
         if (Grounded()) Instantiate(dashEffect, transform);
         yield return new WaitForSeconds(dashTime);
         rb.gravityScale = gravity;
+        rb.velocity = Vector2.zero;
         pState.dashing = false;
         yield return new WaitForSeconds(dashCooldown);
         canDash = true;
     }
+    public float returnSpeed = 0.2f; // Adjust the return speed as needed
 
-    void StartDodge()
+    public void ReturnLightDarts(float delay)
     {
-        if ((Input.GetButtonDown("Dash")|| (Gamepad.current?.leftTrigger.wasPressedThisFrame == true)) && canDodge && !dodged && pState.lightForm)
+        GameObject[] lightDarts = GameObject.FindGameObjectsWithTag("LightDart");
+
+        foreach (GameObject dart in lightDarts)
         {
-            StartCoroutine(Dodge());
-            dodged = true;
-        }
-        if (Grounded())
-        {
-            dodged = false;
+            LightDart lightDart = dart.GetComponent<LightDart>();
+            if (lightDart != null)
+            {
+                lightDart.canDetach = true;
+                StartCoroutine(ReturnDart(dart, delay));
+            }
         }
     }
 
-    IEnumerator Dodge()
+
+    private IEnumerator ReturnDart(GameObject dart, float delay)
     {
-        canDodge = false;
-        pState.invincible = true;
-        pState.dodging = true;
-        anim.SetTrigger("Dashing");
-        audioSource.PlayOneShot(dashAndAttackSound);
-        rb.gravityScale = 0;
-        int _dir = pState.lookingRight ? 1 : -1;
-        rb.velocity = new Vector2(-_dir * (dashSpeed * 0.10f), 0);
-        //if (Grounded()) Instantiate(dashEffect, transform);
-        FreezeRigidbodyPosition();
-        yield return new WaitForSeconds(dashTime);
-        rb.gravityScale = gravity;
-        UnfreezeRigidbodyPosition();
-        pState.dodging = false;
-        pState.invincible = false;  
-        yield return new WaitForSeconds(dashCooldown);    
-        canDodge = true;
+        // Unparent the dart
+        dart.transform.parent = null;
+
+        float duration = 1f; // Default duration
+        float returnSpeed = 250f; // Speed at which the dart returns (units per second)
+
+        // Calculate the distance between the dart and the player
+        float distanceToPlayer = Vector3.Distance(dart.transform.position, transform.position);
+
+        // Calculate the duration based on the distance and return speed
+        if (returnSpeed > 0f)
+        {
+            duration = distanceToPlayer / returnSpeed;
+        }
+
+        float elapsedTime = 0f;
+        Vector3 startPosition = dart.transform.position;
+        Vector3 targetPosition = transform.position;
+
+        while (elapsedTime < duration)
+        {
+            // Calculate lerp progress
+            float t = elapsedTime / duration;
+
+            // Lerp the dart's position towards the player's current position
+            dart.transform.position = Vector3.Lerp(startPosition, targetPosition, t);
+
+            // Update the player's position each frame
+            targetPosition = transform.position;
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // Set the dart's position to the player's position
+        dart.transform.position = transform.position;
+
+        // Destroy the dart
+        Destroy(dart);
+    }
+
+
+
+    void BecomeEmpowered()
+    {
+        if ((Input.GetButtonDown("Dash")|| (Gamepad.current?.leftTrigger.wasPressedThisFrame == true)) && pState.lightForm && !pState.empoweredLight)
+        {
+            StartCoroutine(LightFormEngorgement());
+        }
+    }
+
+    IEnumerator LightFormEngorgement()
+    {
+        pState.empoweredLight = true;
+        yield return new WaitForSeconds(5f);
+        pState.empoweredLight = false;
+        ReturnLightDarts(returnSpeed); 
     }
     
     private bool isShadowDashing = false;
@@ -835,8 +866,6 @@ private void OnTriggerExit2D(Collider2D _other)
             // Ensure sr is not null
             if (sr != null)
             {
-                // Set the color based on the current form
-                //sr.color = pState.shadowForm ? Color.black : Color.white;
 
                 // Modify walkSpeed and gravity based on the current form
                 if (pState.lightForm)
@@ -865,15 +894,12 @@ private void OnTriggerExit2D(Collider2D _other)
 
     void RangedAttack()
     {
-        timeSinceAttck += Time.deltaTime;
+        timeSinceRangedAttck += Time.deltaTime;
 
-        // Check if there is an enemy nearby
-        bool isNearEnemy = CheckIfNearEnemy();
-
-        if ((attack || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && timeSinceAttck >= timeBetweenAttack && !pState.shadowForm && !isNearEnemy)
+        if ((attack || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && timeSinceRangedAttck >= timeBetweenRangedAttack && pState.empoweredLight && !pState.shadowForm)
         {
             // Attack logic
-            timeSinceAttck = 0;
+            timeSinceRangedAttck = 0;
             //anim.SetTrigger("RangedAttacking");
             audioSource.PlayOneShot(dashAndAttackSound);
 
@@ -881,7 +907,7 @@ private void OnTriggerExit2D(Collider2D _other)
             {
                 // Handle regular attack
                 int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
-                GameObject _lightDart = Instantiate(lightningDart, SideAttackTransform.position, Quaternion.identity);
+                GameObject _lightDart = Instantiate(lightningDart, transform.position, Quaternion.identity);
 
                 if (pState.lookingRight)
                 {
@@ -889,21 +915,22 @@ private void OnTriggerExit2D(Collider2D _other)
                 }
                 else
                 {
-                    _lightDart.transform.eulerAngles = new Vector2(_lightDart.transform.eulerAngles.x, 180); 
+                    _lightDart.transform.eulerAngles = new Vector3(0, 180, 0); 
                 }
             }
-            else if (yAxis > 0 && !pState.shadowForm)
+            else
             {
-                GameObject _lightDart = Instantiate(lightningDart, UpAttackTransform.position, Quaternion.identity);
-                 _lightDart.transform.eulerAngles = new Vector3(_lightDart.transform.eulerAngles.x, 0, 90);
-            }
-            else if (yAxis < 0 && !Grounded() && !pState.shadowForm)
-            {
-                GameObject _lightDart = Instantiate(lightningDart, UpAttackTransform.position, Quaternion.identity);
-                 _lightDart.transform.eulerAngles = new Vector3(_lightDart.transform.eulerAngles.x, 0, -90);
+                // Shoot in 8 directions without moving
+                Vector3 shootDirection = new Vector3(xAxis, yAxis, 0).normalized;
+                float angle = Mathf.Atan2(shootDirection.y, shootDirection.x) * Mathf.Rad2Deg;
+                angle = SnapAngle(angle);
+
+                GameObject _lightDart = Instantiate(lightningDart, transform.position, Quaternion.Euler(new Vector3(0, 0, angle)));
+
+                // Reset horizontal movement
+                rb.velocity = new Vector2(0, rb.velocity.y);
             }
         }
-
         if ((Input.GetButton("Attack") || (Gamepad.current?.squareButton.isPressed == true)) && chargeTime <= 2 && !pState.shadowForm)
         {
             chargeTime += Time.deltaTime * chargeSpeed;
@@ -938,16 +965,33 @@ private void OnTriggerExit2D(Collider2D _other)
         }
     }   
 
+    float SnapAngle(float angle)
+    {
+        // Snap angle to 0, 45, 90, 135, 180, 225, 270, 315 degrees
+        float[] snapAngles = { 0, 45, 90, 135, 180, 225, 270, 315 };
+        float minDifference = Mathf.Abs(angle - snapAngles[0]);
+        float snapAngle = snapAngles[0];
+
+        foreach (float snap in snapAngles)
+        {
+            float diff = Mathf.Abs(angle - snap);
+            if (diff < minDifference)
+            {
+                minDifference = diff;
+                snapAngle = snap;
+            }
+        }
+
+        return snapAngle;
+    }
+
 
 
     void Attack()
     {
         timeSinceAttck += Time.deltaTime;
 
-        // Check if there is an enemy nearby
-        bool isNearEnemy = CheckIfNearEnemy();
-
-        if ((attack || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && timeSinceAttck >= timeBetweenAttack && !pState.shadowForm && isNearEnemy)
+        if ((attack || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && timeSinceAttck >= timeBetweenAttack && !pState.empoweredLight && !pState.shadowForm)
         {
             // Attack logic
             timeSinceAttck = 0;
@@ -1008,47 +1052,6 @@ private void OnTriggerExit2D(Collider2D _other)
             ReleaseCharge();
         }
     }      
-
-    bool CheckIfNearEnemy()
-    {
-        // Define the radius and draw a circle in the Scene view
-        float radius = attackRadius;
-        //DrawDebugCircle(transform.position, radius, Color.red);
-
-        // Use Physics2D.OverlapCircleAll to check for enemies within a certain radius
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, radius, attackableLayer);
-
-        // If there are colliders found, return true
-        if (colliders.Length > 0)
-        {
-            //Debug.Log("Enemy is near!");
-            return true;
-        }
-        else
-        {
-            //Debug.Log("No enemy nearby.");
-            return false;
-        }
-    }
-
-    void DrawDebugCircle(Vector2 center, float radius, Color color)
-    {
-        int segments = 36;
-        float angleStep = 360f / segments;
-
-        Vector2 prevPoint = center + Vector2.right * radius;
-
-        for (int i = 0; i < segments + 1; i++)
-        {
-            float angle = i * angleStep;
-            Vector2 nextPoint = center + (Vector2)(Quaternion.Euler(0, 0, angle) * Vector2.right) * radius;
-            Debug.DrawLine(prevPoint, nextPoint, color);
-
-            prevPoint = nextPoint;
-        }
-    }
-
-
 
     private float quickAttackWindow = 1f; // Time window to consider attacks as quick
 
@@ -1330,6 +1333,28 @@ private void OnTriggerExit2D(Collider2D _other)
         pState.recoilingY = false;
     }
 
+    void LightningBody()
+    {
+        // Assuming your player's collider is called "mainCollider"
+        Collider2D mainCollider = GetComponent<Collider2D>();
+
+        // Get the layer index of the "Attackable" layer
+        int attackableLayerIndex = LayerMask.NameToLayer("Attackable");
+
+        if (pState.lightningBody || pState.lightJumping)
+        {
+            // Ignore collisions between the mainCollider and the "Attackable" layer
+            Physics2D.IgnoreLayerCollision(mainCollider.gameObject.layer, attackableLayerIndex, true);
+        }
+        else
+        {
+            // Reset collision ignoring when lightningBody is false
+            Physics2D.IgnoreLayerCollision(mainCollider.gameObject.layer, attackableLayerIndex, false);
+        }
+    }
+
+
+
     public void TakeDamage(float _damage) 
     {   
         if(pState.alive && !pState.dodging && !pState.lightJumping)
@@ -1544,7 +1569,6 @@ private void OnTriggerExit2D(Collider2D _other)
         {
             pState.aiming = true;
             lightningBow.SetActive(true);
-            //FreezeRigidbodyPosition(); 
             timeSinceCast = 0;
             anim.SetBool("Casting", true);
         }
@@ -1556,7 +1580,6 @@ private void OnTriggerExit2D(Collider2D _other)
         if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && Mana >= manaSpellCost && pState.lightForm && pState.aiming)
         {
             
-            //UnfreezeRigidbodyPosition();
             StartCoroutine(ShootLightningArrow());
             
             Mana -= manaSpellCost;
@@ -1581,58 +1604,96 @@ private void OnTriggerExit2D(Collider2D _other)
         anim.SetBool("Casting", false);
     }
 
-    void LightDart()
+    void LightRing()
     {  
         if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && !pState.aiming && timeSinceCast >= timeBetweenCast 
         && Mana >= manaSpellCost / 3.0f && pState.lightForm && yAxis == 0 && unlockedSideCast)
         {
             
             timeSinceCast = 0;
-            StartCoroutine(LightDartCoroutine());
+            StartCoroutine(LightRingCoroutine());
         }
         else
         {
               timeSinceCast += Time.deltaTime;
         }
     }
-    IEnumerator LightDartCoroutine()
-    {   
+
+    public float throwSpeed = 100f; // Adjust as needed
+    public float throwDistance = 20f; // Adjust as needed
+    public float throwLerpTime = 1f; 
+    IEnumerator LightRingCoroutine()
+    {
         if (yAxis == 0 && unlockedSideCast)
         {
             pState.casting = true;
             anim.SetBool("Casting", true);
-            GameObject _lightDart = Instantiate(lightningDart, SideAttackTransform.position, Quaternion.identity);
-            timeSinceCast = 1;
-            audioSource.PlayOneShot(spellCastSound);
+            Mana -= manaSpellCost / 3f;
+            manaOrbsHandler.usedMana = true;
+            manaOrbsHandler.countDown = 3f;
 
-    
-            // Flip fireball based on the player's facing direction
-            if (pState.lookingRight)
+            // Store the initial position of the object and the player
+            Vector3 initialPosition = transform.position;
+            Vector3 playerPosition = transform.position;
+
+            // Instantiate the object
+            GameObject _ringOfLight = Instantiate(ringOfLight, initialPosition, Quaternion.identity);
+
+            // Calculate the direction to move the object
+            Vector3 direction = transform.right;
+
+            // Shoot the object using LeanTween
+            LeanTween.move(_ringOfLight, initialPosition + direction * throwDistance, throwLerpTime)
+                .setEase(LeanTweenType.easeOutQuad)
+                .setOnUpdate((Vector3 val) =>
+                {
+                    // Update the player's position continuously
+                    playerPosition = transform.position;
+                });
+
+            // Wait for the object to finish moving
+            yield return new WaitForSeconds(throwLerpTime);
+
+            // Stop the object
+            Rigidbody2D rb = _ringOfLight.GetComponent<Rigidbody2D>();
+            rb.velocity = Vector2.zero;
+
+            // Pause for a brief moment
+            yield return new WaitForSeconds(0.5f);
+
+            // Move the object back towards the player
+            while (Vector3.Distance(playerPosition, _ringOfLight.transform.position) > 2f)
             {
-                _lightDart.transform.eulerAngles = Vector3.zero;
+                direction = (playerPosition - _ringOfLight.transform.position).normalized;
+                rb.velocity = direction * throwSpeed;
+
+                // Update the player's position continuously
+                playerPosition = transform.position;
+
+                yield return null;
             }
-            else
-            {
-                _lightDart.transform.eulerAngles = new Vector2(_lightDart.transform.eulerAngles.x, 180); 
-            }
-        
-                Mana -= manaSpellCost / 3f;
-                manaOrbsHandler.usedMana = true;
-                manaOrbsHandler.countDown = 3f;
+
+            // Destroy the object
+            Destroy(_ringOfLight);
             
         }
         else
         {
             timeSinceCast += Time.deltaTime;
         }
-        yield return new WaitForSeconds(0.15f);
+
+        // Reset casting state
         anim.SetBool("Casting", false);
         castOrHealTimer = 0;
         pState.casting = false;
     }
 
 
-    
+
+
+
+
+   
     void LightningStrike()
     {
         if ((Input.GetButtonUp("Cast/Heal") || (Gamepad.current?.circleButton.wasReleasedThisFrame == true)) && !pState.aiming
@@ -1660,74 +1721,154 @@ private void OnTriggerExit2D(Collider2D _other)
         anim.SetBool("Casting", true);
         pState.casting = true;
         pState.lightningBody = true;
-        //FreezeRigidbodyPosition();
+        
+        // Add velocity upwards and to the right
+        if (pState.lookingRight)
+        {
+        rb.velocity = new Vector2(0.4f, 0.6f) * jumpForce * 5;
+        }
+        // Add velocity upwards and to the left
+        if (!pState.lookingRight)
+        {
+        rb.velocity = new Vector2(-0.4f, 0.6f) * jumpForce * 5;
+        }
+
 
         yield return new WaitForSeconds(0.15f);
 
-        lightningStrike.SetActive(true);
+  
+        rb.velocity = Vector2.zero;
+        rb.gravityScale = 0;
+
+        yield return new WaitForSeconds(0.5f);
+
         audioSource.PlayOneShot(spellCastSound);
+        GameObject Stake = Instantiate(lightningStake, transform.position, Quaternion.Euler(0, 0, -90));
+        yield return new WaitForSeconds(0.1f);
+
+        int numStakes = 3; // Number of stakes to instantiate
+        float spacing = 5f; // Spacing between each stake
+        float offsetMultiplier = 2f; // Offset multiplier for spacing
+        float timeBetweenStakes = 0.1f; // Time between each stake spawning
+
+        // Instantiate lightning stakes to the left and right of the player
+        for (int i = 0; i < numStakes; i++)
+        {
+            // Instantiate left stakes
+            Vector3 leftOffset = Vector3.left * spacing * (i + 1) * offsetMultiplier;
+            GameObject leftStake = Instantiate(lightningStake, transform.position + leftOffset, Quaternion.Euler(0, 0, -90));
+
+            // Instantiate right stakes
+            Vector3 rightOffset = Vector3.right * spacing * (i + 1) * offsetMultiplier;
+            GameObject rightStake = Instantiate(lightningStake, transform.position + rightOffset, Quaternion.Euler(0, 0, -90));
+
+            // Wait for the specified time between each stake
+            yield return new WaitForSeconds(timeBetweenStakes);
+        }
+
+        //yield return new WaitForSeconds(0.3f);
+        rb.gravityScale = gravity;
+        downSpellFireball.SetActive(true);
 
         Mana -= manaSpellCost;
         manaOrbsHandler.usedMana = true;
         manaOrbsHandler.countDown = 3f;
-        yield return new WaitForSeconds(0.5f);
-               
-        anim.SetBool("Casting", false);
+
+        // Add a loop to check if the player is grounded and end the coroutine if grounded
+        while (!Grounded())
+        {
+            rb.velocity += walkSpeed * 5 * Vector2.down;
+            pState.invincible = true;
+            yield return null; // Wait for the next frame
+        }
+
+        lightningStrike.SetActive(true);
+
+        //audioSource.PlayOneShot(spellCastSound);
+        rb.velocity += walkSpeed * 5 * Vector2.down;
         pState.lightningBody = false;
-        
+        yield return new WaitForSeconds(0.5f);
+        pState.invincible = false;
+
+        anim.SetBool("Casting", false);
+
         lightningStrike.SetActive(false);
-        //UnfreezeRigidbodyPosition();
 
         yield return new WaitForSeconds(1.5f);
         pState.casting = false;
-
     }
+
+    
+
 
     IEnumerator AirLightningStrikeHit()
     {
         anim.SetBool("Casting", true);
         pState.casting = true;
         pState.lightningBody = true;
-        //FreezeRigidbodyPosition();
         rb.velocity = Vector2.zero;
         rb.gravityScale = 0;
 
         yield return new WaitForSeconds(0.5f);
-        rb.gravityScale = gravity;
-        //UnfreezeRigidbodyPosition();
-        downSpellFireball.SetActive(true);
+
         audioSource.PlayOneShot(spellCastSound);
+
+        //yield return new WaitForSeconds(0.3f);
+        rb.gravityScale = gravity;
+        downSpellFireball.SetActive(true);
 
         Mana -= manaSpellCost;
         manaOrbsHandler.usedMana = true;
         manaOrbsHandler.countDown = 3f;
 
-        
-
         // Add a loop to check if the player is grounded and end the coroutine if grounded
         while (!Grounded())
         {
             rb.velocity += walkSpeed * 5 * Vector2.down;
+            pState.invincible = true;
             yield return null; // Wait for the next frame
-            
         }
-        //FreezeRigidbodyPosition();
+
+        GameObject Stake = Instantiate(lightningStake, transform.position, Quaternion.Euler(0, 0, -90));
+        yield return new WaitForSeconds(0.1f);
         lightningStrike.SetActive(true);
-        audioSource.PlayOneShot(spellCastSound);
+
+        int numStakes = 3; // Number of stakes to instantiate
+        float spacing = 5f; // Spacing between each stake
+        float offsetMultiplier = 2f; // Offset multiplier for spacing
+        float timeBetweenStakes = 0.1f; // Time between each stake spawning
+
+        // Instantiate lightning stakes to the left and right of the player
+        for (int i = 0; i < numStakes; i++)
+        {
+            // Instantiate left stakes
+            Vector3 leftOffset = Vector3.left * spacing * (i + 1) * offsetMultiplier;
+            GameObject leftStake = Instantiate(lightningStake, transform.position + leftOffset, Quaternion.Euler(0, 0, -90));
+
+            // Instantiate right stakes
+            Vector3 rightOffset = Vector3.right * spacing * (i + 1) * offsetMultiplier;
+            GameObject rightStake = Instantiate(lightningStake, transform.position + rightOffset, Quaternion.Euler(0, 0, -90));
+
+            // Wait for the specified time between each stake
+            yield return new WaitForSeconds(timeBetweenStakes);
+        }
+
+        //audioSource.PlayOneShot(spellCastSound);
         rb.velocity += walkSpeed * 5 * Vector2.down;
-        yield return new WaitForSeconds(0.5f);
-               
-        anim.SetBool("Casting", false);
-        
-        lightningStrike.SetActive(false);
         pState.lightningBody = false;
-        // UnfreezeRigidbodyPosition();
+        yield return new WaitForSeconds(0.5f);
+        pState.invincible = false;
+
+        anim.SetBool("Casting", false);
+
+        lightningStrike.SetActive(false);
 
         yield return new WaitForSeconds(1.5f);
         pState.casting = false;
-        
-        
     }
+
+
+
     
     void CastSpell()
     {
@@ -1989,7 +2130,6 @@ private void OnTriggerExit2D(Collider2D _other)
     IEnumerator LightJumpCoroutine()
     {
         pState.lightJumping = true;
-        //UnfreezeRigidbodyPosition();
         Vector2 launchDirection;
         if (Mathf.Approximately(xAxis, 0) && Mathf.Approximately(yAxis, 0))
         {
@@ -2010,11 +2150,8 @@ private void OnTriggerExit2D(Collider2D _other)
         {
             rb.velocity = Vector2.zero;
             rb.gravityScale = 0;
-            //FreezeRigidbodyPosition();
             yield return new WaitForSeconds(0.15f);
             audioSource.PlayOneShot(dashAndAttackSound);
-           // UnfreezeRigidbodyPosition();
-
 
             lightBall.SetActive(true);
             // Assuming the light ball's collider is on the "LightBallCollider" layer
@@ -2040,11 +2177,9 @@ private void OnTriggerExit2D(Collider2D _other)
                 yield return null;
             }
 
-            //FreezeRigidbodyPosition();
             rb.gravityScale = 0;
             rb.velocity = Vector2.zero;
             yield return new WaitForSeconds(0.15f);
-            //UnfreezeRigidbodyPosition();
             rb.velocity = Vector2.zero;
             lightBall.SetActive(false);
             Physics2D.IgnoreLayerCollision(gameObject.layer, LayerMask.NameToLayer("Attackable"), false);
@@ -2121,7 +2256,7 @@ private void OnTriggerExit2D(Collider2D _other)
             rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -wallSlidingSpeed, float.MaxValue));
             pState.lightJumping = false;
             lightBall.SetActive(false);
-            UnfreezeRigidbodyPosition();
+
         }
         else
         {

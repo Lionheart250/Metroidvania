@@ -12,6 +12,7 @@ public class PlayerStateList : MonoBehaviour
     public bool lightningBody = false;
     public bool jumping = false;
     public bool lightJumping = false;
+    public bool empoweredLight = false;
     public bool hovering = false;
     public bool dashing = false;
     public bool dodging = false;
