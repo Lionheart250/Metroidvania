@@ -43112,7 +43112,7 @@ PrefabInstance:
       objectReference: {fileID: 9066576656617623858, guid: 7d5a596c58cd04df5b52dc6620224d30, type: 3}
     - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
       propertyPath: aimWalkSpeed
-      value: 10
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
       propertyPath: attackRadius
@@ -43151,9 +43151,21 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4360750681699512633, guid: ca99b356f652b4cfa9f058455eac15ba, type: 3}
     - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
+      propertyPath: chargeParticles
+      value: 
+      objectReference: {fileID: 3739910812526775868, guid: 4e4dbde8bf42f4e8ea7bd8f97379924f, type: 3}
+    - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
       propertyPath: manaOrbsHandler
       value: 
       objectReference: {fileID: 285601737}
+    - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
+      propertyPath: chargeSlashEffect
+      value: 
+      objectReference: {fileID: 8648911973234137180, guid: c97e8aade2b0e4d4c8f98bf6519fd559, type: 3}
+    - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
+      propertyPath: shadowSlashEffect
+      value: 
+      objectReference: {fileID: 8036702266434397819, guid: 7a9d3b46550b44379b7c0640ee11724c, type: 3}
     - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
       propertyPath: lightJumpBufferFrames
       value: 32

@@ -70,7 +70,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] GameObject dashEffect;
     [SerializeField] GameObject puddleFormCollider;
     private bool canDash = true, dashed;
-    private bool canDodge = true, dodged;
     [Space(5)]
 
 
@@ -102,6 +101,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private GameObject slashEffect; //the effect of the slashs
     [SerializeField] private GameObject chargeSlashEffect; 
+    [SerializeField] private GameObject shadowSlashEffect;
     [SerializeField] private float chargeSpeed;
     [SerializeField] public float chargeTime;  // Adjust this value as needed
     bool restoreTime;
@@ -160,7 +160,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform eyeAttackTransform;
     //spell cast objects
     [SerializeField] GameObject sideSpellFireball;
-    [SerializeField] GameObject sideSpellShadowFireball;
+    [SerializeField] GameObject blackholeBlast;
     [SerializeField] GameObject upSpellExplosion;
     [SerializeField] GameObject downSpellFireball;
     [SerializeField] GameObject downSpellShadowFireball;
@@ -228,7 +228,7 @@ public class PlayerController : MonoBehaviour
     //unlocking 
     public bool unlockedWallJump;
     public bool unlockedDash;
-    public bool unlockedDodge;
+    public bool unlockedEmpowered;
     public bool unlockedVarJump;
 
     public bool unlockedSideCast;
@@ -365,7 +365,7 @@ public class PlayerController : MonoBehaviour
             {
                 StartDash();
             }   
-            if(unlockedDodge)
+            if(unlockedEmpowered)
             {
                 BecomeEmpowered();
             }         
@@ -605,16 +605,13 @@ private void OnTriggerExit2D(Collider2D _other)
             }
             else
             {
-                if (!xAxis == 0 && !pState.shadowHooking)
-                {
-                    // Airborne movement
+                // Airborne movement
                     
-                    rb.velocity = new Vector2(airWalkSpeed * xAxis, rb.velocity.y);
+                rb.velocity = new Vector2(airWalkSpeed * xAxis, rb.velocity.y);
 
-                    // Set animation states for airborne movement
-                    anim.SetBool("Running", false);
-                    anim.SetBool("Walking", false);
-                }
+                // Set animation states for airborne movement
+                anim.SetBool("Running", false);
+                anim.SetBool("Walking", false);
             }
         }
     }
@@ -1019,21 +1016,22 @@ private void OnTriggerExit2D(Collider2D _other)
             }
         }
 
-        if ((Input.GetButton("Attack") || (Gamepad.current?.squareButton.isPressed == true)) && chargeTime <= 2 && !pState.shadowForm)
+        if ((Input.GetButton("Attack") || (Gamepad.current?.squareButton.isPressed == true)) && chargeTime <= 3 && !pState.shadowForm)
         {
             chargeTime += Time.deltaTime * chargeSpeed;
-            chargeTime = Mathf.Clamp(chargeTime, 0f, 2f);
-
-            GameObject _chargeParticles = Instantiate(chargeParticles, transform.position, Quaternion.identity);
-
-            if (chargeTime >= 2f)
+            chargeTime = Mathf.Clamp(chargeTime, 0f, 3f);
+            if (chargeTime >= 1.5f)
             {
-                // Double the size
-                Vector3 newScale = _chargeParticles.transform.localScale * 2f;
-                _chargeParticles.transform.localScale = newScale;
-            }
+                GameObject _chargeParticles = Instantiate(chargeParticles, transform.position, Quaternion.identity, transform);
+                if (chargeTime >= 3f)
+                {
+                    // Double the size
+                    Vector3 newScale = _chargeParticles.transform.localScale * 2f;
+                    _chargeParticles.transform.localScale = newScale;
+                }
 
-            Destroy(_chargeParticles, 0.05f);
+                Destroy(_chargeParticles, 0.2f);
+            }
         }
         else if ((Input.GetButtonDown("Attack") || (Gamepad.current?.squareButton.wasPressedThisFrame == true)) && !pState.shadowForm)
         {
@@ -1041,11 +1039,11 @@ private void OnTriggerExit2D(Collider2D _other)
             chargeTime = 0;
         }
 
-        if ((Input.GetButtonUp("Attack") || (Gamepad.current?.squareButton.wasReleasedThisFrame == true)) && chargeTime < 2 && !pState.shadowForm)
+        if ((Input.GetButtonUp("Attack") || (Gamepad.current?.squareButton.wasReleasedThisFrame == true)) && chargeTime < 3 && !pState.shadowForm)
         {
             chargeTime = 0;
         }
-        else if ((Input.GetButtonUp("Attack") || (Gamepad.current?.squareButton.wasReleasedThisFrame == true)) && chargeTime >= 2 && !pState.shadowForm)
+        else if ((Input.GetButtonUp("Attack") || (Gamepad.current?.squareButton.wasReleasedThisFrame == true)) && chargeTime >= 3 && !pState.shadowForm)
         {
             audioSource.PlayOneShot(dashAndAttackSound);
             // Release charge if the button is released and charging duration is sufficient
@@ -1081,7 +1079,7 @@ private void OnTriggerExit2D(Collider2D _other)
                 int _recoilLeftOrRight = pState.lookingRight ? 1 : -1;
 
                 ShadowHit(ShadowSideAttackTransform, ShadowSideAttackArea, ref pState.recoilingX, Vector2.right * _recoilLeftOrRight, recoilXSpeed);
-                Instantiate(slashEffect, ShadowSideAttackTransform);
+                Instantiate(shadowSlashEffect, ShadowSideAttackTransform);
 
                 // Set animation based on comboCounter
                 if (comboCounter == 1)
@@ -1104,7 +1102,7 @@ private void OnTriggerExit2D(Collider2D _other)
             {
                 // Handle up attack
                 ShadowHit(ShadowUpAttackTransform, ShadowUpAttackArea, ref pState.recoilingY, Vector2.up, recoilYSpeed);
-                ShadowSlashEffectAtAngle(slashEffect, 80, ShadowUpAttackTransform);
+                ShadowSlashEffectAtAngle(shadowSlashEffect, 80, ShadowUpAttackTransform);
 
                 // Set animation based on comboCounter
                 if (comboCounter == 1)
@@ -1126,7 +1124,7 @@ private void OnTriggerExit2D(Collider2D _other)
                 // Handle down attack
                 //anim.SetTrigger("downAttack1");
                 ShadowHit(ShadowDownAttackTransform, ShadowDownAttackArea, ref pState.recoilingY, Vector2.down, recoilYSpeed);
-                ShadowSlashEffectAtAngle(slashEffect, -90, ShadowDownAttackTransform);
+                ShadowSlashEffectAtAngle(shadowSlashEffect, -90, ShadowDownAttackTransform);
                 comboCounter = 0;
             }
 
@@ -1909,16 +1907,16 @@ private void OnTriggerExit2D(Collider2D _other)
         {
             anim.SetBool("Casting", true);
             pState.casting = true;
-            GameObject _shadowBloodSpray = Instantiate(shadowBloodSpray, eyeAttackTransform.position, Quaternion.identity);
+            GameObject _blackholeBlast = Instantiate(blackholeBlast, eyeAttackTransform.position, Quaternion.identity);
 
             if (pState.lookingRight)
             {
-                _shadowBloodSpray.transform.eulerAngles = Vector3.zero;
+                _blackholeBlast.transform.eulerAngles = Vector3.zero;
                
             }
             else
             {
-                _shadowBloodSpray.transform.eulerAngles =  new Vector2(_shadowBloodSpray.transform.eulerAngles.x, 180);
+                _blackholeBlast.transform.eulerAngles =  new Vector2(_blackholeBlast.transform.eulerAngles.x, 180);
             }
 
             Mana -= manaSpellCost;
@@ -1968,7 +1966,7 @@ private void OnTriggerExit2D(Collider2D _other)
             pState.casting = true;
             yield return new WaitForSeconds(0.15f);
 
-            sideSpellShadowFireball.SetActive(true);
+
             audioSource.PlayOneShot(ExplosionSpellCastSound);
 
             Mana -= manaSpellCost;
@@ -1977,7 +1975,7 @@ private void OnTriggerExit2D(Collider2D _other)
             pState.recoilingX = true;
             yield return new WaitForSeconds(0.35f);
             pState.casting = false;
-            sideSpellShadowFireball.SetActive(false);
+
             
         }          
         anim.SetBool("Casting", false);
@@ -2066,7 +2064,7 @@ private void OnTriggerExit2D(Collider2D _other)
             StartCoroutine(LerpAirWalkSpeed(25, 50, 0.4f));      
         }
 
-        if (!Grounded() && airJumpCounter < maxAirJumps && ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && !pState.lightForm && !pState.lightningBody))
+        if (!Grounded() && airJumpCounter < maxAirJumps && ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && !pState.lightningBody))
         {
             //audioSource.PlayOneShot(jumpSound);
 
@@ -2114,7 +2112,7 @@ private void OnTriggerExit2D(Collider2D _other)
 
     void LightJump()
     {
-        if (!Grounded() && lightJumpCounter < maxLightJumps && lightJumpBufferCounter > 0 && unlockedVarJump && pState.lightForm && !pState.lightJumping && !isWallJumping && !Walled())
+        if (!Grounded() && lightJumpCounter < maxLightJumps && lightJumpBufferCounter > 0 && unlockedVarJump && pState.lightForm && pState.empoweredLight && !pState.lightJumping && !isWallJumping && !Walled())
         {   
         
             StartCoroutine(LightJumpCoroutine());

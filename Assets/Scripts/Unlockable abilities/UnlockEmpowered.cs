@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UnlockDodge : MonoBehaviour
+public class UnlockEmpowered : MonoBehaviour
 {
     [SerializeField] GameObject particles;
     [SerializeField] GameObject canvasUI;
@@ -11,7 +11,7 @@ public class UnlockDodge : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (PlayerController.Instance.unlockedDodge)
+        if (PlayerController.Instance.unlockedEmpowered)
         {
             Destroy(gameObject);
         }
@@ -34,7 +34,7 @@ public class UnlockDodge : MonoBehaviour
         canvasUI.SetActive(true);
 
         yield return new WaitForSeconds(4f);
-        PlayerController.Instance.unlockedDodge = true;
+        PlayerController.Instance.unlockedEmpowered = true;
         SaveData.Instance.SavePlayerData();
         canvasUI.SetActive(false);
         Destroy(gameObject);

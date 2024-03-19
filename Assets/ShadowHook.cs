@@ -90,7 +90,7 @@ public class ShadowHook : MonoBehaviour
         Vector3 targetPosition = firePoint.position + aimingDirection * maxDistance;
         Vector3 targetLinePosition = firePoint.position + targetAimingDirection * maxDistance * moveSpeed * Time.deltaTime;
 
-        if (Input.GetButtonDown("Shield") || (Gamepad.current?.leftTrigger.wasPressedThisFrame == true) && !coroutining)
+        if (Input.GetButtonDown("Shield") || (Gamepad.current?.leftShoulder.wasPressedThisFrame == true) && !coroutining)
         {
             SetGrapplePoint();
             
@@ -263,16 +263,21 @@ public class ShadowHook : MonoBehaviour
 
         // Ensure the player reaches the exact target position
         gunHolder.position = targetPosition;
-        playerRigidbody.velocity = new Vector2(launchDirection.x * launchSpeed, launchDirection.y * launchSpeed);
-        
+        if(pState.shadowHooking)
+        {
+            playerRigidbody.velocity += new Vector2(launchDirection.x * launchSpeed * 0.1f, launchDirection.y * launchSpeed * 0.1f);
+            
+        }
 
         playerRigidbody.gravityScale = playerController.gravity;
         grappleRope.enabled = false;
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.5f);
+        pState.shadowHooking = false;
+        grappleRope.enabled = false;
         coroutining = false;
         m_springJoint2D.enabled = false;
         grapplePoint = Vector2.zero;
-        pState.shadowHooking = false;
+        //yield return new WaitForSeconds(1.5f);
     }
 
 
