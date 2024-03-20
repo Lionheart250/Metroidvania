@@ -44,7 +44,7 @@ Material:
     - _BlendMode: 1
     - _Contrast: 10
     - _EmissionStrength: 1
-    - _EnableEffects: 0
+    - _EnableEffects: 1
     - _GalaxyIntensity: 2
     - _GlowIntensity: 10
     - _HeadRadius: 0.282

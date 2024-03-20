@@ -1888,6 +1888,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Crawler
       objectReference: {fileID: 0}
+    - target: {fileID: 3398537252002304321, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3398537252002304326, guid: 04994d76033d0474f9791b25ed12b8a5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -658.4894
@@ -43124,19 +43128,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
       propertyPath: recoilXSpeed
-      value: 100
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
       propertyPath: recoilXSteps
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
       propertyPath: recoilYSpeed
-      value: 100
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
       propertyPath: recoilYSteps
-      value: 1
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
       propertyPath: throwDistance
@@ -43147,17 +43151,33 @@ PrefabInstance:
       value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
+      propertyPath: blackholeBlast
+      value: 
+      objectReference: {fileID: 4054615830640223185, guid: b1acec0fcae864507b99113b184db6c6, type: 3}
+    - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
+      propertyPath: blackholeSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 5b1fda625b7f74b649ddb2d720b8dbb9, type: 3}
+    - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
       propertyPath: lightningStake
       value: 
       objectReference: {fileID: 4360750681699512633, guid: ca99b356f652b4cfa9f058455eac15ba, type: 3}
     - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
       propertyPath: chargeParticles
       value: 
-      objectReference: {fileID: 3739910812526775868, guid: 4e4dbde8bf42f4e8ea7bd8f97379924f, type: 3}
+      objectReference: {fileID: 3739910812526775868, guid: 250494a99323540e88d231d370a672d1, type: 3}
     - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
       propertyPath: manaOrbsHandler
       value: 
       objectReference: {fileID: 285601737}
+    - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
+      propertyPath: timeBetweenCast
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
+      propertyPath: upSpellExplosion
+      value: 
+      objectReference: {fileID: 4804212333820284093, guid: 5896c1fde9cd64b5698a177eb85fdd42, type: 3}
     - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
       propertyPath: chargeSlashEffect
       value: 
@@ -43167,8 +43187,24 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 8036702266434397819, guid: 7a9d3b46550b44379b7c0640ee11724c, type: 3}
     - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
+      propertyPath: unlockedEmpowered
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
       propertyPath: lightJumpBufferFrames
       value: 32
+      objectReference: {fileID: 0}
+    - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
+      propertyPath: ExplosionSpellCastSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 405ae7357508e4a5092886cb72c79ec9, type: 3}
+    - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
+      propertyPath: castingRecoilMultiplier
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 438285571990529212, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
+      propertyPath: sideSpellShadowFireball
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 625061989439647171, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
       propertyPath: m_LocalScale.x
@@ -43321,13 +43357,14 @@ PrefabInstance:
     - target: {fileID: 7521046159861858718, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: b19f593ba9255460f8858d5a17dbd391, type: 2}
+      objectReference: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
     - target: {fileID: 9012878364458396485, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
       propertyPath: m_Radius
       value: 0.52
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 5117300754292266643, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 5035203146021994808, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}

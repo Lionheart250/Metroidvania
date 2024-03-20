@@ -112,11 +112,11 @@ public class PlayerController : MonoBehaviour
 
 
     [Header("Recoil Settings:")]
-    [SerializeField] private int recoilXSteps = 1; //how many FixedUpdates() the player recoils horizontally for
-    [SerializeField] private int recoilYSteps = 1; //how many FixedUpdates() the player recoils vertically for
+    [SerializeField] private int recoilXSteps = 2; //how many FixedUpdates() the player recoils horizontally for
+    [SerializeField] private int recoilYSteps = 2; //how many FixedUpdates() the player recoils vertically for
 
-    [SerializeField] private float recoilXSpeed = 100; //the speed of horizontal recoil
-    [SerializeField] private float recoilYSpeed = 100; //the speed of vertical recoil
+    [SerializeField] private float recoilXSpeed = 25; //the speed of horizontal recoil
+    [SerializeField] private float recoilYSpeed = 25; //the speed of vertical recoil
 
     private int stepsXRecoiled, stepsYRecoiled; //the no. of steps recoiled horizontally and verticall
     [Space(5)]
@@ -154,7 +154,7 @@ public class PlayerController : MonoBehaviour
     [Header("Spell Settings")]
     //spell stats
     [SerializeField] float manaSpellCost = 0.3f;
-    [SerializeField] float timeBetweenCast = 2f;
+    [SerializeField] float timeBetweenCast = 1f;
     [SerializeField] float spellDamage; //upspellexplosion and downspellfireball
     [SerializeField] float downSpellForce; // desolate dive only
     [SerializeField] private Transform eyeAttackTransform;
@@ -193,6 +193,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] AudioClip spellCastSound;
     [SerializeField] AudioClip ExplosionSpellCastSound;
     [SerializeField] AudioClip hurtSound;
+    [SerializeField] AudioClip blackholeSound;
     [Space(5)]
 
 
@@ -767,7 +768,7 @@ private void OnTriggerExit2D(Collider2D _other)
         sr.color = spriteColor;
     
         puddleFormCollider.SetActive(true);
-        walkSpeed = 40f;
+        walkSpeed = 60f;
         ToggleMainColliderOff();
     
         // Wait for a set amount of time (adjust the time according to your needs)
@@ -1264,23 +1265,32 @@ private void OnTriggerExit2D(Collider2D _other)
         _slashEffect.transform.localScale = new Vector2(transform.localScale.x, transform.localScale.y);
     }
 
+    public float castingRecoilMultiplier = 4f;
+
     void Recoil()
     {
         if (pState.recoilingX)
         {
+            float currentRecoilXSpeed = recoilXSpeed;
+
+            // Check if casting blackhole blast for increased recoil
+            if (pState.casting && castingRecoilMultiplier > 0)
+            {
+                currentRecoilXSpeed *= castingRecoilMultiplier;
+            }
+
             if (pState.lookingRight)
             {
-                rb.velocity = new Vector2(-recoilXSpeed, 0);
+                rb.velocity = new Vector2(-currentRecoilXSpeed, 0);
             }
             else
             {
-                rb.velocity = new Vector2(recoilXSpeed, 0);
+                rb.velocity = new Vector2(currentRecoilXSpeed, 0);
             }
         }
 
         if (pState.recoilingY)
         {
-            //rb.gravityScale = 0;
             if (yAxis < 0)
             {
                 rb.velocity = new Vector2(rb.velocity.x, recoilYSpeed);
@@ -1292,12 +1302,7 @@ private void OnTriggerExit2D(Collider2D _other)
             airJumpCounter = 0;
             lightJumpCounter = 0;
         }
-       // else if (pState.lightJumping == false)
-        //{
-        //    rb.gravityScale = gravity;
-        //}
 
-        //stop recoil
         if (pState.recoilingX && stepsXRecoiled < recoilXSteps)
         {
             stepsXRecoiled++;
@@ -1903,11 +1908,28 @@ private void OnTriggerExit2D(Collider2D _other)
         }
     }
     IEnumerator CastCoroutine()
-    {   if (yAxis == 0 && unlockedSideCast)
+    {   
+        if (yAxis == 0 && unlockedSideCast)
         {
             anim.SetBool("Casting", true);
             pState.casting = true;
+            yield return new WaitForSeconds(0.15f);
+            audioSource.PlayOneShot(blackholeSound);
             GameObject _blackholeBlast = Instantiate(blackholeBlast, eyeAttackTransform.position, Quaternion.identity);
+            rb.gravityScale = 0;
+            pState.recoilingX = true;
+            int _dir = pState.lookingRight ? 1 : -1;
+            rb.velocity += new Vector2(-_dir * dashSpeed, 0);
+
+            // Apply recoil logic here
+            if (pState.lookingRight)
+            {
+                rb.velocity = new Vector2(-recoilXSpeed, 0);
+            }
+            else
+            {
+                rb.velocity = new Vector2(recoilXSpeed, 0);
+            }
 
             if (pState.lookingRight)
             {
@@ -1918,7 +1940,8 @@ private void OnTriggerExit2D(Collider2D _other)
             {
                 _blackholeBlast.transform.eulerAngles =  new Vector2(_blackholeBlast.transform.eulerAngles.x, 180);
             }
-
+            yield return new WaitForSeconds(0.15f);
+            rb.gravityScale = gravity;
             Mana -= manaSpellCost;
             manaOrbsHandler.usedMana = true;
             manaOrbsHandler.countDown = 3f;
@@ -1931,53 +1954,59 @@ private void OnTriggerExit2D(Collider2D _other)
             yield return new WaitForSeconds(0.15f);
 
             Instantiate(upSpellExplosion, transform);
+            audioSource.PlayOneShot(ExplosionSpellCastSound);
             rb.velocity = Vector2.zero;
-
+            rb.gravityScale = 0;
+            float startTime = Time.time;
+            while (Time.time - startTime < 0.3f)
+            {
+                rb.velocity += (walkSpeed / 24) * Vector2.up;
+                yield return null;
+            }
+            rb.gravityScale = gravity;
             Mana -= manaSpellCost;
             manaOrbsHandler.usedMana = true;
             manaOrbsHandler.countDown = 3f;
-            audioSource.PlayOneShot(ExplosionSpellCastSound);
-            yield return new WaitForSeconds(0.35f);
+
+            yield return new WaitForSeconds(0.8f - (Time.time - startTime));
             pState.casting = false;
         }
-        else if((yAxis < 0 && !Grounded()) && unlockedDownCast)
-        {
-            anim.SetBool("Casting", true);
-            pState.casting = true;
-            
-            
-
-            downSpellShadowFireball.SetActive(true);
-
-            audioSource.PlayOneShot(ExplosionSpellCastSound);
-
-            Mana -= manaSpellCost;
-            manaOrbsHandler.usedMana = true;
-            manaOrbsHandler.countDown = 3f;
-            pState.recoilingY = true;
-            yield return new WaitForSeconds(0.35f);
-            downSpellShadowFireball.SetActive(false);
-            pState.casting = false;
-            
-        }
-        else if((yAxis < 0 && Grounded()) && unlockedDownCast)
+        else if(yAxis < 0 && unlockedDownCast)
         {
             anim.SetBool("Casting", true);
             pState.casting = true;
             yield return new WaitForSeconds(0.15f);
 
+            // Small upward and forward movement
+            float upwardDuration = 0.1f;
+            float upwardSpeed = 50f;
+            float forwardSpeed = 50f; // Adjust the forward speed here
+            float upwardElapsed = 0f;
+            while (upwardElapsed < upwardDuration)
+            {
+                upwardElapsed += Time.deltaTime;
+                rb.velocity = new Vector2(pState.lookingRight ? forwardSpeed : -forwardSpeed, upwardSpeed);
+                yield return null;
+            }
+
+            // Shooting in the direction the player is facing
+            float shootingSpeed = 250f; // Adjust the shooting speed here
+            rb.velocity = new Vector2(pState.lookingRight ? shootingSpeed : -shootingSpeed, rb.velocity.y);
 
             audioSource.PlayOneShot(ExplosionSpellCastSound);
-
             Mana -= manaSpellCost;
             manaOrbsHandler.usedMana = true;
             manaOrbsHandler.countDown = 3f;
-            pState.recoilingX = true;
-            yield return new WaitForSeconds(0.35f);
-            pState.casting = false;
 
-            
-        }          
+            // Continue moving forward until grounded, walled, or ceilinged
+            while (!Grounded() && !Walled() && !Ceilinged())
+            {
+                rb.velocity = new Vector2(pState.lookingRight ? shootingSpeed : -shootingSpeed, rb.velocity.y);
+                yield return null;
+            }
+
+            pState.casting = false;
+        }
         anim.SetBool("Casting", false);
         
         //castOrHealTimer = 0;

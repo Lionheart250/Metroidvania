@@ -109,7 +109,7 @@ public class ShadowHook : MonoBehaviour
             //RotateGun(aimingDirection, true);
             //grappleRope.enabled = false;
             m_springJoint2D.enabled = false;
-            playerRigidbody.gravityScale = playerController.gravity;
+            //playerRigidbody.gravityScale = playerController.gravity;
             playerController.anim.SetBool("Casting", false);
             if(playerController.Grounded())
             {
@@ -277,6 +277,7 @@ public class ShadowHook : MonoBehaviour
         coroutining = false;
         m_springJoint2D.enabled = false;
         grapplePoint = Vector2.zero;
+        playerRigidbody.gravityScale = playerController.gravity;
         //yield return new WaitForSeconds(1.5f);
     }
 
