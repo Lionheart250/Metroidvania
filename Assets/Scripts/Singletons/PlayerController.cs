@@ -59,6 +59,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float ceilingCheckY = 0.2f; //how far up from ceiling check point is Ceilinged() checked
     [SerializeField] private float ceilingCheckX = 0.5f; //how far horizontally from ceiling check point is Ceilinged() checked
     [SerializeField] private LayerMask whatIsGround; //sets the ground layer
+    [SerializeField] private LayerMask whatIsShadowGround; //sets the ground layer
     [Space(5)]
 
 
@@ -2036,25 +2037,36 @@ private void OnTriggerExit2D(Collider2D _other)
     
     public bool Grounded()
     {
-        bool grounded = Physics2D.Raycast(groundCheckPoint.position, Vector2.down, groundCheckY, whatIsGround)
-        || Physics2D.Raycast(groundCheckPoint.position + new Vector3(groundCheckX, 0, 0), Vector2.down, groundCheckY, whatIsGround)
-        || Physics2D.Raycast(groundCheckPoint.position + new Vector3(-groundCheckX, 0, 0), Vector2.down, groundCheckY, whatIsGround);
+        bool grounded = false;
+        if (pState.shadowForm)
+        {
+            grounded = Physics2D.Raycast(groundCheckPoint.position, Vector2.down, groundCheckY, whatIsShadowGround) || Physics2D.Raycast(groundCheckPoint.position, Vector2.down, groundCheckY, whatIsGround)
+                        || Physics2D.Raycast(groundCheckPoint.position + new Vector3(groundCheckX, 0, 0), Vector2.down, groundCheckY, whatIsShadowGround)
+                        || Physics2D.Raycast(groundCheckPoint.position + new Vector3(-groundCheckX, 0, 0), Vector2.down, groundCheckY, whatIsShadowGround);
+        }
+        else
+        {
+            grounded = Physics2D.Raycast(groundCheckPoint.position, Vector2.down, groundCheckY, whatIsGround)
+                        || Physics2D.Raycast(groundCheckPoint.position + new Vector3(groundCheckX, 0, 0), Vector2.down, groundCheckY, whatIsGround)
+                        || Physics2D.Raycast(groundCheckPoint.position + new Vector3(-groundCheckX, 0, 0), Vector2.down, groundCheckY, whatIsGround);
+        }
 
-    if (grounded)
-    {
-        Debug.DrawRay(groundCheckPoint.position, Vector2.down * groundCheckY, Color.green); // Visualize the first raycast
-        Debug.DrawRay(groundCheckPoint.position + new Vector3(groundCheckX, 0, 0), Vector2.down * groundCheckY, Color.green); // Visualize the second raycast
-        Debug.DrawRay(groundCheckPoint.position + new Vector3(-groundCheckX, 0, 0), Vector2.down * groundCheckY, Color.green); // Visualize the third raycast
-    }
-    else
-    {
-        Debug.DrawRay(groundCheckPoint.position, Vector2.down * groundCheckY, Color.yellow); // Visualize the first raycast
-        Debug.DrawRay(groundCheckPoint.position + new Vector3(groundCheckX, 0, 0), Vector2.down * groundCheckY, Color.red); // Visualize the second raycast
-        Debug.DrawRay(groundCheckPoint.position + new Vector3(-groundCheckX, 0, 0), Vector2.down * groundCheckY, Color.red); // Visualize the third raycast
+        if (grounded)
+        {
+            Debug.DrawRay(groundCheckPoint.position, Vector2.down * groundCheckY, Color.green); // Visualize the first raycast
+            Debug.DrawRay(groundCheckPoint.position + new Vector3(groundCheckX, 0, 0), Vector2.down * groundCheckY, Color.green); // Visualize the second raycast
+            Debug.DrawRay(groundCheckPoint.position + new Vector3(-groundCheckX, 0, 0), Vector2.down * groundCheckY, Color.green); // Visualize the third raycast
+        }
+        else
+        {
+            Debug.DrawRay(groundCheckPoint.position, Vector2.down * groundCheckY, Color.yellow); // Visualize the first raycast
+            Debug.DrawRay(groundCheckPoint.position + new Vector3(groundCheckX, 0, 0), Vector2.down * groundCheckY, Color.red); // Visualize the second raycast
+            Debug.DrawRay(groundCheckPoint.position + new Vector3(-groundCheckX, 0, 0), Vector2.down * groundCheckY, Color.red); // Visualize the third raycast
+        }
+
+        return grounded;
     }
 
-    return grounded;
-    }
 
     public bool Ceilinged()
     {
