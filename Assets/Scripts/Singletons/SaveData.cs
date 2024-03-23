@@ -51,6 +51,11 @@ public struct SaveData
     public string sceneWithShade;
     public Quaternion shadeRot;
 
+    //store door data
+    public Dictionary<string, bool> doorStates; // Map door IDs to their open/close states
+ 
+
+
 
 
     public void Initialize()
@@ -67,10 +72,19 @@ public struct SaveData
         {
             BinaryWriter writer = new BinaryWriter(File.Create(Application.persistentDataPath + "/save.shade.data"));
         }
+        if (!File.Exists(Application.persistentDataPath + "/save.environment.data")) //if file doesnt exist, well create the file
+        {
+            BinaryWriter writer = new BinaryWriter(File.Create(Application.persistentDataPath + "/save.environment.data"));
+        }
 
         if (sceneNames == null)
         {
             sceneNames = new HashSet<string>();
+        }
+
+        if (doorStates == null)
+        {
+            doorStates = new Dictionary<string, bool>();
         }
     }
     #region Bench Stuff
@@ -450,31 +464,97 @@ public struct SaveData
         }
     }
     #endregion
+
+    public void SaveEnvironmentData()
+    {
+    using (BinaryWriter writer = new BinaryWriter(File.OpenWrite(Application.persistentDataPath + "/save.environment.data")))
+    {
+            writer.Write(doorStates.Count); // Write the number of doors in the dictionary
+
+            foreach (var kvp in doorStates)
+            {
+                writer.Write(kvp.Key); // Write the door ID
+                writer.Write(kvp.Value); // Write the door state
+            }
+        }
+    }
+
+    #region environment stuff
+    public void LoadEnvironmentData()
+    {
+    if (File.Exists(Application.persistentDataPath + "/save.environment.data"))
+    {
+        using (BinaryReader reader = new BinaryReader(File.OpenRead(Application.persistentDataPath + "/save.environment.data")))
+        {
+                int count = reader.ReadInt32(); // Read the number of doors in the dictionary
+
+                doorStates = new Dictionary<string, bool>();
+
+                for (int i = 0; i < count; i++)
+                {
+                    string doorID = reader.ReadString(); // Read the door ID
+                    bool isOpen = reader.ReadBoolean(); // Read the door state
+
+                    doorStates.Add(doorID, isOpen); // Add the door ID and state to the dictionary
+                }
+            }
+        }
+        else
+        {
+            // Handle if the file doesn't exist
+        }
+    }
+
+    public void SetDoorState(string doorID, bool isOpen)
+    {
+        if (doorStates.ContainsKey(doorID))
+        {
+            doorStates[doorID] = isOpen;
+        }
+        else
+        {
+            doorStates.Add(doorID, isOpen);
+        }
+    }
+
+    public bool GetDoorState(string doorID)
+    {
+        if (doorStates.ContainsKey(doorID))
+        {
+            return doorStates[doorID];
+        }
+        return false; // Return false if the door ID is not found
+    }
+
+
+    #endregion
     public void ClearSavedData()
-{
-    // Delete the save files if they exist
-    if (File.Exists(Application.persistentDataPath + "/save.bench.data"))
     {
-        File.Delete(Application.persistentDataPath + "/save.bench.data");
+        doorStates = new Dictionary<string, bool>();
+        // Delete the save files if they exist
+        if (File.Exists(Application.persistentDataPath + "/save.bench.data"))
+        {
+            File.Delete(Application.persistentDataPath + "/save.bench.data");
+        }
+
+        if (File.Exists(Application.persistentDataPath + "/save.player.data"))
+        {
+            File.Delete(Application.persistentDataPath + "/save.player.data");
+        }
+
+        if (File.Exists(Application.persistentDataPath + "/save.shade.data"))
+        {
+            File.Delete(Application.persistentDataPath + "/save.shade.data");
+        }
+
+        if (File.Exists(Application.persistentDataPath + "/save.environment.data"))
+        {
+            File.Delete(Application.persistentDataPath + "/save.environment.data");
+        }
+
+    
     }
 
-    if (File.Exists(Application.persistentDataPath + "/save.player.data"))
-    {
-        File.Delete(Application.persistentDataPath + "/save.player.data");
-    }
-
-    if (File.Exists(Application.persistentDataPath + "/save.shade.data"))
-    {
-        File.Delete(Application.persistentDataPath + "/save.shade.data");
-    }
-
- 
-}
-
-// ...
-
-// Call this method when you want to clear the saved data
-// For example, when the player selects a "New Game" option
 public void NewGame()
 {
     ClearSavedData();

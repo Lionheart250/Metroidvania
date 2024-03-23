@@ -24,8 +24,8 @@ public class ParallaxEffect : MonoBehaviour
         // Apply horizontal limits
         newPos.x = Mathf.Clamp(newPos.x, startPos.x - maxOffsetX, startPos.x + maxOffsetX);
 
-        // Use LeanTween to move the transform smoothly
-        LeanTween.move(gameObject, newPos, 0.3f).setEaseOutQuad();
+        // Smoothly move the transform
+        transform.position = Vector3.Lerp(transform.position, newPos, 0.3f);
 
         lastCameraPosition = mainCameraTransform.position;
     }

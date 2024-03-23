@@ -567,9 +567,26 @@ private void OnTriggerExit2D(Collider2D _other)
 
 
 
+    public bool insideMirrorTrigger = false; //for the light mirrors game object 
+    private int activeMirrorCoroutines = 0;  
 
+    public void IncrementActiveMirrorCoroutines()
+    {
+        activeMirrorCoroutines++;
+    }
+
+    public void DecrementActiveMirrorCoroutines()
+    {
+        activeMirrorCoroutines--;
+    }
+
+    public int GetActiveMirrorCoroutinesCount()
+    {
+        return activeMirrorCoroutines;
+    }  
     private float walkTimer = 0f;
     private float maxWalkTimer = 1f;
+
 
     private void Move()
     {
@@ -1188,65 +1205,100 @@ private void OnTriggerExit2D(Collider2D _other)
 
 
     void Hit(Transform _attackTransform, Vector2 _attackArea, ref bool _recoilBool, Vector2 _recoilDir, float _recoilStrength)
+{
+    Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
+
+    if (objectsToHit.Length > 0)
     {
-        Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
-
-        if (objectsToHit.Length > 0)
-        {
-            _recoilBool = true;
-            dashed = false;
-        }
-
-        for (int i = 0; i < objectsToHit.Length; i++)
-        {
-            if (objectsToHit[i].CompareTag("Enemy"))
-            {
-                if (objectsToHit[i].GetComponent<Enemy>() != null)
-                {
-                    objectsToHit[i].GetComponent<Enemy>().EnemyGetsHit(damage, _recoilDir, _recoilStrength);
-                }
-                if (Mana < 1)
-                {
-                    Mana += manaGain;
-                }
-
-                if (Mana >= 1 || (halfMana && Mana >= 0.5))
-                {
-                    manaOrbsHandler.UpdateMana(manaGain * 3);
-                }
-            }
-            if (objectsToHit[i].CompareTag("Illusion"))
-            {
-                // Destroy the illusionary wall when hit
-                Destroy(objectsToHit[i].gameObject);
-            }
-        }
-
-        transform.position += new Vector3(_recoilDir.x * _recoilStrength * Time.deltaTime, _recoilDir.y * _recoilStrength * Time.deltaTime, 0f);
+        _recoilBool = true;
+        dashed = false;
     }
 
-    
-
-    void ShadowHit(Transform _attackTransform, Vector2 _attackArea, ref bool _recoilBool, Vector2 _recoilDir, float _recoilStrength)
+    for (int i = 0; i < objectsToHit.Length; i++)
     {
-        Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
-
-        if (objectsToHit.Length > 0)
-        {
-            _recoilBool = true;
-            dashed = false;
-        }
-        for (int i = 0; i < objectsToHit.Length; i++)
+        if (objectsToHit[i].CompareTag("Enemy"))
         {
             if (objectsToHit[i].GetComponent<Enemy>() != null)
             {
                 objectsToHit[i].GetComponent<Enemy>().EnemyGetsHit(damage, _recoilDir, _recoilStrength);
             }
+            if (Mana < 1)
+            {
+                Mana += manaGain;
+            }
+
+            if (Mana >= 1 || (halfMana && Mana >= 0.5))
+            {
+                manaOrbsHandler.UpdateMana(manaGain * 3);
+            }
         }
-
-        transform.position += new Vector3(_recoilDir.x * _recoilStrength * Time.deltaTime, _recoilDir.y * _recoilStrength * Time.deltaTime, 0f);
-
+        if (objectsToHit[i].CompareTag("Illusion"))
+        {
+            // Destroy the illusionary wall when hit
+            Destroy(objectsToHit[i].gameObject);
+        }
+        if (objectsToHit[i].CompareTag("Switch"))
+        {
+            // Call the SwitchGetsHit method
+            Switch switchComponent = objectsToHit[i].GetComponent<Switch>();
+            if (switchComponent != null)
+            {
+                switchComponent.SwitchGetsHit();
+            }
+        }
     }
+
+    transform.position += new Vector3(_recoilDir.x * _recoilStrength * Time.deltaTime, _recoilDir.y * _recoilStrength * Time.deltaTime, 0f);
+}
+
+void ShadowHit(Transform _attackTransform, Vector2 _attackArea, ref bool _recoilBool, Vector2 _recoilDir, float _recoilStrength)
+{
+    Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer);
+
+    if (objectsToHit.Length > 0)
+    {
+        _recoilBool = true;
+        dashed = false;
+    }
+
+    for (int i = 0; i < objectsToHit.Length; i++)
+    {
+        if (objectsToHit[i].GetComponent<Enemy>() != null)
+        {
+            objectsToHit[i].GetComponent<Enemy>().EnemyGetsHit(damage, _recoilDir, _recoilStrength);
+        }
+        if (objectsToHit[i].CompareTag("Switch"))
+        {
+            // Trigger the door opening
+            Door door = objectsToHit[i].GetComponent<Door>();
+            if (door != null)
+            {
+                door.OpenDoor();
+            }
+        }
+        if (objectsToHit[i].CompareTag("Illusion"))
+        {
+            // Destroy the illusionary wall when hit
+            Destroy(objectsToHit[i].gameObject);
+        }
+    }
+
+    transform.position += new Vector3(_recoilDir.x * _recoilStrength * Time.deltaTime, _recoilDir.y * _recoilStrength * Time.deltaTime, 0f);
+
+    // Add mana gain and mana orb update logic here
+    if (Mana < 1)
+    {
+        Mana += manaGain;
+    }
+
+    if (Mana >= 1 || (halfMana && Mana >= 0.5))
+    {
+        manaOrbsHandler.UpdateMana(manaGain * 3);
+    }
+}
+
+
+
 
     void SlashEffectAtAngle(GameObject _slashEffect, int _effectAngle, Transform _attackTransform)
     {

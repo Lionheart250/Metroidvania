@@ -33,6 +33,8 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         SaveData.Instance.Initialize();
+        SaveData.Instance.LoadEnvironmentData();
+
 
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
@@ -43,6 +45,7 @@ public class GameManager : MonoBehaviour
         transitionedFromScene = scene.name;
 
         SaveScene(scene.name);
+        SaveData.Instance.LoadEnvironmentData();
 
         if (PlayerController.Instance != null && PlayerController.Instance.halfMana)
         {

@@ -41,6 +41,7 @@ public class Bench : MonoBehaviour
             SaveData.Instance.benchPos = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y);
             SaveData.Instance.SaveBench();
             SaveData.Instance.SavePlayerData();
+            SaveData.Instance.SaveEnvironmentData();
             Debug.Log("benched");
             benchRenderer.material.color = originalColor;
 
