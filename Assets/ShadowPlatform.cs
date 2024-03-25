@@ -58,6 +58,10 @@ public class ShadowPlatform : MonoBehaviour
         {
             DisableCollider();
         }
+        if (PlayerController.Instance != null && PlayerController.Instance.pState.shadowForm)
+        {
+            EnableCollider();
+        }
     }
 }
 

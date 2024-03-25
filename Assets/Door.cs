@@ -12,6 +12,7 @@ public class Door : MonoBehaviour
 
     private void Start()
     {
+        SaveData.Instance.LoadEnvironmentData();
         //SaveData.Instance.GetDoorState(doorID);
         // Check if the door should be open based on saved state
         if (SaveData.Instance.GetDoorState(doorID))
@@ -40,6 +41,7 @@ public class Door : MonoBehaviour
             if (t >= 1.0f)
             {
                 SaveData.Instance.SetDoorState(doorID, true); // Set door state to open in save data
+                SaveData.Instance.SaveEnvironmentData();
                 doorOpen = true; // Set door state to open
                 openStartTime = Time.time; // Reset the open start time for future reference
             }
