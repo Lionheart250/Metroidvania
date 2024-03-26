@@ -465,6 +465,7 @@ public struct SaveData
     }
     #endregion
 
+    #region environment stuff
     public void SaveEnvironmentData()
     {
     using (BinaryWriter writer = new BinaryWriter(File.OpenWrite(Application.persistentDataPath + "/save.environment.data")))
@@ -479,7 +480,6 @@ public struct SaveData
         }
     }
 
-    #region environment stuff
     public void LoadEnvironmentData()
     {
     if (File.Exists(Application.persistentDataPath + "/save.environment.data"))

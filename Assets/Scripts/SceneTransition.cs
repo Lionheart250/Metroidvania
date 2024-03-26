@@ -15,35 +15,27 @@ public class SceneTransition : MonoBehaviour
 
     // Start is called before the first frame update
     private void Awake()
-{
-    // Check if GameManager.Instance is null
-    if (GameManager.Instance == null)
     {
-        Debug.LogError("GameManager.Instance is null!");
-        return; // Exit the Awake method to prevent further issues
+        if (GameManager.Instance == null)
+        {
+            Debug.LogError("GameManager.Instance is null!");
+            return; // Exit the Awake method to prevent further issues
+        }
+        if (UIManager.Instance == null)
+        {
+            Debug.LogError("UIManager.Instance is null!");
+            return; // Exit the Awake method to prevent further issues
+        }
+        if (GameManager.Instance.transitionedFromScene == transitionTo)
+        {
+            PlayerController.Instance.transform.position = startPoint.position;
+            PlayerController3D.Instance.transform.position = startPoint.position;
+
+            StartCoroutine(PlayerController.Instance.WalkIntoNewScene(exitDirection, exitTime));
+            StartCoroutine(PlayerController3D.Instance.WalkIntoNewScene(exitDirection, exitTime));
+        }
+        StartCoroutine(UIManager.Instance.sceneFader.Fade(SceneFader.FadeDirection.Out));
     }
-
-    // Check if UIManager.Instance is null
-    if (UIManager.Instance == null)
-    {
-        Debug.LogError("UIManager.Instance is null!");
-        return; // Exit the Awake method to prevent further issues
-    }
-
-    // Check the value of GameManager.Instance.transitionedFromScene
-    // Debug.Log("GameManager.Instance.transitionedFromScene: " + GameManager.Instance.transitionedFromScene);
-
-    // Rest of your Awake method
-    if (GameManager.Instance.transitionedFromScene == transitionTo)
-    {
-        PlayerController.Instance.transform.position = startPoint.position;
-        PlayerController3D.Instance.transform.position = startPoint.position;
-
-        StartCoroutine(PlayerController.Instance.WalkIntoNewScene(exitDirection, exitTime));
-        StartCoroutine(PlayerController3D.Instance.WalkIntoNewScene(exitDirection, exitTime));
-    }
-    StartCoroutine(UIManager.Instance.sceneFader.Fade(SceneFader.FadeDirection.Out));
-}
 
 
 

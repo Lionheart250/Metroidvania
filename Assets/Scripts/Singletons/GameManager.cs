@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         SaveData.Instance.Initialize();
-        SaveData.Instance.LoadEnvironmentData();
+        //SaveData.Instance.LoadEnvironmentData();
 
 
         SceneManager.sceneLoaded += OnSceneLoaded;

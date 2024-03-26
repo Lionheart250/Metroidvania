@@ -1003,11 +1003,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4282452007705929218, guid: cdf23ac5d7f4e458f8b71d3dee001c13, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1387.2001
+      value: -1402
       objectReference: {fileID: 0}
     - target: {fileID: 4282452007705929218, guid: cdf23ac5d7f4e458f8b71d3dee001c13, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 445.59998
+      value: 452.7
       objectReference: {fileID: 0}
     - target: {fileID: 4282452007705929218, guid: cdf23ac5d7f4e458f8b71d3dee001c13, type: 3}
       propertyPath: m_LocalPosition.z
@@ -4151,6 +4151,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   door: {fileID: 0}
+  gameObjectManager: {fileID: 0}
 --- !u!61 &1201831572
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -4750,6 +4751,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8393741681737554738, guid: 0691854a2ec9e4636bae787133fad0a9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2216
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4765,7 +4770,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 710593041294272555, guid: ed47fd9a8f14e40d39ab17ef2c746824, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1386.4
+      value: -1399.3
       objectReference: {fileID: 0}
     - target: {fileID: 710593041294272555, guid: ed47fd9a8f14e40d39ab17ef2c746824, type: 3}
       propertyPath: m_LocalPosition.y
@@ -7899,12 +7904,24 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 461846067771931452, guid: 240079ef6b43545a0941d758601dbc45, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 461846067771931452, guid: 240079ef6b43545a0941d758601dbc45, type: 3}
       propertyPath: pauseMenu
       value: 
       objectReference: {fileID: 104096165}
+    - target: {fileID: 461846067771931452, guid: 240079ef6b43545a0941d758601dbc45, type: 3}
+      propertyPath: transitionedFromScene
+      value: Tutorial_Room_1
+      objectReference: {fileID: 0}
     - target: {fileID: 748030824758861161, guid: 240079ef6b43545a0941d758601dbc45, type: 3}
       propertyPath: m_Name
       value: GameManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 3295296588111208480, guid: 240079ef6b43545a0941d758601dbc45, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8194182634471941518, guid: 240079ef6b43545a0941d758601dbc45, type: 3}
       propertyPath: m_LocalPosition.x
