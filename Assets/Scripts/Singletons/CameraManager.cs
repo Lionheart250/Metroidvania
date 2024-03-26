@@ -29,26 +29,51 @@ public class CameraManager : MonoBehaviour
     public static CameraManager Instance { get; private set; }
 
     private void Awake()
+{
+    if (Instance == null)
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-
-        foreach (var camera in allVirtualCameras)
-        {
-            if (camera.Follow == null)
-            {
-                Debug.LogWarning("Virtual camera '" + camera.name + "' does not have a follow target.");
-            }
-        }
-
-        // Set the initial camera to the first camera in the list
-        currentCamera = allVirtualCameras[0];
-        framingTransposer = currentCamera.GetCinemachineComponent<CinemachineFramingTransposer>();
-        normalYDamp = framingTransposer.m_YDamping;
-        _startingTrackedObjectOffset = framingTransposer.m_TrackedObjectOffset;
+        Instance = this;
     }
+
+    // Disable all virtual cameras except the first one
+    for (int i = 1; i < allVirtualCameras.Length; i++)
+    {
+        allVirtualCameras[i].enabled = false;
+    }
+
+    // Cycle through virtual cameras until the player is in view
+    int currentIndex = 0;
+    while (!IsPlayerInView(allVirtualCameras[currentIndex]))
+    {
+        allVirtualCameras[currentIndex].enabled = false;
+        currentIndex = (currentIndex + 1) % allVirtualCameras.Length;
+        allVirtualCameras[currentIndex].enabled = true;
+    }
+
+    // Set the currentCamera to the camera where the player is in view
+    currentCamera = allVirtualCameras[currentIndex];
+    framingTransposer = currentCamera.GetCinemachineComponent<CinemachineFramingTransposer>();
+    normalYDamp = framingTransposer.m_YDamping;
+    _startingTrackedObjectOffset = framingTransposer.m_TrackedObjectOffset;
+}
+
+private bool IsPlayerInView(CinemachineVirtualCamera camera)
+{
+    Collider2D cameraBounds = camera.GetComponent<BoxCollider2D>(); // Assuming the camera bounds are represented by a BoxCollider2D
+
+    if (cameraBounds != null)
+    {
+        Vector3 cameraMin = cameraBounds.bounds.min;
+        Vector3 cameraMax = cameraBounds.bounds.max;
+
+        Vector3 playerPosition = PlayerController.Instance.transform.position;
+        return playerPosition.x >= cameraMin.x && playerPosition.x <= cameraMax.x
+            && playerPosition.y >= cameraMin.y && playerPosition.y <= cameraMax.y;
+    }
+
+    return false;
+}
+
 
     private void Start()
     {

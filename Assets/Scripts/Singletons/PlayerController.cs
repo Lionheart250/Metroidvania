@@ -888,9 +888,9 @@ private void OnTriggerExit2D(Collider2D _other)
                 {   
                     anim.SetBool("ShadowForm", false);
                     walkSpeed = 50f; 
-                    airWalkSpeed = 30f;
+                    airWalkSpeed = 50f;
                     jumpForce = 115f;
-                    maxFallingSpeed = 110f;
+                    maxFallingSpeed = 250f;
                     anim.SetBool("LightForm", true);
                     shadowHook.SetActive(false);
                 }
@@ -898,9 +898,9 @@ private void OnTriggerExit2D(Collider2D _other)
                 {   
                     anim.SetBool("LightForm", false);
                     walkSpeed = 45f;
-                    airWalkSpeed = 35f;
+                    airWalkSpeed = 55f;
                     jumpForce = 115f;
-                    maxFallingSpeed = 110f;
+                    maxFallingSpeed = 250f;
                     anim.SetBool("ShadowForm", true);
                     shadowHook.SetActive(true);
                 }
@@ -2154,7 +2154,7 @@ void ShadowHit(Transform _attackTransform, Vector2 _attackArea, ref bool _recoil
             //audioSource.PlayOneShot(jumpSound);
 
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);  
-            StartCoroutine(LerpAirWalkSpeed(25, 50, 0.4f));      
+            //StartCoroutine(LerpAirWalkSpeed(25, 50, 0.4f));      
         }
 
         if (!Grounded() && airJumpCounter < maxAirJumps && ((Input.GetButtonDown("Jump") || (Gamepad.current?.crossButton.wasPressedThisFrame == true)) && unlockedVarJump && !pState.lightningBody))
