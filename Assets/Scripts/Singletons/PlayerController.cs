@@ -888,9 +888,9 @@ private void OnTriggerExit2D(Collider2D _other)
                 {   
                     anim.SetBool("ShadowForm", false);
                     walkSpeed = 50f; 
-                    airWalkSpeed = 50f;
+                    airWalkSpeed = 55f;
                     jumpForce = 115f;
-                    maxFallingSpeed = 250f;
+                    maxFallingSpeed = 180f;
                     anim.SetBool("LightForm", true);
                     shadowHook.SetActive(false);
                 }
@@ -898,9 +898,9 @@ private void OnTriggerExit2D(Collider2D _other)
                 {   
                     anim.SetBool("LightForm", false);
                     walkSpeed = 45f;
-                    airWalkSpeed = 55f;
+                    airWalkSpeed = 60f;
                     jumpForce = 115f;
-                    maxFallingSpeed = 250f;
+                    maxFallingSpeed = 180f;
                     anim.SetBool("ShadowForm", true);
                     shadowHook.SetActive(true);
                 }

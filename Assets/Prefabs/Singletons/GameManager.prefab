@@ -55,7 +55,7 @@ MonoBehaviour:
   pauseMenu: {fileID: 0}
   fadeTime: 0.25
   gameIsPaused: 0
-  transitionedFromScene: Tutorial_Room_1
+  transitionedFromScene: 
 --- !u!114 &1636583603836627377
 MonoBehaviour:
   m_ObjectHideFlags: 0
