@@ -29,7 +29,6 @@ public class MoneyTree : MonoBehaviour
             doorOpen = false;
             EnableMoneyObjects();
         }
-        
     }
 
     public void EnableMoneyObjects()
