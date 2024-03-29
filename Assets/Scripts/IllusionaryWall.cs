@@ -4,17 +4,47 @@ using UnityEngine;
 
 public class IllusionaryWall : MonoBehaviour
 {
-    // Reference to the illusionary wall object
-    public GameObject illusionaryWall;
+    public List<GameObject> objectsToManage = new List<GameObject>();
+    public string doorID;
 
-    // Function called when a collision occurs with another collider
-    void OnCollisionEnter2D(Collision2D collision)
+    private bool illusionDestroyed; // Use a private variable to track door state
+
+    private void Start()
     {
-        // Check if the colliding object is the player's attack
-        if (collision.gameObject.CompareTag("Player"))
+        SaveData.Instance.LoadEnvironmentData();
+        SaveData.Instance.GetDoorState(doorID);
+        // Check if the door should be open based on saved state
+        if (SaveData.Instance.GetDoorState(doorID))
         {
-            // Trigger the illusion effect (e.g., disable the illusionary wall)
-            illusionaryWall.SetActive(false);
+            illusionDestroyed = true;
+            DisableIllusionObjects();
         }
+        else
+        {
+            illusionDestroyed = false;
+            EnableIllusionObjects();
+        }
+    }
+
+    public void EnableIllusionObjects()
+    {
+        foreach (var obj in objectsToManage)
+        {
+            obj.SetActive(true);
+        }
+        SaveData.Instance.SetDoorState(doorID, false); // Set door state to open in save data
+        SaveData.Instance.SaveEnvironmentData();
+        illusionDestroyed = true; // Set door state to open
+    }
+
+    public void DisableIllusionObjects()
+    {
+        foreach (var obj in objectsToManage)
+        {
+            obj.SetActive(false);
+        }
+        SaveData.Instance.SetDoorState(doorID, true); // Set door state to closed in save data
+        SaveData.Instance.SaveEnvironmentData();
+        illusionDestroyed = false; // Set door state to closed
     }
 }

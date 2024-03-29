@@ -6,6 +6,9 @@ public class Switch : MonoBehaviour
 {
     public Door door;
     public GameObjectManager gameObjectManager;
+    public IllusionaryWall illusionaryWall;
+    public MoneyTree moneyTree;
+    public ManaTree manaTree;
 
     public void SwitchGetsHit()
     {
@@ -17,6 +20,24 @@ public class Switch : MonoBehaviour
         if (gameObjectManager != null)
         {
             gameObjectManager.EnableObjects();
+        }
+
+        if (illusionaryWall != null)
+        {
+            illusionaryWall.DisableIllusionObjects();
+
+        }
+
+        if (moneyTree != null)
+        {
+            moneyTree.SpawnCoins();
+
+        }
+
+        if (manaTree != null)
+        {
+            manaTree.AddMana();
+
         }
     }
 }
