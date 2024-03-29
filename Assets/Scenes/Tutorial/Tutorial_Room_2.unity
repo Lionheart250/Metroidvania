@@ -18121,9 +18121,11 @@ MonoBehaviour:
   coinPrefab: {fileID: 1778231571585097257, guid: 0887e5685b0884e6ebe6ded1a8e78e2c, type: 3}
   numberOfCoins: 3
   spawnLimit: 3
+  spawnCount: 0
   objectsToManage:
   - {fileID: 561277735}
-  doorID: MoneyTree1
+  doorID: MoneyTreeTrigger1
+  spawnCounts: MoneyTreeSpawns1
 --- !u!4 &561413286 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3922115881500503448, guid: 0e3e7892c7fa24ddd831db814ee10888, type: 3}

@@ -52,7 +52,16 @@ public struct SaveData
     public Quaternion shadeRot;
 
     //store door data
-    public Dictionary<string, bool> doorStates; // Map door IDs to their open/close states
+    private Dictionary<string, EnvironmentData> environmentData = new Dictionary<string, EnvironmentData>();
+
+    [System.Serializable]
+    public class EnvironmentData
+    {
+        public bool doorState;
+        public int moneyTreeHealth;
+    }
+
+
  
 
 
@@ -468,62 +477,61 @@ public struct SaveData
     #region environment stuff
     public void SaveEnvironmentData()
     {
-    using (BinaryWriter writer = new BinaryWriter(File.OpenWrite(Application.persistentDataPath + "/save.environment.data")))
-    {
-            writer.Write(doorStates.Count); // Write the number of doors in the dictionary
-
-            foreach (var kvp in doorStates)
-            {
-                writer.Write(kvp.Key); // Write the door ID
-                writer.Write(kvp.Value); // Write the door state
-            }
+        string savePath = Application.persistentDataPath + "/save.environment.data";
+        using (StreamWriter sw = new StreamWriter(savePath))
+        {
+            string json = JsonConvert.SerializeObject(environmentData);
+            sw.Write(json);
         }
     }
 
     public void LoadEnvironmentData()
     {
-    if (File.Exists(Application.persistentDataPath + "/save.environment.data"))
-    {
-        using (BinaryReader reader = new BinaryReader(File.OpenRead(Application.persistentDataPath + "/save.environment.data")))
+        string savePath = Application.persistentDataPath + "/save.environment.data";
+        if (File.Exists(savePath))
         {
-                int count = reader.ReadInt32(); // Read the number of doors in the dictionary
-
-                doorStates = new Dictionary<string, bool>();
-
-                for (int i = 0; i < count; i++)
-                {
-                    string doorID = reader.ReadString(); // Read the door ID
-                    bool isOpen = reader.ReadBoolean(); // Read the door state
-
-                    doorStates.Add(doorID, isOpen); // Add the door ID and state to the dictionary
-                }
+            using (StreamReader sr = new StreamReader(savePath))
+            {
+                string json = sr.ReadToEnd();
+                environmentData = JsonConvert.DeserializeObject<Dictionary<string, EnvironmentData>>(json);
             }
-        }
-        else
-        {
-            // Handle if the file doesn't exist
         }
     }
 
-    public void SetDoorState(string doorID, bool isOpen)
+    public void SetDoorState(string doorID, bool state)
     {
-        if (doorStates.ContainsKey(doorID))
+        if (!environmentData.ContainsKey(doorID))
         {
-            doorStates[doorID] = isOpen;
+            environmentData[doorID] = new EnvironmentData();
         }
-        else
-        {
-            doorStates.Add(doorID, isOpen);
-        }
+        environmentData[doorID].doorState = state;
     }
 
     public bool GetDoorState(string doorID)
     {
-        if (doorStates.ContainsKey(doorID))
+        if (environmentData.ContainsKey(doorID))
         {
-            return doorStates[doorID];
+            return environmentData[doorID].doorState;
         }
-        return false; // Return false if the door ID is not found
+        return false;
+    }
+
+    public void SetMoneyTreeHealth(string doorID, int health)
+    {
+        if (!environmentData.ContainsKey(doorID))
+        {
+            environmentData[doorID] = new EnvironmentData();
+        }
+        environmentData[doorID].moneyTreeHealth = health;
+    }
+
+    public int GetMoneyTreeHealth(string doorID)
+    {
+        if (environmentData.ContainsKey(doorID))
+        {
+            return environmentData[doorID].moneyTreeHealth;
+        }
+        return 100; // Default health if not found
     }
 
 

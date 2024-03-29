@@ -60,6 +60,7 @@ public class ManaTree : MonoBehaviour
         if (PlayerController.Instance.Mana < 1f)
         {
             PlayerController.Instance.Mana += manaGain;
+            SaveData.Instance.SavePlayerData();
         }
 
         if (PlayerController.Instance.Mana >= 1f || (PlayerController.Instance.halfMana && PlayerController.Instance.Mana >= 0.5f))
