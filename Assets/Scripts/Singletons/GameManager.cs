@@ -47,6 +47,12 @@ public class GameManager : MonoBehaviour
         SaveScene(scene.name);
         SaveData.Instance.LoadEnvironmentData();
 
+        // Set the player's position to the most recently saved player position
+        if (PlayerController.Instance != null)
+        {
+            PlayerController.Instance.transform.position = SaveData.Instance.playerPosition;
+        }
+
         if (PlayerController.Instance != null && PlayerController.Instance.halfMana)
         {
             SaveData.Instance.LoadShadeData();
@@ -58,6 +64,7 @@ public class GameManager : MonoBehaviour
 
         bench = FindObjectOfType<Bench>();
     }
+
 
     private void Update()
     {
@@ -86,26 +93,25 @@ public class GameManager : MonoBehaviour
     }
 
     public void RespawnPlayer()
+{
+    SaveData.Instance.LoadBench();
+    
+    // Check if the player has reached a bench and has a valid benchPos
+    if (!string.IsNullOrEmpty(SaveData.Instance.benchSceneName) && SaveData.Instance.benchPos != null)
     {
-        SaveData.Instance.LoadBench();
-        if (!string.IsNullOrEmpty(SaveData.Instance.benchSceneName))
-        {
-            SceneManager.LoadScene(SaveData.Instance.benchSceneName);
-        }
-
-        if (SaveData.Instance.benchPos != null)
-        {
-            respawnPoint = SaveData.Instance.benchPos;
-        }
-        else
-        {
-            respawnPoint = defaultRespawnPoint;
-        }
-        StartCoroutine(UIManager.Instance.DeactivateDeathScreen());
-        PlayerController.Instance.transform.position = respawnPoint;
-
-        PlayerController.Instance.Respawned();
+        respawnPoint = SaveData.Instance.benchPos;
     }
+    else
+    {
+        respawnPoint = platformingRespawnPoint; // Use platformingRespawnPoint as the default respawn point
+    }
+
+    StartCoroutine(UIManager.Instance.DeactivateDeathScreen());
+    PlayerController.Instance.transform.position = respawnPoint;
+
+    PlayerController.Instance.Respawned();
+}
+
 
     public void FreezeTime()
     {
