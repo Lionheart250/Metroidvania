@@ -11,6 +11,7 @@ public class Coin : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             CurrencyManager.Instance.AddCurrency(coinValue);
+            SaveData.Instance.SavePlayerData();
             Destroy(gameObject); // Destroy the coin after collecting
         }
     }

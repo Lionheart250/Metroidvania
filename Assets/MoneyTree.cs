@@ -7,28 +7,13 @@ public class MoneyTree : MonoBehaviour
     public GameObject coinPrefab;
     public int numberOfCoins = 1;
     public int spawnLimit = 3; // Number of times to spawn coins before destroying the MoneyTree
-    private int spawnCount = 0; // Counter for the number of times coins have been spawned
+    public int spawnCount = 0; // Counter for the number of times coins have been spawned
     public List<GameObject> objectsToManage = new List<GameObject>();
 
-    public string doorID;
-
-    private bool doorOpen; // Use a private variable to track door state
-
+    public string SpawnID;
     private void Start()
     {
-        SaveData.Instance.LoadEnvironmentData();
-        SaveData.Instance.GetDoorState(doorID);
-        // Check if the door should be open based on saved state
-        if (SaveData.Instance.GetDoorState(doorID))
-        {
-            doorOpen = true;
-            DisableMoneyObjects();
-        }
-        else
-        {
-            doorOpen = false;
-            EnableMoneyObjects();
-        }
+        LoadState();
     }
 
     public void EnableMoneyObjects()
@@ -37,9 +22,7 @@ public class MoneyTree : MonoBehaviour
         {
             obj.SetActive(true);
         }
-        SaveData.Instance.SetDoorState(doorID, false); // Set door state to closed in save data
-        SaveData.Instance.SaveEnvironmentData();
-        doorOpen = true; // Set door state to open
+        SaveState();
     }
 
     public void DisableMoneyObjects()
@@ -48,9 +31,7 @@ public class MoneyTree : MonoBehaviour
         {
             obj.SetActive(false);
         }
-        SaveData.Instance.SetDoorState(doorID, true); // Set door state to open in save data
-        SaveData.Instance.SaveEnvironmentData();
-        doorOpen = false; // Set door state to closed
+        SaveState();
     }
 
     public void SpawnCoins()
@@ -75,11 +56,32 @@ public class MoneyTree : MonoBehaviour
 
         spawnCount++;
 
+        SaveState(); // Save the spawn count after spawning coins
+
         if (spawnCount >= spawnLimit)
         {
-            Destroy(gameObject);
-            doorOpen = true;
             DisableMoneyObjects();
+        }
+    }
+
+    // Save and load the state of the money tree
+    private void SaveState()
+    {
+        SaveData.Instance.SaveSpawnCount(SpawnID, spawnCount);
+        SaveData.Instance.SaveEnvironmentData();
+    }
+
+    private void LoadState()
+    {
+        SaveData.Instance.LoadEnvironmentData();
+        spawnCount = SaveData.Instance.GetSpawnCount(SpawnID);
+        if (spawnCount >= spawnLimit)
+        {
+            DisableMoneyObjects();
+        }
+        else
+        {
+            EnableMoneyObjects();
         }
     }
 }

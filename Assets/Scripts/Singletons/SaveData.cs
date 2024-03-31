@@ -53,6 +53,8 @@ public struct SaveData
 
     //store door data
     public Dictionary<string, bool> doorStates; // Map door IDs to their open/close states
+    public Dictionary<string, int> spawnCounts;
+
  
 
 
@@ -86,6 +88,12 @@ public struct SaveData
         {
             doorStates = new Dictionary<string, bool>();
         }
+
+        if (spawnCounts == null)
+        {
+            spawnCounts = new Dictionary<string, int>();
+        }
+
     }
     #region Bench Stuff
     public void SaveBench()
@@ -468,34 +476,50 @@ public struct SaveData
     #region environment stuff
     public void SaveEnvironmentData()
     {
-    using (BinaryWriter writer = new BinaryWriter(File.OpenWrite(Application.persistentDataPath + "/save.environment.data")))
-    {
-            writer.Write(doorStates.Count); // Write the number of doors in the dictionary
-
+        using (BinaryWriter writer = new BinaryWriter(File.OpenWrite(Application.persistentDataPath + "/save.environment.data")))
+        {
+            // Save doorStates
+            writer.Write(doorStates.Count);
             foreach (var kvp in doorStates)
             {
-                writer.Write(kvp.Key); // Write the door ID
-                writer.Write(kvp.Value); // Write the door state
+                writer.Write(kvp.Key);
+                writer.Write(kvp.Value);
+            }
+
+            // Save spawnCounts
+            writer.Write(spawnCounts.Count);
+            foreach (var kvp in spawnCounts)
+            {
+                writer.Write(kvp.Key);
+                writer.Write(kvp.Value);
             }
         }
     }
 
     public void LoadEnvironmentData()
     {
-    if (File.Exists(Application.persistentDataPath + "/save.environment.data"))
-    {
-        using (BinaryReader reader = new BinaryReader(File.OpenRead(Application.persistentDataPath + "/save.environment.data")))
+        if (File.Exists(Application.persistentDataPath + "/save.environment.data"))
         {
-                int count = reader.ReadInt32(); // Read the number of doors in the dictionary
-
+            using (BinaryReader reader = new BinaryReader(File.OpenRead(Application.persistentDataPath + "/save.environment.data")))
+            {
+                // Load doorStates
+                int doorStatesCount = reader.ReadInt32();
                 doorStates = new Dictionary<string, bool>();
-
-                for (int i = 0; i < count; i++)
+                for (int i = 0; i < doorStatesCount; i++)
                 {
-                    string doorID = reader.ReadString(); // Read the door ID
-                    bool isOpen = reader.ReadBoolean(); // Read the door state
+                    string doorID = reader.ReadString();
+                    bool isOpen = reader.ReadBoolean();
+                    doorStates.Add(doorID, isOpen);
+                }
 
-                    doorStates.Add(doorID, isOpen); // Add the door ID and state to the dictionary
+                // Load spawnCounts
+                int spawnCountsCount = reader.ReadInt32();
+                spawnCounts = new Dictionary<string, int>();
+                for (int i = 0; i < spawnCountsCount; i++)
+                {
+                    string spawnID = reader.ReadString();
+                    int spawnCount = reader.ReadInt32();
+                    spawnCounts.Add(spawnID, spawnCount);
                 }
             }
         }
@@ -504,7 +528,6 @@ public struct SaveData
             // Handle if the file doesn't exist
         }
     }
-
     public void SetDoorState(string doorID, bool isOpen)
     {
         if (doorStates.ContainsKey(doorID))
@@ -526,11 +549,34 @@ public struct SaveData
         return false; // Return false if the door ID is not found
     }
 
+    public void SaveSpawnCount(string spawnID, int spawnCount)
+    {
+        if (spawnCounts.ContainsKey(spawnID))
+        {
+            spawnCounts[spawnID] = spawnCount;
+        }
+        else
+        {
+            spawnCounts.Add(spawnID, spawnCount);
+        }
+    }
+
+    public int GetSpawnCount(string spawnID)
+    {
+        if (spawnCounts.ContainsKey(spawnID))
+        {
+            return spawnCounts[spawnID];
+        }
+        return 0;
+    }
+
+
 
     #endregion
     public void ClearSavedData()
     {
         doorStates = new Dictionary<string, bool>();
+        spawnCounts = new Dictionary<string, int>();
         // Delete the save files if they exist
         if (File.Exists(Application.persistentDataPath + "/save.bench.data"))
         {

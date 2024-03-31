@@ -7,7 +7,6 @@ public class IllusionaryWall : MonoBehaviour
     public List<GameObject> objectsToManage = new List<GameObject>();
     public string doorID;
 
-    private bool illusionDestroyed; // Use a private variable to track door state
 
     private void Start()
     {
@@ -16,12 +15,10 @@ public class IllusionaryWall : MonoBehaviour
         // Check if the door should be open based on saved state
         if (SaveData.Instance.GetDoorState(doorID))
         {
-            illusionDestroyed = true;
             DisableIllusionObjects();
         }
         else
         {
-            illusionDestroyed = false;
             EnableIllusionObjects();
         }
     }
@@ -34,7 +31,6 @@ public class IllusionaryWall : MonoBehaviour
         }
         SaveData.Instance.SetDoorState(doorID, false); // Set door state to open in save data
         SaveData.Instance.SaveEnvironmentData();
-        illusionDestroyed = true; // Set door state to open
     }
 
     public void DisableIllusionObjects()
@@ -45,6 +41,5 @@ public class IllusionaryWall : MonoBehaviour
         }
         SaveData.Instance.SetDoorState(doorID, true); // Set door state to closed in save data
         SaveData.Instance.SaveEnvironmentData();
-        illusionDestroyed = false; // Set door state to closed
     }
 }

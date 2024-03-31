@@ -6,8 +6,6 @@ public class GameObjectManager : MonoBehaviour
     public List<GameObject> objectsToManage = new List<GameObject>();
     public string doorID;
 
-    private bool objectManagerTriggered; // Use a private variable to track door state
-
     private void Start()
     {
         SaveData.Instance.LoadEnvironmentData();
@@ -15,12 +13,10 @@ public class GameObjectManager : MonoBehaviour
         // Check if the door should be open based on saved state
         if (SaveData.Instance.GetDoorState(doorID))
         {
-            objectManagerTriggered = true;
             EnableObjects();
         }
         else
         {
-            objectManagerTriggered = false;
             DisableObjects();
         }
     }
@@ -33,7 +29,6 @@ public class GameObjectManager : MonoBehaviour
         }
         SaveData.Instance.SetDoorState(doorID, true); // Set door state to open in save data
         SaveData.Instance.SaveEnvironmentData();
-        objectManagerTriggered = true; // Set door state to open
     }
 
     public void DisableObjects()
@@ -44,6 +39,5 @@ public class GameObjectManager : MonoBehaviour
         }
         SaveData.Instance.SetDoorState(doorID, false); // Set door state to closed in save data
         SaveData.Instance.SaveEnvironmentData();
-        objectManagerTriggered = false; // Set door state to closed
     }
 }

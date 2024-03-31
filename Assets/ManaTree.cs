@@ -5,32 +5,18 @@ using UnityEngine;
 public class ManaTree : MonoBehaviour
 {
     public float manaGain = 0.1f; // Amount of mana to gain
-    public int spawnLimit = 3; // Number of times to add mana before destroying the ManaTree
-    private int spawnCount = 0; // Counter for the number of times mana has been added
+    public int spawnLimit = 3; // Number of times to spawn coins before destroying the MoneyTree
+    public int spawnCount = 0; // Counter for the number of times coins have been spawned
     public List<GameObject> objectsToManage = new List<GameObject>();
-    public string doorID;
 
-    private bool doorOpen; // Use a private variable to track door state
-
+    public string SpawnID;
     private ManaOrbsHandler orbsHandler; // Reference to ManaOrbsHandler
 
     private void Start()
     {
         orbsHandler = FindObjectOfType<ManaOrbsHandler>(); // Find the ManaOrbsHandler in the scene
-
-        SaveData.Instance.LoadEnvironmentData();
-        SaveData.Instance.GetDoorState(doorID);
-        // Check if the door should be open based on saved state
-        if (SaveData.Instance.GetDoorState(doorID))
-        {
-            doorOpen = true;
-            DisableManaObjects();
-        }
-        else
-        {
-            doorOpen = false;
-            EnableManaObjects();
-        }
+        LoadState();
+        
     }
 
     public void EnableManaObjects()
@@ -39,9 +25,7 @@ public class ManaTree : MonoBehaviour
         {
             obj.SetActive(true);
         }
-        SaveData.Instance.SetDoorState(doorID, false); // Set door state to open in save data
-        SaveData.Instance.SaveEnvironmentData();
-        doorOpen = true; // Set door state to open
+        SaveState();
     }
 
     public void DisableManaObjects()
@@ -50,9 +34,7 @@ public class ManaTree : MonoBehaviour
         {
             obj.SetActive(false);
         }
-        SaveData.Instance.SetDoorState(doorID, true); // Set door state to closed in save data
-        SaveData.Instance.SaveEnvironmentData();
-        doorOpen = false; // Set door state to closed
+        SaveState();
     }
 
     public void AddMana()
@@ -76,11 +58,32 @@ public class ManaTree : MonoBehaviour
 
         spawnCount++;
 
+        SaveState();
+
         if (spawnCount >= spawnLimit)
         {
-            Destroy(gameObject);
-            doorOpen = true;
+
             DisableManaObjects();
+        }
+    }
+
+    private void SaveState()
+    {
+        SaveData.Instance.SaveSpawnCount(SpawnID, spawnCount);
+        SaveData.Instance.SaveEnvironmentData();
+    }
+
+    private void LoadState()
+    {
+        SaveData.Instance.LoadEnvironmentData();
+        spawnCount = SaveData.Instance.GetSpawnCount(SpawnID);
+        if (spawnCount >= spawnLimit)
+        {
+            DisableManaObjects();
+        }
+        else
+        {
+            EnableManaObjects();
         }
     }
 }
