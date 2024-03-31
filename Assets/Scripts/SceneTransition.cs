@@ -5,7 +5,14 @@ using UnityEngine.SceneManagement;
 
 public class SceneTransition : MonoBehaviour
 {
+    public static SceneTransition Instance { get; private set; }
+
     [SerializeField] private string transitionTo;
+    public string TransitionTo
+    {
+        get { return transitionTo; }
+    }
+
 
     [SerializeField] private Transform startPoint;
 

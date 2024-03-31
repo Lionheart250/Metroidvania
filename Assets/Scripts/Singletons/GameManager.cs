@@ -48,7 +48,7 @@ public class GameManager : MonoBehaviour
         SaveData.Instance.LoadEnvironmentData();
 
         // Set the player's position to the most recently saved player position
-        if (PlayerController.Instance != null)
+        if (PlayerController.Instance != null && GameManager.Instance.transitionedFromScene != SceneTransition.Instance.TransitionTo)
         {
             PlayerController.Instance.transform.position = SaveData.Instance.playerPosition;
         }

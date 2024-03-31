@@ -397,7 +397,7 @@ Transform:
   m_GameObject: {fileID: 3146015249766397942}
   serializedVersion: 2
   m_LocalRotation: {x: 0.38268343, y: -0, z: -0, w: 0.92387956}
-  m_LocalPosition: {x: -2196, y: 408.9, z: 409.9}
+  m_LocalPosition: {x: -2196, y: 271.7, z: 272.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1942,11 +1942,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3052548925173610729, guid: a969bad3b84484af783f7c43f5e43186, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2216
+      value: -2182.1
       objectReference: {fileID: 0}
     - target: {fileID: 3052548925173610729, guid: a969bad3b84484af783f7c43f5e43186, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 572.1
+      value: 490.6
       objectReference: {fileID: 0}
     - target: {fileID: 3052548925173610729, guid: a969bad3b84484af783f7c43f5e43186, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1984,6 +1984,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 5264815839557227787, guid: a969bad3b84484af783f7c43f5e43186, type: 3}
+      propertyPath: m_GravityScale
+      value: 25
+      objectReference: {fileID: 0}
     - target: {fileID: 5364675538309831872, guid: a969bad3b84484af783f7c43f5e43186, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.5
@@ -1993,12 +1997,24 @@ PrefabInstance:
       value: 5.21
       objectReference: {fileID: 0}
     - target: {fileID: 6356057791472256871, guid: a969bad3b84484af783f7c43f5e43186, type: 3}
+      propertyPath: mana
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6356057791472256871, guid: a969bad3b84484af783f7c43f5e43186, type: 3}
       propertyPath: manaGain
       value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 6356057791472256871, guid: a969bad3b84484af783f7c43f5e43186, type: 3}
+      propertyPath: jumpForce
+      value: 125
+      objectReference: {fileID: 0}
+    - target: {fileID: 6356057791472256871, guid: a969bad3b84484af783f7c43f5e43186, type: 3}
       propertyPath: walkSpeed
-      value: 50
+      value: 55
+      objectReference: {fileID: 0}
+    - target: {fileID: 6356057791472256871, guid: a969bad3b84484af783f7c43f5e43186, type: 3}
+      propertyPath: airWalkSpeed
+      value: 55
       objectReference: {fileID: 0}
     - target: {fileID: 6356057791472256871, guid: a969bad3b84484af783f7c43f5e43186, type: 3}
       propertyPath: UpAttackArea.y
@@ -2006,7 +2022,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6356057791472256871, guid: a969bad3b84484af783f7c43f5e43186, type: 3}
       propertyPath: maxFallingSpeed
-      value: 180
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 6356057791472256871, guid: a969bad3b84484af783f7c43f5e43186, type: 3}
       propertyPath: DownAttackArea.y
@@ -2026,7 +2042,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6356057791472256871, guid: a969bad3b84484af783f7c43f5e43186, type: 3}
       propertyPath: fallGravityMultiplier
-      value: 6
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 6356057791472256871, guid: a969bad3b84484af783f7c43f5e43186, type: 3}
       propertyPath: ShadowDownAttackArea.x
