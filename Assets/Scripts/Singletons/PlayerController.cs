@@ -606,8 +606,8 @@ private void OnTriggerExit2D(Collider2D _other)
 
                     if (walkTimer >= 0.24f)
                     {
-                        anim.SetBool("Running", false);
-                        anim.SetBool("Walking", true);
+                        anim.SetBool("Running", true);
+                        anim.SetBool("Walking", false);
                     }
                     else
                     {
@@ -1195,6 +1195,15 @@ private void OnTriggerExit2D(Collider2D _other)
                                         
                 }
             }
+            if (objectsToHit[i].CompareTag("Switch"))
+            {
+                // Call the SwitchGetsHit method
+                Switch switchComponent = objectsToHit[i].GetComponent<Switch>();
+                if (switchComponent != null)
+                {
+                    switchComponent.SwitchGetsHit();
+                }
+            }
         }
     
         Instantiate(chargeSlashEffect, ChargeAttackTransform);
@@ -1258,19 +1267,22 @@ private void OnTriggerExit2D(Collider2D _other)
 
         for (int i = 0; i < objectsToHit.Length; i++)
         {
-            if (objectsToHit[i].GetComponent<Enemy>() != null)
+            if (objectsToHit[i].CompareTag("Enemy"))
             {
-                objectsToHit[i].GetComponent<Enemy>().EnemyGetsHit(damage, _recoilDir, _recoilStrength);
-            }
-            // Add mana gain and mana orb update logic here
-            if (Mana < 1)
-            {
-                Mana += manaGain;
-            }
+                if (objectsToHit[i].GetComponent<Enemy>() != null)
+                {
+                    objectsToHit[i].GetComponent<Enemy>().EnemyGetsHit(damage, _recoilDir, _recoilStrength);
+                }
+                // Add mana gain and mana orb update logic here
+                if (Mana < 1)
+                {
+                    Mana += manaGain;
+                }
 
-            if (Mana >= 1 || (halfMana && Mana >= 0.5))
-            {
-                manaOrbsHandler.UpdateMana(manaGain * 3);
+                if (Mana >= 1 || (halfMana && Mana >= 0.5))
+                {
+                    manaOrbsHandler.UpdateMana(manaGain * 3);
+                }
             }
             if (objectsToHit[i].CompareTag("Switch"))
             {
